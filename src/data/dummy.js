@@ -533,6 +533,10 @@ export const links = [
         name: 'customers',
         icon: <RiContactsLine />,
       },
+      {
+        name: 'modal',
+        icon: <RiContactsLine />,
+      },
     ],
   },
   {

@@ -16,6 +16,8 @@ export const ContextProvider = ({ children }) => {
     const [currentColor, setCurrentColor] = useState('#03C9D7')
     const [currentMode, setCurrentMode] = useState('Light')
     const [themeSettings, setThemeSettings] = useState(false)
+    const [isLogin, setIsLogin] = useState(false);
+    const [token, setToken] = useState(localStorage.getItem("token"));
 
     const setMode = (e) => {
         setCurrentMode(e.target.value);
@@ -29,6 +31,15 @@ export const ContextProvider = ({ children }) => {
     }
     const handleClicked = (clicked) => { setIsClicked({ ...initialState, [clicked]: true }) };
 
+    const handleLogin = () => {
+        setIsLogin(true);
+    }
+
+    const handleSetToken = (token) => {
+        setToken(token);
+        localStorage.setItem('token', token);
+    };
+
     return (
         <StateContext.Provider value={{
             activeMenu,
@@ -40,7 +51,9 @@ export const ContextProvider = ({ children }) => {
             currentColor, currentMode,
             themeSettings, setThemeSettings,
             setMode,
-            setColor
+            setColor,
+            handleLogin, isLogin,
+            handleSetToken, token,
         }}>
             {children}
         </StateContext.Provider>
