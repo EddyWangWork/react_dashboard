@@ -2,6 +2,7 @@ export { default as Ecommerce } from './Ecommerce';
 export { default as Kanban } from './Kanban';
 export { default as Orders } from './Orders';
 export { default as Employees } from './Employees';
+export { default as Todolists } from './Todolists';
 export { default as Editor } from './Editor';
 export { default as Customers } from './Customers';
 export { default as ColorPicker } from './ColorPicker';
@@ -14,7 +15,9 @@ export { default as Line } from './Charts/Line';
 export { default as Pie } from './Charts/Pie';
 export { default as Pyramid } from './Charts/Pyramid';
 export { default as Stacked } from './Charts/Stacked';
-export { default as Modal } from './ModalTest';
+export { default as ModalTest } from './ModalTest';
+export { default as DialogTodolists } from './DialogTodolists';
 export { default as Login } from './Login';
 export { default as Dashboard } from './Dashboard';
+
 

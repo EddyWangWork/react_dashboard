@@ -36,8 +36,13 @@ export const ContextProvider = ({ children }) => {
     }
 
     const handleSetToken = (token) => {
-        setToken(token);
-        localStorage.setItem('token', token);
+        localStorage.setItem('token', `Bearer ${token}`);
+        setToken(localStorage.getItem("token"));
+    };
+
+    const handleClearToken = () => {
+        localStorage.setItem('token', '');
+        setToken('');
     };
 
     return (
@@ -54,6 +59,7 @@ export const ContextProvider = ({ children }) => {
             setColor,
             handleLogin, isLogin,
             handleSetToken, token,
+            handleClearToken
         }}>
             {children}
         </StateContext.Provider>
