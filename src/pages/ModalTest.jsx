@@ -5,125 +5,92 @@ import { DialogComponent } from '@syncfusion/ej2-react-popups';
 import { TextBoxComponent } from '@syncfusion/ej2-react-inputs';
 import { DropDownListComponent } from '@syncfusion/ej2-react-dropdowns';
 import { useStateContext } from '../contexts/ContextProvider';
+import { CheckBoxComponent } from '@syncfusion/ej2-react-buttons';
 
-const ModalTest = ({ props }) => {
-    const { handleClearToken, isLogin, token, handleLogin } = useStateContext();
-    const [itemName, setItemName] = useState(props.name);
-    const [description, setDescription] = useState('');
-    const [typeId, setTypeId] = useState('');
+const ModalTest = ({ }) => {
 
-    const handleItemNameTextChange = (e) => {
-        setItemName(e.target.value);
-    }
-    const handleDescriptionTextChange = (e) => {
-        setDescription(e.target.value);
-    }
-    const handleTypeIdTextChange = (e) => {
-        setTypeId(e.target.value);
-    }
-    const navigate = useNavigate();
-    const getTodolistsCategory = () => {
-        axios
-            .get(`http://localhost:5000/api/todolists/getTodolistsCategory`, {
-                headers: {
-                    'Authorization': token,
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then((response) => {
-                console.log(response.data)
-            })
-            .catch((err) => {
-                console.log(err);
-                console.log(err.response.status);
-                if (err.response.status == 401) {
-                    handleClearToken();
-                    navigate('/login', { replace: true });
-                }
-            });
-    }
-
-    let buttons = [{
-        buttonModel: {
-            content: 'OK',
-            cssClass: 'e-flat',
-            isPrimary: true,
+    let dialogInstance;
+    let checkboxObj;
+    let animationSettings;
+    let buttons;
+    let buttonEle;
+    const [display, setDisplay] = useState('none');
+    const [status, setStatus] = useState({ hideDialog: false });
+    let buttonRef = (element) => {
+        buttonEle = element;
+    };
+    animationSettings = { effect: 'None' };
+    buttons = [
+        {
+            // Click the footer buttons to hide the Dialog
+            click: () => {
+                setStatus({ hideDialog: false });
+            },
+            // Accessing button component properties by buttonModel property
+            buttonModel: {
+                //Enables the primary button
+                isPrimary: true,
+                content: 'OK',
+            },
         },
-        'click': () => {
-            console.log(`${itemName} ${description} ${typeId}`);
-        }
-    },
-    {
-        buttonModel: {
-            content: 'Cancel',
-            cssClass: 'e-flat'
-        },
-        'click': () => {
-            console.log('aaa');
-        }
-    }];
-
-    // const sportsData = [
-    //     { Id: 'game1', Game: 'Badminton' },
-    //     { Id: 'game2', Game: 'Football' },
-    //     { Id: 'game3', Game: 'Tennis' }
-    // ];
-    // const fields = { text: 'Game', value: 'Id' };
-
-    const sportsData = [
-        { Id: 'game1', Game: 'Badminton' },
-        { Id: 'game2', Game: 'Football' },
-        { Id: 'game3', Game: 'Tennis' }
     ];
-    const fields = { text: 'Game', value: 'Id' };
+    // function to handle the CheckBox change event
+    function onChange(args) {
+        if (args.checked) {
+            dialogInstance.overlayClick = () => {
+                setStatus({ hideDialog: false });
+            };
+        }
+        else {
+            dialogInstance.overlayClick = () => {
+                setStatus({ hideDialog: true });
+            };
+        }
+    }
+    // To Open dialog
+    function buttonClick() {
+        setStatus({ hideDialog: true });
+    }
+    function dialogClose() {
+        setStatus({ hideDialog: false });
+        setDisplay('inline-block');
+    }
+    function dialogOpen() {
+        setStatus({ hideDialog: true });
+        setDisplay('none');
+    }
 
     useEffect(() => {
-        console.log(props);
-        getTodolistsCategory();
+
     }, []);
 
     return (
-        <div className="row custom-margin custom-padding-5">
-            <div className="col-xs-6 col-sm-6 col-lg-6 col-md-6">
-                <TextBoxComponent value={itemName} onChange={handleItemNameTextChange}
-                    placeholder="First Name"
-                    floatLabelType="Auto" />
-                <p>The current value is: {itemName}</p>
-            </div>
-            <div className="col-xs-6 col-sm-6 col-lg-6 col-md-6 mt-5">
-                <TextBoxComponent onChange={handleDescriptionTextChange} placeholder="Description" floatLabelType="Auto" />
-            </div>
-            <div className="col-xs-6 col-sm-6 col-lg-6 col-md-6 mt-5">
-                <DropDownListComponent id="ddlelement" onChange={handleTypeIdTextChange} dataSource={sportsData} fields={fields} placeholder="Select a game" />
+        <div className="control-pane">
+            <div className="control-section modal-dialog-target">
+                <div id="target" className="col-lg-8">
+                    <button className="e-control e-btn dlgbtn dlgbtn-position" ref={buttonRef} onClick={buttonClick} style={{ display: display }}>
+                        Open
+                    </button>
+                    {/* Rendering modal Dialog by enabling 'isModal' as true */}
+                    <DialogComponent
+                        id="modalDialog"
+                        isModal={true}
+                        buttons={buttons}
+                        header="Software Update"
+                        width="335px"
+                        content="Your current software version is up to date."
+                        ref={(dialog) => (dialogInstance = dialog)}
+                        target="#target"
+                        visible={status.hideDialog}
+                        open={dialogOpen}
+                        close={dialogClose}
+                        animationSettings={animationSettings}>
+                    </DialogComponent>
+                </div>
+                <div className="col-lg-4 property-section">
+                </div>
             </div>
         </div>
-        // <div className='m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl'>
-        //     <DialogComponent
-        //         visible={showModal}
-        //         header={'Modal Title'}
-        //         width={'800px'}
-        //         isModal={true}
-        //         showCloseIcon={true}
-        //         animationSettings={{ effect: 'Fade' }}
-        //         onClose={onHideModal}
-        //         buttons={buttons}
-        //     >
-        //         <div>
-        //             <div className="row custom-margin custom-padding-5">
-        //                 <div className="col-xs-6 col-sm-6 col-lg-6 col-md-6">
-        //                     <TextBoxComponent value={itemName} onChange={handleItemNameTextChange} placeholder="First Name" floatLabelType="Auto" />
-        //                     <p>The current value is: {itemName}</p>
-        //                 </div>
-        //                 <div className="col-xs-6 col-sm-6 col-lg-6 col-md-6 mt-5">
-        //                     <TextBoxComponent onChange={handleDescriptionTextChange} placeholder="Description" floatLabelType="Auto" />
-        //                 </div>
-        //                 <div className="col-xs-6 col-sm-6 col-lg-6 col-md-6 mt-5">
-        //                     <DropDownListComponent id="ddlelement" onChange={handleTypeIdTextChange} dataSource={sportsData} fields={fields} placeholder="Select a game" />
-        //                 </div>
-        //             </div>
-        //         </div>
-        //     </DialogComponent>
-        // </div>
     );
 };
 

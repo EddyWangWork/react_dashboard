@@ -16,6 +16,7 @@ export { default as Pie } from './Charts/Pie';
 export { default as Pyramid } from './Charts/Pyramid';
 export { default as Stacked } from './Charts/Stacked';
 export { default as ModalTest } from './ModalTest';
+export { default as ModalTodolist } from './ModalTodolist';
 export { default as DialogTodolists } from './DialogTodolists';
 export { default as Login } from './Login';
 export { default as Dashboard } from './Dashboard';
