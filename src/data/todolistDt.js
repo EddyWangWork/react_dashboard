@@ -1,24 +1,10 @@
+import axios from 'axios';
 import { ModalTodolist } from '../pages';
-
-const popupDone = () => {
-
-}
+import { format } from 'date-fns'
 
 const customerGridImage = (props) => (
     <div>
         <div>
-            {/* <button
-                type='button'
-                // onClick={customFunc}
-                // style={{ color }}
-                className='relative text-xl rounded-full p-3 hover:bg-light-gray'
-            >
-                <span
-                    // style={{ background: dotColor }}
-                    className='absolute inline-flex rounded-full h-2 w-2 right-2 top-2'
-                />
-                DONE
-            </button> */}
             <ModalTodolist props={props} />
         </div>
     </div>
@@ -34,7 +20,7 @@ export const todolistsGrid = [
     },
     {
         field: 'id',
-        hidden: true
+        visible: false
     },
     {
         field: 'name',
@@ -64,29 +50,36 @@ export const todolistsGrid = [
 
 export const todolistsDoneGrid = [
     {
-        field: 'id'
+        field: 'id',
+        visible: false
     },
     {
-        field: 'name',
+        field: 'todolistName',
         headerText: 'Name',
         width: '120',
         textAlign: 'Center'
     },
     {
-        field: 'description',
+        field: 'todolistDescription',
         headerText: 'Description',
         width: '120',
         textAlign: 'Center'
     },
     {
-        field: 'updateDate',
-        headerText: 'Date',
+        field: 'todolistCategory',
+        headerText: 'Category',
         width: '120',
         textAlign: 'Center'
     },
     {
-        field: 'category',
-        headerText: 'Category',
+        field: 'updateDate',
+        headerText: 'UpdateDate',
+        width: '120',
+        textAlign: 'Center'
+    },
+    {
+        field: 'remark',
+        headerText: 'Remark',
         width: '120',
         textAlign: 'Center'
     }

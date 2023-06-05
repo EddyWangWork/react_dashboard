@@ -5,8 +5,8 @@ import { format, parseISO } from 'date-fns'
 import axios from 'axios';
 import { TabComponent, TabItemDirective, TabItemsDirective } from '@syncfusion/ej2-react-navigations';
 import { DialogComponent } from '@syncfusion/ej2-react-popups';
-import { todolistsGrid } from '../data/todolistDt';
-import { DialogTodolists } from '../pages'
+import { todolistsGrid, todolistsDoneGrid } from '../data/todolistDt';
+import { DialogTodolists, DialogTodolistsDone } from '../pages'
 import { Header } from '../components';
 
 import { useStateContext } from '../contexts/ContextProvider';
@@ -16,11 +16,10 @@ const Todolists = () => {
     const { handleClearToken, isLogin, token, handleLogin } = useStateContext();
 
     const [tdlData, setTdlData] = useState([]);
+    const [tdlDoneData, setTdlDoneData] = useState([]);
     const [trigger, setTrigger] = useState(0);
 
     const navigate = useNavigate();
-
-    let grid;
 
     const getTodolistsCategory = () => {
         axios
@@ -75,16 +74,36 @@ const Todolists = () => {
             });
     }
 
+    const getTodolistsDone = () => {
+        axios
+            .get(`http://localhost:5000/api/todolistsDone/getTodolistsDoneAll`, {
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then((response) => {
+                console.log(response.data)
+                response.data.map((data, index) => {
+                    var date = new Date(data.updateDate);
+                    data.updateDate = format(date, 'dd/MM/yyyy');
+                });
+                setTdlDoneData(response.data);
+                gridtdlDone.dataSource = tdlDoneData;
+            })
+            .catch((err) => {
+                console.log(err);
+                console.log(err.response.status);
+                if (err.response.status == 401) {
+                    handleClearToken();
+                    navigate('/login', { replace: true });
+                }
+            });
+    }
+
     const addTrigger = (thistrigger) => {
         thistrigger++;
         setTrigger(thistrigger);
-    }
-
-    const refreshData2 = (thisGird) => {
-        getTodolistsCategory();
-        grid = thisGird
-        console.log('refreshData2: ' + grid);
-        grid.dataSource = tdlData;
     }
 
     const addTodolist = (req) => {
@@ -135,6 +154,22 @@ const Todolists = () => {
             });
     }
 
+    const editTodolistDone = (id, req) => {
+        axios.put(`http://localhost:5000/api/todolistsdone/${id}`, req, {
+            headers: {
+                'Authorization': token,
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                console.log(response);
+                refreshData();
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
     const deleteTodolist = (id) => {
         axios.delete(`http://localhost:5000/api/todolists/${id}`, {
             headers: {
@@ -151,9 +186,25 @@ const Todolists = () => {
             });
     }
 
+    const deleteTodolistDone = (id) => {
+        axios.delete(`http://localhost:5000/api/todolistsdone/${id}`, {
+            headers: {
+                'Authorization': token,
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                console.log(response);
+                refreshData();
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
     const refreshData = () => {
         getTodolistsCategory();
-        //grid.dataSource = tdlData;
+        getTodolistsDone();
     }
 
     const actionComplete = (args) => {
@@ -163,6 +214,22 @@ const Todolists = () => {
                 args.form.ej2_instances[0].addRules('tdlUpdateDate', { required: [customFn, '* Please valid Date'] });
             }
         }
+    }
+
+    const actionCompleteTdlDone = (args) => {
+        if (args.form) {
+            if ((args.requestType === 'beginEdit' || args.requestType === 'add')) {
+                args.form.ej2_instances[0].addRules('tdlRemark', { required: [true, '* Please enter your name'] });
+                args.form.ej2_instances[0].addRules('tdlDoneDate', { required: [customFn, '* Please valid Date'] });
+            }
+        }
+    }
+
+    const customFn = (args) => {
+        console.log(args.value);
+        var ff = args.value.split('/');
+        var myDate2 = Date.parse(`${ff[2]}-${ff[1]}-${ff[0]}`);
+        return myDate2 > 0
     }
 
     const actionBegin = (args) => {
@@ -202,46 +269,58 @@ const Todolists = () => {
         }
     };
 
+    const actionBeginTdlDone = (args) => {
+        if (args.requestType === 'save' && args.form) {
+            console.log(args);
+            var data = args.data
+            console.log(data);
+            var exactDate = data.tdlDoneDate
+            var ddd = new Date(exactDate).getTime();
+            if (args.action == 'edit') {
+                console.log('EDIT');
+                var req = {
+                    remark: data.tdlRemark,
+                    UnixUpdateTime: ddd
+                }
+                console.log(req);
+                editTodolistDone(data.id, req);
+            }
+        }
+        else if (args.requestType == 'delete') {
+            console.log('DELETE');
+            console.log(args.data[0].id);
+            deleteTodolistDone(args.data[0].id);
+        }
+    };
+
     useEffect(() => {
-        getTodolistsCategory();
         console.log("todolists.jsx: useEffect");
+        getTodolistsCategory();
+        getTodolistsDone();
     }, [trigger]);
 
-    //    let grid;
     const dialogTemplate = (props) => {
         let sss = { ...props }
         console.log("dialogTemplate: ", sss);
         return (<DialogTodolists props={sss} />);
     };
 
-    const customFn = (args) => {
-        console.log(args.value);
-        var ff = args.value.split('/');
-        var myDate2 = Date.parse(`${ff[2]}-${ff[1]}-${ff[0]}`);
-        return myDate2 > 0
-    }
+    const dialogTdlDoneTemplate = (props) => {
+        let sss = { ...props }
+        console.log("dialogTdlDoneTemplate: ", sss);
+        return (<DialogTodolistsDone props={sss} />);
+    };
 
+    let grid;
+    let gridtdlDone;
     const toolbarOptions = ['Add', 'Edit', 'Delete'];
     const editSettings = { allowEditing: true, allowAdding: true, allowDeleting: true, mode: 'Dialog', template: dialogTemplate };
+    const editSettingsTdlDone = { allowEditing: true, allowDeleting: true, mode: 'Dialog', template: dialogTdlDoneTemplate };
     const pageSettings = { pageCount: 5 };
 
-    return (
-        <div className='m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl'>
-            <Header category='Page' title='Todolists' />
-            <div className='m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl'>
-                <button
-                    type='button'
-                    onClick={event => { refreshData() }}
-                    // style={{ color }}
-                    className='relative text-xl rounded-full p-3 hover:bg-light-gray'
-                >
-                    <span
-                        // style={{ background: dotColor }}
-                        className='absolute inline-flex rounded-full h-2 w-2 right-2 top-2'
-                    />
-                    REFRESH
-                </button>
-            </div>
+    let headerText = [{ text: "Twitter" }, { text: "Facebook" }, { text: "WhatsApp" }];
+    const content0 = () => {
+        return <div>
             <GridComponent
                 ref={g => grid = g}
                 dataSource={tdlData}
@@ -251,7 +330,6 @@ const Todolists = () => {
                 pageSettings={pageSettings}
                 actionBegin={actionBegin}
                 actionComplete={actionComplete}
-            // toolbar={['Search']}
             >
                 <ColumnsDirective>
                     {todolistsGrid.map((item, index) => (
@@ -260,33 +338,46 @@ const Todolists = () => {
                 </ColumnsDirective>
                 <Inject services={[Page, Search, Toolbar, Edit]} />
             </GridComponent>
-            {/* <div className="control-pane">
-                <div className="control-section modal-dialog-target">
-                    <div id="target" className="col-lg-8"></div>
-                    <DialogComponent
-                        id="modalDialog"
-                        isModal={true}
-                        buttons={buttons}
-                        header="Software Update"
-                        width="335px"
-                        content="Your current software version is up to date."
-                        ref={(dialog) => (dialogInstance = dialog)}
-                        target="#target"
-                        visible={status.hideDialog}
-                        open={dialogOpen}
-                        close={dialogClose}
-                        animationSettings={animationSettings}>
-                    </DialogComponent>
-                </div>
-                <div className="col-lg-4 property-section">
-                </div>
-            </div> */}
-            {/* <TabComponent heightAdjustMode='Auto' id='defaultTab'>
+        </div>;
+    }
+    const content1 = () => {
+        return <div>
+            <GridComponent
+                ref={g => gridtdlDone = g}
+                dataSource={tdlDoneData}
+                toolbar={toolbarOptions}
+                allowPaging={true}
+                editSettings={editSettingsTdlDone}
+                pageSettings={pageSettings}
+                actionBegin={actionBeginTdlDone}
+                actionComplete={actionCompleteTdlDone}
+            >
+                <ColumnsDirective>
+                    {todolistsDoneGrid.map((item, index) => (
+                        <ColumnDirective editType='dropdownedit' key={index} {...item} />
+                    ))}
+                </ColumnsDirective>
+                <Inject services={[Page, Search, Toolbar, Edit]} />
+            </GridComponent>
+        </div>;
+    }
+    const content2 = () => {
+        return <div>
+            WhatsApp Messenger is a proprietary cross-platform instant messaging client for smartphones that operates under a subscription business model. It uses the Internet to send text messages, images, video, user location and audio media messages to other users using standard cellular mobile numbers. As of February 2016, WhatsApp had a user base of up to one billion,[10] making it the most globally popular messaging application. WhatsApp Inc., based in Mountain View, California, was acquired by Facebook Inc. on February 19, 2014, for approximately US$19.3 billion.
+        </div>;
+    }
+
+    return (
+        // <div className='m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl'>
+        <div className='m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl'>
+            <Header category='Page' title='Todolists' />
+            <TabComponent heightAdjustMode='Auto'>
                 <TabItemsDirective>
-                    <TabItemDirective header={headertext[0]} content={tabContent1} />
-                    <TabItemDirective header={headertext[1]} content={tabContent2} />
+                    <TabItemDirective header={headerText[0]} content={content0} />
+                    <TabItemDirective header={headerText[1]} content={content1} />
+                    <TabItemDirective header={headerText[2]} content={content2} />
                 </TabItemsDirective>
-            </TabComponent> */}
+            </TabComponent>
         </div >
     )
 }

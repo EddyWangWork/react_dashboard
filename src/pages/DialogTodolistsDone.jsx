@@ -10,13 +10,8 @@ import { useStateContext } from '../contexts/ContextProvider';
 
 let remarkText;
 
-const DialogTodolists = ({ props, isTodolistDone, handleClick }) => {
-    const { handleClearToken, isLogin, token, handleLogin } = useStateContext();
-
-    const [name, setName] = useState(props.name);
-    const [description, setDescription] = useState(props.description);
-    const [categoryId, setCategoryId] = useState(props.categoryId ?? 1);
-    const [updatedate, setUpdatedate] = useState(props.updateDate);
+const DialogTodolistsDone = ({ props }) => {
+    const { handleClearToken, token } = useStateContext();
 
     const [remark, setRemark] = useState();
     const [doneDate, setDonedate] = useState(new Date());
@@ -25,29 +20,11 @@ const DialogTodolists = ({ props, isTodolistDone, handleClick }) => {
     const [categoryData, setCategoryData] = useState([]);
     const fields = { text: 'name', value: 'id' };
 
-    const handleNameTextChange = (e) => {
-        setName(e.target.value);
-    }
-    const handleDescTextChange = (e) => {
-        setDescription(e.target.value);
-    }
-    const handleCatTextChange = (e) => {
-        setCategoryId(e.target.value);
-    }
-    const handleUpdateDateTextChange = (e) => {
-        setUpdatedate(e.target.value);
-    }
-
     const handleRemarkChange = (e) => {
         setRemark(e.value);
-        // setResponse({ remark, doneDate })
     }
     const handleDoneDateChange = (e) => {
-        // debugger
         setDonedate(e.value);
-        // debugger
-        // console.log(doneDate);
-        // setResponse({ remark, doneDate })
     }
 
     const navigate = useNavigate();
@@ -60,19 +37,9 @@ const DialogTodolists = ({ props, isTodolistDone, handleClick }) => {
                 }
             })
             .then((response) => {
-                //console.log(response.data)
                 setCategoryData(response.data);
-                if (isTodolistDone) {
-                    if (remarkText) {
-                        remarkText.focusIn();
-                    }
-                }
-                // if (isTodolistDone) {
-                //     remarkText.focusIn();
-                // }
             })
             .catch((err) => {
-                // debugger
                 console.log(err);
                 console.log(err.response.status);
                 if (err.response.status == 401) {
@@ -83,10 +50,9 @@ const DialogTodolists = ({ props, isTodolistDone, handleClick }) => {
     }
 
     useEffect(() => {
-        // console.log("dialogTdl.jsx:useEffect => ", props);
+        console.log("DialogTodolistsDone.jsx:useEffect => ", props);
         getTodolistsCategory();
-        setUpdatedate(updatedate);
-        // console.log(doneDate);
+        console.log(doneDate);
 
         setResponse({ remark, doneDate });
     }, [remark, doneDate]);
@@ -97,54 +63,48 @@ const DialogTodolists = ({ props, isTodolistDone, handleClick }) => {
                 <div className="col-xs-6 col-sm-6 col-lg-6 col-md-6">
                     <TextBoxComponent
                         id='tdlName'
-                        value={name}
-                        onChange={handleNameTextChange}
+                        value={props.todolistName}
                         placeholder="Name"
                         floatLabelType="Auto"
-                        enabled={!isTodolistDone} />
+                        enabled={false}
+                    />
                 </div>
                 <div className="col-xs-6 col-sm-6 col-lg-6 col-md-6 mt-5">
                     <TextBoxComponent
                         id='tdlDesc'
-                        value={description}
-                        onChange={handleDescTextChange}
+                        value={props.todolistDescription}
                         placeholder="Description"
                         floatLabelType="Auto"
-                        enabled={!isTodolistDone} />
-                </div>
-                <div className="col-xs-6 col-sm-6 col-lg-6 col-md-6 mt-5">
-                    <DropDownListComponent
-                        id='tdlCategoryId'
-                        onChange={handleCatTextChange}
-                        dataSource={categoryData}
-                        fields={fields}
-                        placeholder="Category"
-                        floatLabelType="Auto"
-                        value={categoryId}
-                        enabled={!isTodolistDone}
-                    // value={props.categoryId || 0}
+                        enabled={false}
                     />
                 </div>
                 <div className="col-xs-6 col-sm-6 col-lg-6 col-md-6 mt-5">
+                    <TextBoxComponent
+                        value={props.todolistCategory}
+                        placeholder="Category"
+                        floatLabelType="Auto"
+                        enabled={false}
+                    />
+                </div>
+                {/* <div className="col-xs-6 col-sm-6 col-lg-6 col-md-6 mt-5">
                     <DatePickerComponent
                         id='tdlUpdateDate'
                         strictMode={false}
-                        value={updatedate}
-                        onChange={handleUpdateDateTextChange}
+                        value={props.updateDate}
                         format='dd/MM/yyyy'
                         floatLabelType="Auto"
                         placeholder="Date"
-                        enabled={!isTodolistDone}
+                        enabled={false}
                     >
                     </DatePickerComponent>
-                </div>
+                </div> */}
             </div>
-            {isTodolistDone && <div className="row custom-margin custom-padding-5">
+            <div className="row custom-margin custom-padding-5">
                 <div className="col-xs-6 col-sm-6 col-lg-6 col-md-6 mt-5">
                     <TextBoxComponent
                         ref={text => remarkText = text}
                         id='tdlRemark'
-                        value={remark}
+                        value={props.remark}
                         onChange={handleRemarkChange}
                         placeholder="Remark"
                         floatLabelType="Auto" />
@@ -153,29 +113,17 @@ const DialogTodolists = ({ props, isTodolistDone, handleClick }) => {
                     <DatePickerComponent
                         id='tdlDoneDate'
                         strictMode={false}
-                        value={doneDate}
+                        value={props.updateDate}
                         onChange={handleDoneDateChange}
                         format='dd/MM/yyyy'
                         floatLabelType="Auto"
                         placeholder="Date">
                     </DatePickerComponent>
                 </div>
-            </div>}
-            {isTodolistDone && <button
-                type='button'
-                onClick={event => handleClick(response)}
-                // style={{ color }}
-                className='relative text-xl rounded-full p-3 hover:bg-light-gray'
-            >
-                <span
-                    // style={{ background: dotColor }}
-                    className='absolute inline-flex rounded-full h-2 w-2 right-2 top-2'
-                />
-                DONE
-            </button>}
+            </div>
         </div>
 
     );
 };
 
-export default DialogTodolists;
+export default DialogTodolistsDone;

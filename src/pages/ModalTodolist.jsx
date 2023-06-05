@@ -20,9 +20,6 @@ const ModalTodolist = ({ props }) => {
     const [display, setDisplay] = useState('none');
     const [status, setStatus] = useState({ hideDialog: false });
     const [dContent, setDcontent] = useState();
-    // let buttonRef = (element) => {
-    //     buttonEle = element;
-    // };
 
     const addTodolistDone = (req) => {
         axios.post('http://localhost:5000/api/todolistsdone', req, {
@@ -33,8 +30,8 @@ const ModalTodolist = ({ props }) => {
         })
             .then(response => {
                 console.log(response);
+                props.Todolistsss(props.trigger);
                 dialogClose();
-                //refreshData();
             })
             .catch(error => {
                 console.log(error);
@@ -99,7 +96,6 @@ const ModalTodolist = ({ props }) => {
         console.log('argument from ROW: ', props);
 
         addTodolistAction(props, obj);
-        props.Todolistsss(props.trigger);
     };
 
     function addTodolistAction(props, obj) {
