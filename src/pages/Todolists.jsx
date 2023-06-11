@@ -15,8 +15,8 @@ const Todolists = () => {
 
     const { handleClearToken, isLogin, token, handleLogin } = useStateContext();
 
-    const [tdlData, setTdlData] = useState([]);
-    const [tdlDoneData, setTdlDoneData] = useState([]);
+    const [tdlData, setTdlData] = useState(null);
+    const [tdlDoneData, setTdlDoneData] = useState(null);
     const [trigger, setTrigger] = useState(0);
 
     const navigate = useNavigate();
@@ -93,6 +93,7 @@ const Todolists = () => {
             })
             .catch((err) => {
                 console.log(err);
+                console.error(err);
                 console.log(err.response.status);
                 if (err.response.status == 401) {
                     handleClearToken();
@@ -101,29 +102,8 @@ const Todolists = () => {
             });
     }
 
-    const addTrigger = (thistrigger) => {
-        thistrigger++;
-        setTrigger(thistrigger);
-    }
-
     const addTodolist = (req) => {
         axios.post('http://localhost:5000/api/todolists', req, {
-            headers: {
-                'Authorization': token,
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(response => {
-                console.log(response);
-                refreshData();
-            })
-            .catch(error => {
-                console.log(error);
-            });
-    }
-
-    const addTodolistDone = (req) => {
-        axios.post('http://localhost:5000/api/todolistsdone', req, {
             headers: {
                 'Authorization': token,
                 'Content-Type': 'application/json'
@@ -202,9 +182,22 @@ const Todolists = () => {
             });
     }
 
+    const addTrigger = (thistrigger) => {
+        thistrigger++;
+        setTrigger(thistrigger);
+    }
+
     const refreshData = () => {
+        console.log("refreshData")
         getTodolistsCategory();
         getTodolistsDone();
+    }
+
+    const customFn = (args) => {
+        console.log(args.value);
+        var ff = args.value.split('/');
+        var myDate2 = Date.parse(`${ff[2]}-${ff[1]}-${ff[0]}`);
+        return myDate2 > 0
     }
 
     const actionComplete = (args) => {
@@ -223,13 +216,6 @@ const Todolists = () => {
                 args.form.ej2_instances[0].addRules('tdlDoneDate', { required: [customFn, '* Please valid Date'] });
             }
         }
-    }
-
-    const customFn = (args) => {
-        console.log(args.value);
-        var ff = args.value.split('/');
-        var myDate2 = Date.parse(`${ff[2]}-${ff[1]}-${ff[0]}`);
-        return myDate2 > 0
     }
 
     const actionBegin = (args) => {
@@ -293,22 +279,47 @@ const Todolists = () => {
         }
     };
 
+    const dataStateChange = (state) => {
+        console.log("dataStateChange: " + state);
+    }
+
+    const dataStateChange2 = (state) => {
+        console.log("dataStateChange2: " + state);
+    }
+
     useEffect(() => {
         console.log("todolists.jsx: useEffect");
-        getTodolistsCategory();
-        getTodolistsDone();
+
+        setTdlData(null);
+        setTdlDoneData(null);
+
+        if (trigger > 0) {
+            console.log("trigger: " + trigger);
+            getTodolistsCategory();
+        }
+
     }, [trigger]);
 
+    const gridCreated = () => {
+        console.log("gridCreated: ");
+        if (!tdlData) {
+            getTodolistsCategory();
+        }
+    }
+
+    const gridDoneCreated = () => {
+        console.log("gridDoneCreated: ");
+        if (!tdlDoneData) {
+            getTodolistsDone();
+        }
+    }
+
     const dialogTemplate = (props) => {
-        let sss = { ...props }
-        console.log("dialogTemplate: ", sss);
-        return (<DialogTodolists props={sss} />);
+        return (<DialogTodolists props={props} />);
     };
 
     const dialogTdlDoneTemplate = (props) => {
-        let sss = { ...props }
-        console.log("dialogTdlDoneTemplate: ", sss);
-        return (<DialogTodolistsDone props={sss} />);
+        return (<DialogTodolistsDone props={props} />);
     };
 
     let grid;
@@ -318,11 +329,12 @@ const Todolists = () => {
     const editSettingsTdlDone = { allowEditing: true, allowDeleting: true, mode: 'Dialog', template: dialogTdlDoneTemplate };
     const pageSettings = { pageCount: 5 };
 
-    let headerText = [{ text: "Twitter" }, { text: "Facebook" }, { text: "WhatsApp" }];
+    let headerText = [{ text: "Todolist" }, { text: "Todolist-Done" }];
     const content0 = () => {
         return <div>
             <GridComponent
                 ref={g => grid = g}
+                dataStateChange={dataStateChange}
                 dataSource={tdlData}
                 toolbar={toolbarOptions}
                 allowPaging={true}
@@ -330,6 +342,7 @@ const Todolists = () => {
                 pageSettings={pageSettings}
                 actionBegin={actionBegin}
                 actionComplete={actionComplete}
+                created={gridCreated}
             >
                 <ColumnsDirective>
                     {todolistsGrid.map((item, index) => (
@@ -343,7 +356,8 @@ const Todolists = () => {
     const content1 = () => {
         return <div>
             <GridComponent
-                ref={g => gridtdlDone = g}
+                ref={g2 => gridtdlDone = g2}
+                dataStateChange={dataStateChange2}
                 dataSource={tdlDoneData}
                 toolbar={toolbarOptions}
                 allowPaging={true}
@@ -351,6 +365,7 @@ const Todolists = () => {
                 pageSettings={pageSettings}
                 actionBegin={actionBeginTdlDone}
                 actionComplete={actionCompleteTdlDone}
+                created={gridDoneCreated}
             >
                 <ColumnsDirective>
                     {todolistsDoneGrid.map((item, index) => (
@@ -359,11 +374,6 @@ const Todolists = () => {
                 </ColumnsDirective>
                 <Inject services={[Page, Search, Toolbar, Edit]} />
             </GridComponent>
-        </div>;
-    }
-    const content2 = () => {
-        return <div>
-            WhatsApp Messenger is a proprietary cross-platform instant messaging client for smartphones that operates under a subscription business model. It uses the Internet to send text messages, images, video, user location and audio media messages to other users using standard cellular mobile numbers. As of February 2016, WhatsApp had a user base of up to one billion,[10] making it the most globally popular messaging application. WhatsApp Inc., based in Mountain View, California, was acquired by Facebook Inc. on February 19, 2014, for approximately US$19.3 billion.
         </div>;
     }
 
@@ -375,7 +385,6 @@ const Todolists = () => {
                 <TabItemsDirective>
                     <TabItemDirective header={headerText[0]} content={content0} />
                     <TabItemDirective header={headerText[1]} content={content1} />
-                    <TabItemDirective header={headerText[2]} content={content2} />
                 </TabItemsDirective>
             </TabComponent>
         </div >

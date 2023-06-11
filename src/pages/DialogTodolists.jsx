@@ -9,6 +9,7 @@ import { format, parseISO } from 'date-fns'
 import { useStateContext } from '../contexts/ContextProvider';
 
 let remarkText;
+let refName;
 
 const DialogTodolists = ({ props, isTodolistDone, handleClick }) => {
     const { handleClearToken, isLogin, token, handleLogin } = useStateContext();
@@ -16,7 +17,7 @@ const DialogTodolists = ({ props, isTodolistDone, handleClick }) => {
     const [name, setName] = useState(props.name);
     const [description, setDescription] = useState(props.description);
     const [categoryId, setCategoryId] = useState(props.categoryId ?? 1);
-    const [updatedate, setUpdatedate] = useState(props.updateDate);
+    const [updatedate, setUpdatedate] = useState(props.updateDate ?? new Date());
 
     const [remark, setRemark] = useState();
     const [doneDate, setDonedate] = useState(new Date());
@@ -67,12 +68,8 @@ const DialogTodolists = ({ props, isTodolistDone, handleClick }) => {
                         remarkText.focusIn();
                     }
                 }
-                // if (isTodolistDone) {
-                //     remarkText.focusIn();
-                // }
             })
             .catch((err) => {
-                // debugger
                 console.log(err);
                 console.log(err.response.status);
                 if (err.response.status == 401) {
@@ -82,13 +79,18 @@ const DialogTodolists = ({ props, isTodolistDone, handleClick }) => {
             });
     }
 
+    const initComponentColumns = () => {
+        refName.focusIn();
+        setUpdatedate(updatedate);
+    }
+
     useEffect(() => {
         // console.log("dialogTdl.jsx:useEffect => ", props);
         getTodolistsCategory();
-        setUpdatedate(updatedate);
-        // console.log(doneDate);
-
         setResponse({ remark, doneDate });
+
+        initComponentColumns();
+
     }, [remark, doneDate]);
 
     return (
@@ -96,6 +98,7 @@ const DialogTodolists = ({ props, isTodolistDone, handleClick }) => {
             <div className="row custom-margin custom-padding-5">
                 <div className="col-xs-6 col-sm-6 col-lg-6 col-md-6">
                     <TextBoxComponent
+                        ref={text => refName = text}
                         id='tdlName'
                         value={name}
                         onChange={handleNameTextChange}
@@ -122,7 +125,6 @@ const DialogTodolists = ({ props, isTodolistDone, handleClick }) => {
                         floatLabelType="Auto"
                         value={categoryId}
                         enabled={!isTodolistDone}
-                    // value={props.categoryId || 0}
                     />
                 </div>
                 <div className="col-xs-6 col-sm-6 col-lg-6 col-md-6 mt-5">
