@@ -6,7 +6,7 @@ import { TooltipComponent } from '@syncfusion/ej2-react-popups';
 import { Navbar, Footer, Sidebar, ThemeSettings } from '../components';
 import {
     Ecommerce, Orders, Calendar, Employees, Stacked, Pyramid, Customers, ModalTest, Kanban, Line,
-    Area, Bar, Pie, Financial, ColorPicker, ColorMapping, Editor, Login, Todolists
+    Area, Bar, Pie, Financial, ColorPicker, ColorMapping, Editor, Login, Todolists, Transaction
 } from '../pages';
 
 import { useStateContext } from '../contexts/ContextProvider';
@@ -76,6 +76,7 @@ const Dashboard = () => {
                                 <Route path="/employees" element={<Employees />} />
                                 <Route path="/customers" element={<Customers />} />
                                 <Route path="/todolists" element={<Todolists />} />
+                                <Route path="/transactions" element={<Transaction />} />
                                 <Route path="/modal" element={<ModalTest />} />
 
                                 {/* apps  */}

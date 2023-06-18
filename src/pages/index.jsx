@@ -21,5 +21,6 @@ export { default as DialogTodolists } from './DialogTodolists';
 export { default as DialogTodolistsDone } from './DialogTodolistsDone';
 export { default as Login } from './Login';
 export { default as Dashboard } from './Dashboard';
+export { default as Transaction } from './Transaction';
 
 
