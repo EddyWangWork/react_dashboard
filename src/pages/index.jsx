@@ -22,5 +22,7 @@ export { default as DialogTodolistsDone } from './DialogTodolistsDone';
 export { default as Login } from './Login';
 export { default as Dashboard } from './Dashboard';
 export { default as Transaction } from './Transaction';
-
+export { default as DSItems } from './DSItems';
+export { default as DialogDSItem } from './dialogs/DialogDSItem';
+export { default as DSItemsTreeview } from './DSItemsTreeview';
 

@@ -6,7 +6,7 @@ import axios from 'axios';
 import { TabComponent, TabItemDirective, TabItemsDirective } from '@syncfusion/ej2-react-navigations';
 import { DialogComponent } from '@syncfusion/ej2-react-popups';
 import { dsAccGrid, todolistsDoneGrid } from '../data/dtTransaction';
-import { DialogTodolists, DialogTodolistsDone } from '../pages'
+import { DSItems, DSItemsTreeview } from '../pages'
 import { Header } from '../components';
 
 import { useStateContext } from '../contexts/ContextProvider';
@@ -14,10 +14,9 @@ import { useStateContext } from '../contexts/ContextProvider';
 const Transaction = () => {
 
     const { handleClearToken, isLogin, token, handleLogin } = useStateContext();
+    const navigate = useNavigate();
 
     const [bankAccData, setBankAccData] = useState(null);
-
-    const navigate = useNavigate();
 
     const getdsaccounts = () => {
         axios
@@ -53,7 +52,7 @@ const Transaction = () => {
     // const editSettings = { allowEditing: true, allowAdding: true, allowDeleting: true, mode: 'Dialog', template: dialogTemplate }
     const pageSettings = { pageCount: 5 };
 
-    let headerText = [{ text: "DS Account" }, { text: "Todolist-Done" }];
+    let headerText = [{ text: "DS Account" }, { text: "DS Item" }, { text: "DS Item TV" }];
     const content0 = () => {
         return <div>
             <GridComponent
@@ -75,6 +74,18 @@ const Transaction = () => {
             </GridComponent>
         </div>;
     }
+    const tabDSItem = () => {
+        return <div>
+            <DSItems>
+            </DSItems>
+        </div>;
+    }
+    const tabDSItemTV = () => {
+        return <div>
+            <DSItemsTreeview>
+            </DSItemsTreeview>
+        </div>;
+    }
 
     return (
         <div className='m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl'>
@@ -82,6 +93,8 @@ const Transaction = () => {
             <TabComponent heightAdjustMode='Auto'>
                 <TabItemsDirective>
                     <TabItemDirective header={headerText[0]} content={content0} />
+                    <TabItemDirective header={headerText[1]} content={tabDSItem} />
+                    <TabItemDirective header={headerText[2]} content={tabDSItemTV} />
                 </TabItemsDirective>
             </TabComponent>
         </div >
