@@ -14,7 +14,7 @@ import axios from 'axios';
 import { TabComponent, TabItemDirective, TabItemsDirective } from '@syncfusion/ej2-react-navigations';
 import { DialogComponent } from '@syncfusion/ej2-react-popups';
 import { dsTransGrid, todolistsDoneGrid } from '../data/dtTransaction';
-import { DSItems, DSItemsTreeview } from '../pages'
+import { DialogDSTransaction } from '../pages'
 import { Header } from '../components';
 
 import { useStateContext } from '../contexts/ContextProvider';
@@ -24,35 +24,6 @@ const DSTransaction = () => {
     const navigate = useNavigate();
 
     const [dsTrans, setDSTrans] = useState(null);
-
-    const getDSTransactionsLast30Days = () => {
-        axios
-            .get(`http://localhost:5000/api/dstransactions/getDSTransactionsLast30Days`, {
-                headers: {
-                    'Authorization': token,
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then((response) => {
-                console.log(response.data)
-                response.data.map((data, index) => {
-                    var date = new Date(data.updateDate);
-                    data.updateDate = format(date, 'dd/MM/yyyy');
-                    data.amount = data.amount.toFixed(2);
-                    data.balance = Number(data.balance.toFixed(2));
-                });
-                console.log(response.data)
-                setDSTrans(response.data)
-            })
-            .catch((err) => {
-                console.log(err);
-                console.log(err.response.status);
-                if (err.response.status == 401) {
-                    handleClearToken();
-                    navigate('/login', { replace: true });
-                }
-            });
-    }
 
     const getdstransactions = () => {
         axios
@@ -67,7 +38,6 @@ const DSTransaction = () => {
                 response.data.map((data, index) => {
                     data.updateDate = new Date(data.updateDate);
                 });
-                console.log(response.data)
                 setDSTrans(response.data)
             })
             .catch((err) => {
@@ -100,6 +70,59 @@ const DSTransaction = () => {
             });
     }
 
+    const addDStransaction = (req) => {
+        axios.post('http://localhost:5000/api/dstransactions', req, {
+            headers: {
+                'Authorization': token,
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                console.log(response);
+                refreshData();
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
+    const editDStransaction = (id, req) => {
+        axios.put(`http://localhost:5000/api/dstransactions/${id}`, req, {
+            headers: {
+                'Authorization': token,
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                console.log(response);
+                refreshData();
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
+    const deleteDStransaction = (id) => {
+        axios.delete(`http://localhost:5000/api/dstransactions/${id}`, {
+            headers: {
+                'Authorization': token,
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                console.log(response);
+                refreshData();
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
+    const refreshData = () => {
+        console.log("refreshData")
+        getdstransactions();
+    }
+
     const gridCreated = () => {
         if (!dsTrans) {
             getdstransactions();
@@ -117,9 +140,6 @@ const DSTransaction = () => {
     const groupOptions = {
         columns: ['updateDate']
     };
-
-    const toolbarOptions = ['Add', 'Edit', 'Delete'];
-    const pageSettings = { pageCount: 5 };
 
     const dateChange = (e) => {
         console.log(e);
@@ -237,6 +257,56 @@ const DSTransaction = () => {
         color: 'green'
     };
 
+    const dialogTemplate = (props) => {
+        return (<DialogDSTransaction props={props} />);
+    };
+
+    const actionBegin = (args) => {
+        var data = args.data
+        console.log(data);
+
+        if (args.requestType === 'save' && args.form) {
+            if (args.action == 'add') {
+                console.log('ADD');
+                var req = {
+                    name: data.nameFull,
+                    description: data.desc,
+                    amount: data.amount,
+                    UnixUpdateTime: +data.updateDate,
+                    type: data.typeId,
+                    DSAccountId: data.accId,
+                    DSAccountTransferId: data.accToId
+                }
+                console.log(req);
+                addDStransaction(req);
+            }
+            else if (args.action == 'edit') {
+                console.log('EDIT');
+                var req = {
+                    name: data.nameFull,
+                    description: data.desc,
+                    amount: data.amount,
+                    UnixUpdateTime: +data.updateDate,
+                    type: data.typeId,
+                    DSAccountId: data.accId,
+                    DSAccountTransferId: data.accToId
+                }
+                console.log(data.id);
+                console.log(req);
+                editDStransaction(data.id, req);
+            }
+        }
+        else if (args.requestType == 'delete') {
+            console.log('DELETE');
+            console.log(args.data[0].id);
+            deleteDStransaction(args.data[0].id);
+        }
+    };
+
+    const toolbarOptions = ['Add', 'Edit', 'Delete'];
+    const editSettings = { allowEditing: true, allowAdding: true, allowDeleting: true, mode: 'Dialog', template: dialogTemplate };
+    const pageSettings = { pageCount: 5 };
+
     return (
         <div>
             <div className="col-xs-6 col-sm-6 col-lg-6 col-md-6">
@@ -250,9 +320,11 @@ const DSTransaction = () => {
                 <GridComponent
                     dataSource={dsTrans}
                     toolbar={toolbarOptions}
+                    editSettings={editSettings}
+                    pageSettings={pageSettings}
+                    actionBegin={actionBegin}
                     allowPaging={true}
                     allowFiltering={true}
-                    pageSettings={pageSettings}
                     filterSettings={filterOptions}
                     allowGrouping={true}
                     allowSorting={true}

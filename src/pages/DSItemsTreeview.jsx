@@ -22,7 +22,6 @@ const DSItemsTreeview = () => {
     const navigate = useNavigate();
 
     const [dsItemsTvData, setdsItemsTvData] = useState(null);
-    const [dsItemsData, setdsItemsData] = useState(null);
 
     const getDSTvItems = () => {
         axios
@@ -53,14 +52,14 @@ const DSItemsTreeview = () => {
     }, []);
 
     return (
-        // specifies the tag for render the DropDownTree component
         <DropDownTreeComponent
             id="dropdowntree"
             fields={fields}
             allowFiltering={true}
             filterType='Contains'
             popupHeight='700px'
-        />);
+        />
+    );
 }
 
 export default DSItemsTreeview

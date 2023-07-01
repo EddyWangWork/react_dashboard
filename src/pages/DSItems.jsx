@@ -229,7 +229,6 @@ const DSItems = () => {
         }
         else if (args.requestType == 'delete') {
             console.log('DELETE');
-            console.log(args.data[0]);
             if (args.data[0].subId) { // is sub
                 deleteDSItemSubCategory(args.data[0].subId);
             }
