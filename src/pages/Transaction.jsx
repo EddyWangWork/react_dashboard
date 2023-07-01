@@ -6,7 +6,7 @@ import axios from 'axios';
 import { TabComponent, TabItemDirective, TabItemsDirective } from '@syncfusion/ej2-react-navigations';
 import { DialogComponent } from '@syncfusion/ej2-react-popups';
 import { dsAccGrid, todolistsDoneGrid } from '../data/dtTransaction';
-import { DSItems, DSItemsTreeview } from '../pages'
+import { DSItems, DSItemsTreeview, DSTransaction } from '../pages'
 import { Header } from '../components';
 
 import { useStateContext } from '../contexts/ContextProvider';
@@ -52,7 +52,7 @@ const Transaction = () => {
     // const editSettings = { allowEditing: true, allowAdding: true, allowDeleting: true, mode: 'Dialog', template: dialogTemplate }
     const pageSettings = { pageCount: 5 };
 
-    let headerText = [{ text: "DS Account" }, { text: "DS Item" }, { text: "DS Item TV" }];
+    let headerText = [{ text: "DS Account" }, { text: "DS Item" }, { text: "DS Item TV" }, { text: "Transaction" }];
     const content0 = () => {
         return <div>
             <GridComponent
@@ -86,6 +86,12 @@ const Transaction = () => {
             </DSItemsTreeview>
         </div>;
     }
+    const tabDSTrans = () => {
+        return <div>
+            <DSTransaction>
+            </DSTransaction>
+        </div>;
+    }
 
     return (
         <div className='m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl'>
@@ -95,6 +101,7 @@ const Transaction = () => {
                     <TabItemDirective header={headerText[0]} content={content0} />
                     <TabItemDirective header={headerText[1]} content={tabDSItem} />
                     <TabItemDirective header={headerText[2]} content={tabDSItemTV} />
+                    <TabItemDirective header={headerText[3]} content={tabDSTrans} />
                 </TabItemsDirective>
             </TabComponent>
         </div >
