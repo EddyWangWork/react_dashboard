@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import { DataManager } from '@syncfusion/ej2-data';
 import { createElement, getValue } from '@syncfusion/ej2-base';
-import { DropDownList } from '@syncfusion/ej2-dropdowns';
-import { DateRangePickerComponent } from '@syncfusion/ej2-react-calendars';
+import { DropDownListComponent, DropDownTreeComponent, AutoCompleteComponent } from '@syncfusion/ej2-react-dropdowns';
+import { DateRangePickerComponent, DatePickerComponent } from '@syncfusion/ej2-react-calendars';
 import {
     GridComponent, ColumnsDirective, ColumnDirective,
     AggregateColumnDirective, AggregateColumnsDirective, AggregateDirective, AggregatesDirective,
@@ -11,11 +11,11 @@ import {
 } from '@syncfusion/ej2-react-grids';
 import { format, parseISO } from 'date-fns'
 import axios from 'axios';
-import { TabComponent, TabItemDirective, TabItemsDirective } from '@syncfusion/ej2-react-navigations';
+import { TabComponent, TabItemDirective, TabItemsDirective, AccordionComponent, AccordionItemDirective, AccordionItemsDirective } from '@syncfusion/ej2-react-navigations';
 import { DialogComponent } from '@syncfusion/ej2-react-popups';
 import { dsTransGrid, todolistsDoneGrid } from '../data/dtTransaction';
 import { DialogDSTransaction } from '../pages'
-import { Header } from '../components';
+import { Header, Button } from '../components';
 
 import { useStateContext } from '../contexts/ContextProvider';
 
@@ -24,6 +24,61 @@ const DSTransaction = () => {
     const navigate = useNavigate();
 
     const [dsTrans, setDSTrans] = useState(null);
+
+    const [dsTransTypeData, setdsTransTypeData] = useState(null);
+    const [dsAccData, setdsAccData] = useState(null);
+
+    const [updateDateI, setupdateDateI] = useState(null);
+    const [typeIdI, settypeIdI] = useState(null);
+    const [accIdI, setaccIdI] = useState(null);
+
+    const [updateDateI2, setupdateDateI2] = useState(null);
+
+    const GetDSTransactionTypes = () => {
+        axios
+            .get(`http://localhost:5000/api/dstransactions/GetDSTransactionTypes`, {
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then((response) => {
+                console.log(response.data)
+                var res = response.data.filter(x => x.id != 4)
+                setdsTransTypeData(res)
+            })
+            .catch((err) => {
+                console.log(err);
+                console.log(err.response.status);
+                if (err.response.status == 401) {
+                    handleClearToken();
+                    navigate('/login', { replace: true });
+                }
+            });
+    }
+
+    const getdsaccounts = () => {
+        axios
+            .get(`http://localhost:5000/api/dsaccounts/getdsaccounts`, {
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then((response) => {
+                console.log(response.data)
+                var activeAcc = response.data.filter(x => x.isActive == true)
+                setdsAccData(activeAcc)
+            })
+            .catch((err) => {
+                console.log(err);
+                console.log(err.response.status);
+                if (err.response.status == 401) {
+                    handleClearToken();
+                    navigate('/login', { replace: true });
+                }
+            });
+    }
 
     const getdstransactions = () => {
         axios
@@ -148,13 +203,17 @@ const DSTransaction = () => {
         console.log(+e.startDate);
         console.log(+e.endDate);
 
-        const req =
-        {
-            UnixStartDate: +e.startDate,
-            UnixEndDate: +e.endDate
-        }
+        if (e.startDate) {
+            const req =
+            {
+                UnixStartDate: +e.startDate,
+                UnixEndDate: +e.endDate
+            }
 
-        getDSTransactionsByDate(req);
+            getDSTransactionsByDate(req);
+        } else {
+            refreshData();
+        }
     }
 
     const rowDataBound = (args) => {
@@ -263,7 +322,14 @@ const DSTransaction = () => {
 
     const actionBegin = (args) => {
         var data = args.data
-        console.log(data);
+
+        if (args.data) {
+            if (args.requestType === 'add') {
+                args.data.updateDate = updateDateI
+                args.data.type = typeIdI
+                args.data.dsAccountId = accIdI
+            }
+        }
 
         if (args.requestType === 'save' && args.form) {
             if (args.action == 'add') {
@@ -303,12 +369,86 @@ const DSTransaction = () => {
         }
     };
 
+
+
+    const actionComplete = (args) => {
+        if (args.form) {
+            if ((args.requestType === 'beginEdit' || args.requestType === 'add')) {
+                args.form.ej2_instances[0].addRules('typeId', { required: [true, '* Please select type'] });
+                args.form.ej2_instances[0].addRules('accId', { required: [true, '* Please select account'] });
+                //args.form.ej2_instances[0].addRules('nameFull', { required: [true, '* Please enter name'] });
+                args.form.ej2_instances[0].addRules('amount', { required: [true, '* Please enter amount'] });
+            }
+        }
+    }
+
+    const handleUpdateDate = (e) => {
+        setupdateDateI(e.value);
+    }
+
+    const handleTypeId = (e) => {
+        settypeIdI(e.value);
+    }
+
+    const handleAccId = (e) => {
+        setaccIdI(e.value);
+    }
+
     const toolbarOptions = ['Add', 'Edit', 'Delete'];
     const editSettings = { allowEditing: true, allowAdding: true, allowDeleting: true, mode: 'Dialog', template: dialogTemplate };
     const pageSettings = { pageCount: 5 };
 
+    const dsTransTypefields = { text: 'name', value: 'id' };
+    const dsAccfields = { text: 'name', value: 'id' };
+
+    useEffect(() => {
+        getdsaccounts();
+        GetDSTransactionTypes();
+    }, []);
+
     return (
         <div>
+            <AccordionComponent>
+                <div>
+                    <div>
+                        <div> PRESET </div>
+                    </div>
+                    <div className='flex flex-wrap lg:flex-nowrap'>
+                        <div className='bg-white dark:text-gray-200 dark:bg-secondary-dark-bg rounded-xl w-full m-3 bg-hero-pattern bg-no-repeat bg-cover bg-center'>
+                            <DatePickerComponent
+                                id='updateDate'
+                                placeholder="Date"
+                                floatLabelType="Auto"
+                                strictMode={false}
+                                format='dd/MM/yyyy'
+                                onChange={handleUpdateDate}
+                            >
+                            </DatePickerComponent>
+                        </div>
+                        <div className='bg-white dark:text-gray-200 dark:bg-secondary-dark-bg rounded-xl w-full m-3 bg-hero-pattern bg-no-repeat bg-cover bg-center'>
+                            <DropDownListComponent
+                                id='typeId'
+                                placeholder="Type"
+                                floatLabelType="Auto"
+                                dataSource={dsTransTypeData}
+                                fields={dsTransTypefields}
+                                onChange={handleTypeId}
+                            />
+                        </div>
+                        <div className='bg-white dark:text-gray-200 dark:bg-secondary-dark-bg rounded-xl w-full m-3 bg-hero-pattern bg-no-repeat bg-cover bg-center'>
+                            <DropDownListComponent
+                                id='accId'
+                                placeholder="Account"
+                                floatLabelType="Auto"
+                                dataSource={dsAccData}
+                                fields={dsAccfields}
+                                onChange={handleAccId}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </AccordionComponent>
+
             <div className="col-xs-6 col-sm-6 col-lg-6 col-md-6">
                 <DateRangePickerComponent
                     id="daterangepicker"
@@ -323,6 +463,7 @@ const DSTransaction = () => {
                     editSettings={editSettings}
                     pageSettings={pageSettings}
                     actionBegin={actionBegin}
+                    actionComplete={actionComplete}
                     allowPaging={true}
                     allowFiltering={true}
                     filterSettings={filterOptions}

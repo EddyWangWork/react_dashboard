@@ -2,7 +2,7 @@ import React, { useEffect, useState, ChangeEvent, useRef, useReducer } from 'rea
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { TextBoxComponent, FormValidator, FormValidatorModel, NumericTextBoxComponent } from '@syncfusion/ej2-react-inputs';
-import { DropDownListComponent, DropDownTreeComponent } from '@syncfusion/ej2-react-dropdowns';
+import { DropDownListComponent, DropDownTreeComponent, AutoCompleteComponent } from '@syncfusion/ej2-react-dropdowns';
 import { DatePickerComponent } from '@syncfusion/ej2-react-calendars';
 import { CheckBoxComponent } from '@syncfusion/ej2-react-buttons';
 import { format, parseISO } from 'date-fns'
@@ -14,6 +14,7 @@ const DialogDSTransaction = ({ props }) => {
     const navigate = useNavigate();
 
     const [dsItemsTvData, setdsItemsTvData] = useState(null);
+    const [dsItemsACData, setdsItemsACData] = useState(null);
     const [dsTransTypeData, setdsTransTypeData] = useState(null);
     const [dsAccData, setdsAccData] = useState(null);
 
@@ -40,6 +41,37 @@ const DialogDSTransaction = ({ props }) => {
             .then((response) => {
                 console.log(response.data)
                 setdsItemsTvData(response.data)
+            })
+            .catch((err) => {
+                console.log(err);
+                console.log(err.response.status);
+                if (err.response.status == 401) {
+                    handleClearToken();
+                    navigate('/login', { replace: true });
+                }
+            });
+    }
+
+    const getDSACItems = () => {
+        axios
+            .get(`http://localhost:5000/api/dsitemsubcategory/getDSItemsCategoryWithSubV3`, {
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then((response) => {
+                console.log(response.data)
+
+                var lisss = [];
+
+                response.data.map((d, i) => {
+                    d.dsItemSubCategories.map((dd, ii) => {
+                        lisss.push(`${d.name}|${dd.name}`);
+                    })
+                })
+
+                setdsItemsACData(lisss)
             })
             .catch((err) => {
                 console.log(err);
@@ -116,6 +148,10 @@ const DialogDSTransaction = ({ props }) => {
         setname(name);
     }
 
+    const handleName2 = (e) => {
+        setname(e.target.value);
+    }
+
     const handleDesc = (e) => {
         setdesc(e.target.value);
     }
@@ -160,12 +196,15 @@ const DialogDSTransaction = ({ props }) => {
 
     let refAccId;
     let refTypeId;
+    let refUpdateDate;
 
     useEffect(() => {
         getDSTvItems();
+        getDSACItems();
         getdsaccounts();
         GetDSTransactionTypes();
         setTypeColor(typeId);
+        refUpdateDate.focusIn();
     }, []);
 
     return (
@@ -174,6 +213,7 @@ const DialogDSTransaction = ({ props }) => {
                 <div className="col-xs-6 col-sm-6 col-lg-6 col-md-6 mt-5">
                     <DatePickerComponent
                         id='updateDate'
+                        ref={(x) => { refUpdateDate = x; }}
                         placeholder="Date"
                         floatLabelType="Auto"
                         strictMode={false}
@@ -218,24 +258,12 @@ const DialogDSTransaction = ({ props }) => {
                     />
                 </div>}
                 {!isTransfer && <div className="col-xs-6 col-sm-6 col-lg-6 col-md-6 mt-5">
-                    <DropDownTreeComponent
-                        id="name"
+                    <AutoCompleteComponent
+                        id="nameFull"
+                        dataSource={dsItemsACData}
                         placeholder="Name"
-                        fields={dsItemfields}
-                        allowFiltering={true}
-                        filterType='Contains'
-                        popupHeight='700px'
-                        select={handleName}
-                        value={desc}
-                    />
-                </div>}
-                {!isTransfer && <div className="col-xs-6 col-sm-6 col-lg-6 col-md-6 mt-5">
-                    <TextBoxComponent
-                        id='nameFull'
-                        placeholder="Item Name"
+                        onChange={handleName2}
                         value={name}
-                        floatLabelType="Auto"
-                        readOnly={true}
                     />
                 </div>}
                 <div className="col-xs-6 col-sm-6 col-lg-6 col-md-6 mt-5">
