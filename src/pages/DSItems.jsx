@@ -239,17 +239,10 @@ const DSItems = () => {
     };
 
     const actionComplete = (args) => {
-        // if (args.form) {
-        //     if ((args.requestType === 'beginEdit' || args.requestType === 'add')) {
-        //         args.form.ej2_instances[0].addRules('dsitemName', { required: [true, '* Please enter your name'] });
-        //         args.form.ej2_instances[0].addRules('dsSubItemName', { required: [true, '* Please enter sub your name'] });
-        //     }
-        // }
     }
 
     const toolbarOptions = ['Add', 'Edit', 'Delete'];
     const editSettings = { allowEditing: true, allowAdding: true, allowDeleting: true, mode: 'Dialog', template: dialogTemplate };
-    //<TreeViewComponent fields={fields} created={tvCreated} />
     const pageSettings = { pageCount: 5 };
 
     return (

@@ -27,4 +27,5 @@ export { default as DialogDSItem } from './dialogs/DialogDSItem';
 export { default as DSItemsTreeview } from './DSItemsTreeview';
 export { default as DSTransaction } from './DSTransaction';
 export { default as DialogDSTransaction } from './dialogs/DialogDSTransaction';
+export { default as DialogDSAccount } from './dialogs/DialogDSAccount';
 

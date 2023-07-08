@@ -394,6 +394,24 @@ const DSTransaction = () => {
         setaccIdI(e.value);
     }
 
+    const rowSelected = () => {
+        if (grid) {
+            /** Get the selected row indexes */
+            const selectedrowindex = grid.getSelectedRowIndexes();
+            /** Get the selected records. */
+            const selectedrecords = grid.getSelectedRecords();
+            console.log(selectedrecords);
+            preUpdateDate.value = selectedrecords[0].updateDate
+            setupdateDateI(selectedrecords[0].updateDate);
+            preAccId.value = selectedrecords[0].dsAccountId;
+            setaccIdI(selectedrecords[0].dsAccountId);
+        }
+    };
+
+    let grid;
+    let preUpdateDate;
+    let preAccId;
+
     const toolbarOptions = ['Add', 'Edit', 'Delete'];
     const editSettings = { allowEditing: true, allowAdding: true, allowDeleting: true, mode: 'Dialog', template: dialogTemplate };
     const pageSettings = { pageCount: 5 };
@@ -416,6 +434,7 @@ const DSTransaction = () => {
                     <div className='flex flex-wrap lg:flex-nowrap'>
                         <div className='bg-white dark:text-gray-200 dark:bg-secondary-dark-bg rounded-xl w-full m-3 bg-hero-pattern bg-no-repeat bg-cover bg-center'>
                             <DatePickerComponent
+                                ref={x => preUpdateDate = x}
                                 id='updateDate'
                                 placeholder="Date"
                                 floatLabelType="Auto"
@@ -437,6 +456,7 @@ const DSTransaction = () => {
                         </div>
                         <div className='bg-white dark:text-gray-200 dark:bg-secondary-dark-bg rounded-xl w-full m-3 bg-hero-pattern bg-no-repeat bg-cover bg-center'>
                             <DropDownListComponent
+                                ref={x => preAccId = x}
                                 id='accId'
                                 placeholder="Account"
                                 floatLabelType="Auto"
@@ -458,6 +478,7 @@ const DSTransaction = () => {
             </div>
             <div className="col-xs-6 col-sm-6 col-lg-6 col-md-6">
                 <GridComponent
+                    ref={g => grid = g}
                     dataSource={dsTrans}
                     toolbar={toolbarOptions}
                     editSettings={editSettings}
@@ -473,6 +494,7 @@ const DSTransaction = () => {
                     groupSettings={groupOptions}
                     rowDataBound={rowDataBound}
                     created={gridCreated}
+                    rowSelected={rowSelected}
                 >
                     <ColumnsDirective>
                         {dsTransGrid.map((item, index) => (

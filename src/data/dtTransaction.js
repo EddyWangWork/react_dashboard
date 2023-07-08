@@ -19,7 +19,8 @@ export const dsAccGrid = [
         field: 'balance',
         headerText: 'Balance',
         width: '120',
-        textAlign: 'Center'
+        format: 'C2',
+        textAlign: 'Right'
     },
     {
         field: 'isActive',
