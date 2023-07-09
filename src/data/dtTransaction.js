@@ -6,11 +6,12 @@ export const dsAccGrid = [
     {
         field: 'name',
         headerText: 'Name',
-        width: '120',
+        width: '50',
         textAlign: 'Center'
     },
     {
         field: 'description',
+        visible: false,
         headerText: 'Description',
         width: '120',
         textAlign: 'Center'
@@ -18,7 +19,7 @@ export const dsAccGrid = [
     {
         field: 'balance',
         headerText: 'Balance',
-        width: '120',
+        width: '50',
         format: 'C2',
         textAlign: 'Right'
     },
@@ -56,14 +57,18 @@ export const dsItemsGrid = [
     }
 ];
 
-const FilterType2 = {
-    type: 'CheckBox'
-};
-
 export const dsTransGrid = [
     {
         field: 'id',
         visible: false
+    },
+    {
+        field: 'updateDateDay',
+        headerText: 'Date',
+        width: '100',
+        format: { type: 'date', format: 'dd/MM/yyyy' },
+        textAlign: 'Center',
+        allowFiltering: false
     },
     {
         field: 'name',
@@ -85,7 +90,8 @@ export const dsTransGrid = [
         field: 'updateDate',
         headerText: 'Date',
         width: '100',
-        format: { type: 'date', format: 'dd/MM/yyyy' },
+        format: { type: 'date', format: 'MM/yyyy' },
+        enableGroupByFormat: true,
         textAlign: 'Center',
         allowFiltering: false
     },

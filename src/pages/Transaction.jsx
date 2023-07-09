@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
-import { GridComponent, ColumnsDirective, ColumnDirective, Page, Search, Toolbar, Inject, Edit } from '@syncfusion/ej2-react-grids';
+import {
+    GridComponent, ColumnsDirective, ColumnDirective,
+    AggregateColumnDirective, AggregateColumnsDirective, AggregateDirective, AggregatesDirective,
+    Page, Search, Toolbar, Inject, Edit
+} from '@syncfusion/ej2-react-grids';
 import { format, parseISO } from 'date-fns'
 import axios from 'axios';
 import { TabComponent, TabItemDirective, TabItemsDirective } from '@syncfusion/ej2-react-navigations';
 import { DialogComponent } from '@syncfusion/ej2-react-popups';
+import { createElement, getValue } from '@syncfusion/ej2-base';
 import { dsAccGrid, todolistsDoneGrid } from '../data/dtTransaction';
 import { DSItems, DSItemsTreeview, DSTransaction, DialogDSAccount } from '../pages'
 import { Header } from '../components';
@@ -29,6 +34,10 @@ const Transaction = () => {
             .then((response) => {
                 console.log(response.data)
                 var activeAcc = response.data.filter(x => x.isActive == true)
+
+                const sortActiveAcc = activeAcc.sort((a, b) => b.balance - a.balance)
+                console.log(sortActiveAcc)
+
                 setBankAccData(activeAcc)
             })
             .catch((err) => {
@@ -133,8 +142,22 @@ const Transaction = () => {
         }
     };
 
-    const actionComplete = (args) => {
-    }
+    const footerAmount = (props) => {
+        return (<span>Sum: {props.Sum}</span>);
+    };
+
+    const rowDataBound = (args) => {
+        if (args.row) {
+            var td = args.row.children[3];
+
+            if (getValue('balance', args.data) > 0) {
+                td.style.color = 'green'
+            }
+            else {
+                td.style.color = 'red'
+            }
+        }
+    };
 
     const toolbarOptions = ['Add', 'Edit', 'Delete'];
     const editSettings = { allowEditing: true, allowAdding: true, allowDeleting: true, mode: 'Dialog', template: dialogTemplate }
@@ -150,14 +173,28 @@ const Transaction = () => {
                 editSettings={editSettings}
                 pageSettings={pageSettings}
                 actionBegin={actionBegin}
-                actionComplete={actionComplete}
                 created={gridCreated}
+                rowDataBound={rowDataBound}
             >
                 <ColumnsDirective>
                     {dsAccGrid.map((item, index) => (
                         <ColumnDirective editType='dropdownedit' key={index} {...item} />
                     ))}
                 </ColumnsDirective>
+
+                <AggregatesDirective>
+                    <AggregateDirective>
+                        <AggregateColumnsDirective>
+                            <AggregateColumnDirective
+                                field='balance'
+                                type='Sum'
+                                format='C2'
+                                footerTemplate={footerAmount}
+                            />
+                        </AggregateColumnsDirective>
+                    </AggregateDirective>
+                </AggregatesDirective>
+
                 <Inject services={[Page, Search, Toolbar, Edit]} />
             </GridComponent>
         </div>;

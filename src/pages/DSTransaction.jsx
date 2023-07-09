@@ -92,6 +92,7 @@ const DSTransaction = () => {
                 console.log(response.data)
                 response.data.map((data, index) => {
                     data.updateDate = new Date(data.updateDate);
+                    data.updateDateDay = new Date(data.updateDate);
                 });
                 setDSTrans(response.data)
             })
@@ -218,7 +219,7 @@ const DSTransaction = () => {
 
     const rowDataBound = (args) => {
         if (args.row) {
-            var tdAmount = args.row.children.length == 10 ? args.row.children[5] : args.row.children[6];
+            var tdAmount = args.row.children.length == 12 ? args.row.children[7] : args.row.children[8];
 
             if (getValue('type', args.data) == 1) {
                 tdAmount.style.color = 'green'
