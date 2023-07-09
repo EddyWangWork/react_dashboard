@@ -117,6 +117,7 @@ const DSTransaction = () => {
                 console.log(response.data)
                 response.data.map((data, index) => {
                     data.updateDate = new Date(data.updateDate);
+                    data.updateDateDay = new Date(data.updateDate);
                 });
                 console.log(response.data)
                 setDSTrans(response.data)
@@ -219,7 +220,7 @@ const DSTransaction = () => {
 
     const rowDataBound = (args) => {
         if (args.row) {
-            var tdAmount = args.row.children.length == 12 ? args.row.children[7] : args.row.children[8];
+            var tdAmount = args.row.children.length == 12 ? args.row.children[7] : args.row.children[6];
 
             if (getValue('type', args.data) == 1) {
                 tdAmount.style.color = 'green'
@@ -415,7 +416,7 @@ const DSTransaction = () => {
 
     const toolbarOptions = ['Add', 'Edit', 'Delete'];
     const editSettings = { allowEditing: true, allowAdding: true, allowDeleting: true, mode: 'Dialog', template: dialogTemplate };
-    const pageSettings = { pageCount: 5 };
+    const pageSettings = { pageCount: 10 };
 
     const dsTransTypefields = { text: 'name', value: 'id' };
     const dsAccfields = { text: 'name', value: 'id' };

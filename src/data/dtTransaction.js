@@ -63,6 +63,15 @@ export const dsTransGrid = [
         visible: false
     },
     {
+        field: 'updateDate',
+        headerText: 'Date',
+        width: '100',
+        format: { type: 'date', format: 'MM/yyyy' },
+        enableGroupByFormat: true,
+        textAlign: 'Center',
+        allowFiltering: false
+    },
+    {
         field: 'updateDateDay',
         headerText: 'Date',
         width: '100',
@@ -85,15 +94,6 @@ export const dsTransGrid = [
     {
         field: 'type',
         visible: false
-    },
-    {
-        field: 'updateDate',
-        headerText: 'Date',
-        width: '100',
-        format: { type: 'date', format: 'MM/yyyy' },
-        enableGroupByFormat: true,
-        textAlign: 'Center',
-        allowFiltering: false
     },
     {
         field: 'amount',
