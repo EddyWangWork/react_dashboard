@@ -13,37 +13,19 @@ import { useStateContext } from '../contexts/ContextProvider';
 
 const DSItems = () => {
 
-    const { handleClearToken, isLogin, token, handleLogin } = useStateContext();
+    const {
+        handleClearToken, token,
+        urlDSItemSub, urlgetDSItemWithSub, urladdWithSubItem,
+        urlDSItem
+    } = useStateContext();
     const navigate = useNavigate();
 
     const [dsItemsTvData, setdsItemsTvData] = useState(null);
     const [dsItemsData, setdsItemsData] = useState(null);
 
-    const getDSTvItems = () => {
-        axios
-            .get(`http://localhost:5000/api/dsitemsubcategory/getDSItemsCategoryWithSubV3`, {
-                headers: {
-                    'Authorization': token,
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then((response) => {
-                console.log(response.data)
-                setdsItemsTvData(response.data)
-            })
-            .catch((err) => {
-                console.log(err);
-                console.log(err.response.status);
-                if (err.response.status == 401) {
-                    handleClearToken();
-                    navigate('/login', { replace: true });
-                }
-            });
-    }
-
     const getDSItems = () => {
         axios
-            .get(`http://localhost:5000/api/dsitemsubcategory/getDSItemsCategoryWithSubV2`, {
+            .get(`${urlgetDSItemWithSub}`, {
                 headers: {
                     'Authorization': token,
                     'Content-Type': 'application/json'
@@ -63,8 +45,8 @@ const DSItems = () => {
             });
     }
 
-    const addDSItemAndSubCategory = (req) => {
-        axios.post('http://localhost:5000/api/dsitemcategory/createDSItemAndSubCategory', req, {
+    const addDSItemAndSubItem = (req) => {
+        axios.post(`${urladdWithSubItem}`, req, {
             headers: {
                 'Authorization': token,
                 'Content-Type': 'application/json'
@@ -79,8 +61,8 @@ const DSItems = () => {
             });
     }
 
-    const addDSItemSubCategory = (req) => {
-        axios.post('http://localhost:5000/api/dsitemsubcategory', req, {
+    const addDSItemSub = (req) => {
+        axios.post(`${urlDSItemSub}`, req, {
             headers: {
                 'Authorization': token,
                 'Content-Type': 'application/json'
@@ -95,8 +77,8 @@ const DSItems = () => {
             });
     }
 
-    const editDSItemCategory = (id, req) => {
-        axios.put(`http://localhost:5000/api/dsitemcategory/${id}`, req, {
+    const editDSItem = (id, req) => {
+        axios.put(`${urlDSItem}/${id}`, req, {
             headers: {
                 'Authorization': token,
                 'Content-Type': 'application/json'
@@ -111,8 +93,8 @@ const DSItems = () => {
             });
     }
 
-    const editDSItemSubCategory = (id, req) => {
-        axios.put(`http://localhost:5000/api/dsitemsubcategory/${id}`, req, {
+    const editDSItemSub = (id, req) => {
+        axios.put(`${urlDSItemSub}/${id}`, req, {
             headers: {
                 'Authorization': token,
                 'Content-Type': 'application/json'
@@ -127,8 +109,8 @@ const DSItems = () => {
             });
     }
 
-    const deleteDSItemCategory = (id) => {
-        axios.delete(`http://localhost:5000/api/dsitemcategory/${id}`, {
+    const deleteDSItem = (id) => {
+        axios.delete(`${urlDSItem}/${id}`, {
             headers: {
                 'Authorization': token,
                 'Content-Type': 'application/json'
@@ -143,8 +125,8 @@ const DSItems = () => {
             });
     }
 
-    const deleteDSItemSubCategory = (id) => {
-        axios.delete(`http://localhost:5000/api/dsitemsubcategory/${id}`, {
+    const deleteDSItemSub = (id) => {
+        axios.delete(`${urlDSItemSub}/${id}`, {
             headers: {
                 'Authorization': token,
                 'Content-Type': 'application/json'
@@ -171,20 +153,6 @@ const DSItems = () => {
         }
     }
 
-    // useEffect(() => {
-    //     setdsItemsTvData(null);
-    //     setdsItemsData(null);
-    // });
-
-    let fields = { dataSource: dsItemsTvData, id: 'id', text: 'name', child: 'dsItemSubCategories' };
-
-    const tvCreated = () => {
-        console.log('tvCreated');
-        if (!dsItemsTvData) {
-            getDSTvItems();
-        }
-    }
-
     const dialogTemplate = (props) => {
         return (<DialogDSItem props={props} />);
     };
@@ -195,45 +163,46 @@ const DSItems = () => {
         if (args.requestType === 'save' && args.form) {
             if (args.action == 'add') {
                 console.log('ADD');
-                if (data.dsItemCatId) { //is sub
+                if (data.dsMainItemId) { //is sub
                     var req = {
                         name: data.dsSubItemName,
-                        dsItemCategoryId: data.dsItemCatId
+                        dsItemID: data.dsMainItemId
                     }
-                    addDSItemSubCategory(req);
+                    addDSItemSub(req);
                 }
                 else { //is main
                     var req = {
                         name: data.dsitemName,
                         subName: data.dsSubItemName
                     }
-                    addDSItemAndSubCategory(req);
+                    addDSItemAndSubItem(req);
                 }
             }
             else if (args.action == 'edit') {
                 console.log('EDIT');
-                if (data.subId) { //is sub
+                console.log(data);
+                if (data.subID) { //is sub
                     var req = {
                         name: data.dsSubItemName,
-                        dsItemCategoryId: data.dsItemCatId
+                        dsItemID: data.dsMainItemId
                     }
-                    editDSItemSubCategory(data.subId, req)
+                    editDSItemSub(data.subID, req)
                 }
                 else { //is main
                     var req = {
                         name: data.dsitemName,
                     }
-                    editDSItemCategory(data.id, req);
+                    editDSItem(data.id, req);
                 }
             }
         }
         else if (args.requestType == 'delete') {
             console.log('DELETE');
-            if (args.data[0].subId) { // is sub
-                deleteDSItemSubCategory(args.data[0].subId);
+            if (args.data[0].subID) { // is sub
+                deleteDSItemSub(args.data[0].subID);
             }
             else { //is main
-                deleteDSItemCategory(args.data[0].id);
+                deleteDSItem(args.data[0].id);
             }
         }
     };

@@ -11,7 +11,10 @@ import { useStateContext } from '../contexts/ContextProvider';
 let remarkText;
 
 const DialogTodolistsDone = ({ props }) => {
-    const { handleClearToken, token } = useStateContext();
+    const {
+        handleClearToken, token,
+        urlgetTodolistTypes
+    } = useStateContext();
 
     const [remark, setRemark] = useState();
     const [doneDate, setDonedate] = useState(new Date());
@@ -30,7 +33,7 @@ const DialogTodolistsDone = ({ props }) => {
     const navigate = useNavigate();
     const getTodolistsCategory = () => {
         axios
-            .get(`http://localhost:5000/api/todolists/getTodolistsCategory`, {
+            .get(`${urlgetTodolistTypes}`, {
                 headers: {
                     'Authorization': token,
                     'Content-Type': 'application/json'

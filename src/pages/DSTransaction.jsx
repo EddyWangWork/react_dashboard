@@ -20,7 +20,12 @@ import { Header, Button } from '../components';
 import { useStateContext } from '../contexts/ContextProvider';
 
 const DSTransaction = () => {
-    const { handleClearToken, isLogin, token, handleLogin } = useStateContext();
+    const {
+        handleClearToken, token,
+        urlgetDSTransTypes,
+        urldsAccont,
+        urlgetDSTransactionV2,
+    } = useStateContext();
     const navigate = useNavigate();
 
     const [dsTrans, setDSTrans] = useState(null);
@@ -36,7 +41,7 @@ const DSTransaction = () => {
 
     const GetDSTransactionTypes = () => {
         axios
-            .get(`http://localhost:5000/api/dstransactions/GetDSTransactionTypes`, {
+            .get(`${urlgetDSTransTypes}`, {
                 headers: {
                     'Authorization': token,
                     'Content-Type': 'application/json'
@@ -59,7 +64,7 @@ const DSTransaction = () => {
 
     const getdsaccounts = () => {
         axios
-            .get(`http://localhost:5000/api/dsaccounts/getdsaccounts`, {
+            .get(`${urldsAccont}`, {
                 headers: {
                     'Authorization': token,
                     'Content-Type': 'application/json'
@@ -82,7 +87,7 @@ const DSTransaction = () => {
 
     const getdstransactions = () => {
         axios
-            .get(`http://localhost:5000/api/dstransactions/getdstransactions`, {
+            .get(`${urlgetDSTransactionV2}`, {
                 headers: {
                     'Authorization': token,
                     'Content-Type': 'application/json'
@@ -91,9 +96,10 @@ const DSTransaction = () => {
             .then((response) => {
                 console.log(response.data)
                 response.data.map((data, index) => {
-                    data.updateDate = new Date(data.updateDate);
-                    data.updateDateDay = new Date(data.updateDate);
+                    data.createdDateTime = new Date(data.createdDateTime);
+                    data.createdDateTimeDay = new Date(data.createdDateTime);
                 });
+                console.log(response.data)
                 setDSTrans(response.data)
             })
             .catch((err) => {
@@ -103,27 +109,6 @@ const DSTransaction = () => {
                     handleClearToken();
                     navigate('/login', { replace: true });
                 }
-            });
-    }
-
-    const getDSTransactionsByDate = (req) => {
-        axios.post('http://localhost:5000/api/dstransactions/getDSTransactionsByDate', req, {
-            headers: {
-                'Authorization': token,
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(response => {
-                console.log(response.data)
-                response.data.map((data, index) => {
-                    data.updateDate = new Date(data.updateDate);
-                    data.updateDateDay = new Date(data.updateDate);
-                });
-                console.log(response.data)
-                setDSTrans(response.data)
-            })
-            .catch(error => {
-                console.log(error);
             });
     }
 
@@ -191,11 +176,11 @@ const DSTransaction = () => {
     };
 
     const sortingOptions = {
-        columns: [{ field: 'updateDate', direction: 'Descending' }]
+        columns: [{ field: 'createdDateTime', direction: 'Descending' }]
     };
 
     const groupOptions = {
-        columns: ['updateDate']
+        columns: ['createdDateTime']
     };
 
     const dateChange = (e) => {
@@ -212,7 +197,7 @@ const DSTransaction = () => {
                 UnixEndDate: +e.endDate
             }
 
-            getDSTransactionsByDate(req);
+            //getDSTransactionsByDate(req);
         } else {
             refreshData();
         }
@@ -222,10 +207,10 @@ const DSTransaction = () => {
         if (args.row) {
             var tdAmount = args.row.children.length == 12 ? args.row.children[7] : args.row.children[6];
 
-            if (getValue('type', args.data) == 1) {
+            if (getValue('dsTypeID', args.data) == 1) {
                 tdAmount.style.color = 'green'
             }
-            else if (getValue('type', args.data) == 2) {
+            else if (getValue('dsTypeID', args.data) == 2) {
                 tdAmount.style.color = 'red'
             }
             else {
@@ -235,7 +220,7 @@ const DSTransaction = () => {
     };
 
     const customDebitG = (props) => {
-        return props.items.filter(x => x.type == 2).map(x => x.amount).reduce((a, b) => a + b, 0)
+        return props.items.filter(x => x.dsTypeID == 2).map(x => x.amount).reduce((a, b) => a + b, 0)
     };
 
     const footerDebitG = (props) => {
@@ -244,7 +229,7 @@ const DSTransaction = () => {
     };
 
     const customCreditG = (props) => {
-        return props.items.filter(x => x.type == 1).map(x => x.amount).reduce((a, b) => a + b, 0)
+        return props.items.filter(x => x.dsTypeID == 1).map(x => x.amount).reduce((a, b) => a + b, 0)
     };
 
     const footerCreditG = (props) => {
@@ -254,13 +239,13 @@ const DSTransaction = () => {
 
     const customCurrentCredit = (props) => {
         if (!props.result.GroupGuid) {
-            return props.result.filter(x => x.type == 1).map(x => x.amount).reduce((a, b) => a + b, 0)
+            return props.result.filter(x => x.dsTypeID == 1).map(x => x.amount).reduce((a, b) => a + b, 0)
         }
         else {
             var sum = 0;
             props.result.map((d, i) => {
                 d.items.map((dd, ii) => {
-                    if (dd.type == 1) {
+                    if (dd.dsTypeID == 1) {
                         sum += dd.amount;
                     }
                 })
@@ -275,13 +260,13 @@ const DSTransaction = () => {
 
     const customCurrentDebit = (props) => {
         if (!props.result.GroupGuid) {
-            return props.result.filter(x => x.type == 2).map(x => x.amount).reduce((a, b) => a + b, 0)
+            return props.result.filter(x => x.dsTypeID == 2).map(x => x.amount).reduce((a, b) => a + b, 0)
         }
         else {
             var sum = 0;
             props.result.map((d, i) => {
                 d.items.map((dd, ii) => {
-                    if (dd.type == 2) {
+                    if (dd.dsTypeID == 2) {
                         sum += dd.amount;
                     }
                 })
@@ -295,7 +280,7 @@ const DSTransaction = () => {
     };
 
     const customDebit = () => {
-        return dsTrans.filter(x => x.type == 2).map(x => x.amount).reduce((a, b) => a + b, 0).toFixed(2)
+        return dsTrans.filter(x => x.dsTypeID == 2).map(x => x.amount).reduce((a, b) => a + b, 0).toFixed(2)
     };
 
     const footerDebit = (props) => {
@@ -303,7 +288,7 @@ const DSTransaction = () => {
     };
 
     const customCredit = () => {
-        return dsTrans.filter(x => x.type == 1).map(x => x.amount).reduce((a, b) => a + b, 0).toFixed(2)
+        return dsTrans.filter(x => x.dsTypeID == 1).map(x => x.amount).reduce((a, b) => a + b, 0).toFixed(2)
     };
 
     const footerCredit = (props) => {
@@ -403,10 +388,10 @@ const DSTransaction = () => {
             /** Get the selected records. */
             const selectedrecords = grid.getSelectedRecords();
             console.log(selectedrecords);
-            preUpdateDate.value = selectedrecords[0].updateDate
-            setupdateDateI(selectedrecords[0].updateDate);
-            preAccId.value = selectedrecords[0].dsAccountId;
-            setaccIdI(selectedrecords[0].dsAccountId);
+            preUpdateDate.value = selectedrecords[0].createdDateTime
+            setupdateDateI(selectedrecords[0].createdDateTime);
+            preAccId.value = selectedrecords[0].dsAccountID;
+            setaccIdI(selectedrecords[0].dsAccountID);
         }
     };
 

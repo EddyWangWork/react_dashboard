@@ -13,7 +13,10 @@ import { useStateContext } from '../contexts/ContextProvider';
 
 const Todolists = () => {
 
-    const { handleClearToken, isLogin, token, handleLogin } = useStateContext();
+    const {
+        handleClearToken, isLogin, token, handleLogin, localhostUrl,
+        urlgetTodolistTypes
+    } = useStateContext();
 
     const [tdlData, setTdlData] = useState(null);
     const [tdlDoneData, setTdlDoneData] = useState(null);
@@ -23,7 +26,7 @@ const Todolists = () => {
 
     const getTodolistsCategory = () => {
         axios
-            .get(`http://localhost:5000/api/todolists/getTodolistsCategory`, {
+            .get(`${urlgetTodolistTypes}`, {
                 headers: {
                     'Authorization': token,
                     'Content-Type': 'application/json'
@@ -45,19 +48,18 @@ const Todolists = () => {
 
     const getTodolistsAll = (category) => {
         axios
-            .get(`http://localhost:5000/api/todolists/getTodolistsAll`, {
+            .get(`${localhostUrl}/Todolist`, {
                 headers: {
                     'Authorization': token,
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 }
             })
             .then((response) => {
-                // setPosts(response.data);
                 console.log(response.data)
                 response.data.map((data, index) => {
                     var date = new Date(data.updateDate);
                     data.updateDate = format(date, 'dd/MM/yyyy');
-                    data.category = category.find(x => x.id == data.categoryId).name;
+                    data.category = category.find(x => x.id == data.categoryID).name;
                     data.Todolistsss = addTrigger;
                     data.trigger = trigger;
                 });
@@ -76,7 +78,7 @@ const Todolists = () => {
 
     const getTodolistsDone = () => {
         axios
-            .get(`http://localhost:5000/api/todolistsDone/getTodolistsDoneAll`, {
+            .get(`${localhostUrl}/TodolistDone`, {
                 headers: {
                     'Authorization': token,
                     'Content-Type': 'application/json'
@@ -103,7 +105,7 @@ const Todolists = () => {
     }
 
     const addTodolist = (req) => {
-        axios.post('http://localhost:5000/api/todolists', req, {
+        axios.post(`${localhostUrl}/Todolist`, req, {
             headers: {
                 'Authorization': token,
                 'Content-Type': 'application/json'
@@ -119,7 +121,7 @@ const Todolists = () => {
     }
 
     const editTodolist = (id, req) => {
-        axios.put(`http://localhost:5000/api/todolists/${id}`, req, {
+        axios.put(`${localhostUrl}/Todolist/${id}`, req, {
             headers: {
                 'Authorization': token,
                 'Content-Type': 'application/json'
@@ -135,7 +137,7 @@ const Todolists = () => {
     }
 
     const editTodolistDone = (id, req) => {
-        axios.put(`http://localhost:5000/api/todolistsdone/${id}`, req, {
+        axios.put(`${localhostUrl}/TodolistDone/${id}`, req, {
             headers: {
                 'Authorization': token,
                 'Content-Type': 'application/json'
@@ -151,7 +153,7 @@ const Todolists = () => {
     }
 
     const deleteTodolist = (id) => {
-        axios.delete(`http://localhost:5000/api/todolists/${id}`, {
+        axios.delete(`${localhostUrl}/Todolist/${id}`, {
             headers: {
                 'Authorization': token,
                 'Content-Type': 'application/json'
@@ -167,7 +169,7 @@ const Todolists = () => {
     }
 
     const deleteTodolistDone = (id) => {
-        axios.delete(`http://localhost:5000/api/todolistsdone/${id}`, {
+        axios.delete(`${localhostUrl}/TodolistDone/${id}`, {
             headers: {
                 'Authorization': token,
                 'Content-Type': 'application/json'
@@ -231,7 +233,7 @@ const Todolists = () => {
                     name: data.tdlName,
                     description: data.tdlDesc,
                     categoryId: Number(data.tdlCategoryId),
-                    UnixUpdateTime: ddd
+                    //UnixUpdateTime: ddd
                 }
                 console.log(req);
                 addTodolist(req);
@@ -242,7 +244,7 @@ const Todolists = () => {
                     name: data.tdlName,
                     description: data.tdlDesc,
                     categoryId: Number(data.tdlCategoryId),
-                    UnixUpdateTime: ddd
+                    //UnixUpdateTime: ddd
                 }
                 console.log(req);
                 editTodolist(data.id, req);

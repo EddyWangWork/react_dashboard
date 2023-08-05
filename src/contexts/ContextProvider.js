@@ -18,6 +18,32 @@ export const ContextProvider = ({ children }) => {
     const [themeSettings, setThemeSettings] = useState(false)
     const [isLogin, setIsLogin] = useState(false);
     const [token, setToken] = useState(localStorage.getItem("token"));
+    const [localhostUrl, setlocalhostUrl] = useState('https://localhost:7069');
+
+    const [urllogin, seturllogin] = useState(`${localhostUrl}/Member/login`);
+
+    //common
+    const [urlgetTodolistTypes, setgetTodolistTypes] = useState(`${localhostUrl}/Common/getTodolistTypes`);
+    const [urlgetDSTransTypes, seturlgetDSTransTypes] = useState(`${localhostUrl}/Common/getDSTransTypes`);
+
+    //todolist
+    const [urlTodolistDone, seturlTodolistDone] = useState(`${localhostUrl}/TodolistDone`);
+
+    //ds account
+    const [urldsAccont, seturldsAccont] = useState(`${localhostUrl}/DSAccount`);
+
+    //dsItem
+    const [urlDSItem, seturlDSItem] = useState(`${localhostUrl}/DSItem`);
+    const [urlgetDSItemWithSub, seturlgetDSItemWithSub] = useState(`${urlDSItem}/getDSItemWithSub`);
+    const [urlgetDSItemWithSubV3, seturlgetDSItemWithSubV3] = useState(`${urlDSItem}/getDSItemWithSubV3`);
+    const [urladdWithSubItem, seturladdWithSubItem] = useState(`${urlDSItem}/addWithSubItem`);
+
+    //dsItemSub
+    const [urlDSItemSub, seturlDSItemSub] = useState(`${localhostUrl}/DSItemSub`);
+
+    //dsTrans
+    const [urlDS, seturlDS] = useState(`${localhostUrl}/DS`);
+    const [urlgetDSTransactionV2, seturlgetDSTransactionV2] = useState(`${urlDS}/getDSTransactionV2`);
 
     const setMode = (e) => {
         setCurrentMode(e.target.value);
@@ -59,7 +85,16 @@ export const ContextProvider = ({ children }) => {
             setColor,
             handleLogin, isLogin,
             handleSetToken, token,
-            handleClearToken
+            handleClearToken,
+            localhostUrl,
+
+            urllogin,
+            urlgetTodolistTypes, urlgetDSTransTypes, //common
+            urlTodolistDone, //todolist            
+            urldsAccont, //ds account
+            urlDSItem, urlgetDSItemWithSub, urlgetDSItemWithSubV3, urladdWithSubItem, //dsitem
+            urlDSItemSub, //dsitem sub
+            urlgetDSTransactionV2, //dsTrans
         }}>
             {children}
         </StateContext.Provider>

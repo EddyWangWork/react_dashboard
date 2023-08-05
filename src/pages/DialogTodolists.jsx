@@ -12,11 +12,14 @@ let remarkText;
 let refName;
 
 const DialogTodolists = ({ props, isTodolistDone, handleClick }) => {
-    const { handleClearToken, isLogin, token, handleLogin } = useStateContext();
+    const {
+        handleClearToken, isLogin, token, handleLogin, localhostUrl,
+        urlgetTodolistTypes
+    } = useStateContext();
 
     const [name, setName] = useState(props.name);
     const [description, setDescription] = useState(props.description);
-    const [categoryId, setCategoryId] = useState(props.categoryId ?? 1);
+    const [categoryId, setCategoryId] = useState(props.categoryID ?? 1);
     const [updatedate, setUpdatedate] = useState(props.updateDate ?? new Date());
 
     const [remark, setRemark] = useState();
@@ -54,7 +57,7 @@ const DialogTodolists = ({ props, isTodolistDone, handleClick }) => {
     const navigate = useNavigate();
     const getTodolistsCategory = () => {
         axios
-            .get(`http://localhost:5000/api/todolists/getTodolistsCategory`, {
+            .get(`${urlgetTodolistTypes}`, {
                 headers: {
                     'Authorization': token,
                     'Content-Type': 'application/json'

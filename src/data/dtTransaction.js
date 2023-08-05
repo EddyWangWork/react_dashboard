@@ -8,14 +8,16 @@ export const dsAccGrid = [
         headerText: 'Name',
         width: '50',
         textAlign: 'Center'
-    },
-    {
-        field: 'description',
-        visible: false,
-        headerText: 'Description',
-        width: '120',
-        textAlign: 'Center'
-    },
+    }
+    // ,
+    // {
+    //     field: 'description',
+    //     visible: false,
+    //     headerText: 'Description',
+    //     width: '120',
+    //     textAlign: 'Center'
+    // }
+    ,
     {
         field: 'balance',
         headerText: 'Balance',
@@ -49,7 +51,7 @@ export const dsItemsGrid = [
         textAlign: 'Center'
     },
     {
-        field: 'dsItemCategoryId',
+        field: 'dsItemID',
         headerText: 'Category',
         width: '120',
         textAlign: 'Center',
@@ -63,7 +65,7 @@ export const dsTransGrid = [
         visible: false
     },
     {
-        field: 'updateDate',
+        field: 'createdDateTime',
         headerText: 'Date',
         width: '100',
         format: { type: 'date', format: 'MM/yyyy' },
@@ -72,7 +74,7 @@ export const dsTransGrid = [
         allowFiltering: false
     },
     {
-        field: 'updateDateDay',
+        field: 'createdDateTimeDay',
         headerText: 'Date',
         width: '100',
         format: { type: 'date', format: 'dd/MM/yyyy' },
@@ -80,7 +82,7 @@ export const dsTransGrid = [
         allowFiltering: false
     },
     {
-        field: 'name',
+        field: 'dsItemName',
         headerText: 'Name',
         width: '250',
         textAlign: 'Center'
@@ -92,7 +94,7 @@ export const dsTransGrid = [
         textAlign: 'Center'
     },
     {
-        field: 'type',
+        field: 'dsTypeID',
         visible: false
     },
     {
@@ -110,11 +112,11 @@ export const dsTransGrid = [
         textAlign: 'Right'
     },
     {
-        field: 'dsAccountId',
+        field: 'dsAccountID',
         visible: false
     },
     {
-        field: 'typeName',
+        field: 'dsTypeName',
         headerText: 'Type',
         width: '100',
         textAlign: 'Center',

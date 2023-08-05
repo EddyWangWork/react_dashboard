@@ -10,7 +10,10 @@ import { format, parseISO } from 'date-fns'
 import { useStateContext } from '../../contexts/ContextProvider';
 
 const DialogDSItem = ({ props }) => {
-    const { handleClearToken, isLogin, token, handleLogin } = useStateContext();
+    const {
+        handleClearToken, token,
+        urlDSItem
+    } = useStateContext();
     const navigate = useNavigate();
 
     let refName;
@@ -19,14 +22,14 @@ const DialogDSItem = ({ props }) => {
     const [dsItemName, setDSItemName] = useState(props.name);
     const [dsSubItemName, setDSSubItemName] = useState(props.subName);
     const [dsItemId, setDSItemId] = useState(props.id ?? 1);
-    const [isDSMainItem, setIsDSMainItem] = useState(props.isAdd ? true : props.subId == 0);
-    const [isEditDSMainItem] = useState(props.subId == 0);
+    const [isDSMainItem, setIsDSMainItem] = useState(props.isAdd ? true : props.subID == 0);
+    const [isEditDSMainItem] = useState(props.subID == 0);
 
     const dsItemfields = { text: 'name', value: 'id' };
 
     const getDSItemsCategory = () => {
         axios
-            .get(`http://localhost:5000/api/dsitemcategory/getDSItemsCategory`, {
+            .get(`${urlDSItem}`, {
                 headers: {
                     'Authorization': token,
                     'Content-Type': 'application/json'
@@ -67,7 +70,6 @@ const DialogDSItem = ({ props }) => {
 
     useEffect(() => {
         console.log(props);
-        //console.log(isEditDSMainItem);
 
         getDSItemsCategory();
 
@@ -96,8 +98,7 @@ const DialogDSItem = ({ props }) => {
                         floatLabelType="Auto"
                     />}
                     {!isDSMainItem && <DropDownListComponent
-                        id='dsItemCatId'
-                        //onChange={handleCatTextChange}
+                        id='dsMainItemId'
                         dataSource={dsItems}
                         fields={dsItemfields}
                         placeholder="Item Name"

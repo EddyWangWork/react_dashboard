@@ -6,14 +6,14 @@ import { useStateContext } from '../contexts/ContextProvider';
 import axios from 'axios';
 
 function Login() {
-    const { handleLogin, handleSetToken, token } = useStateContext();
+    const { handleLogin, handleSetToken, token, localhostUrl, urllogin } = useStateContext();
 
     const [formData, setFormData] = useState({ name: '', email: '' });
 
     const handleFormSubmit = (event) => {
         event.preventDefault();
 
-        axios.post('http://localhost:5000/api/members/login', formData)
+        axios.post(`${urllogin}`, formData)
             .then(response => {
                 console.log(response);
                 console.log(response.data['token']);

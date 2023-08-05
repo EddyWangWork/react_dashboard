@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import {
     GridComponent, ColumnsDirective, ColumnDirective,
-    AggregateColumnDirective, AggregateColumnsDirective, AggregateDirective, AggregatesDirective,
+    AggregateColumnDirective, AggregateColumnsDirective, AggregateDirective, AggregatesDirective, Aggregate,
     Page, Search, Toolbar, Inject, Edit
 } from '@syncfusion/ej2-react-grids';
 import { format, parseISO } from 'date-fns'
@@ -18,14 +18,14 @@ import { useStateContext } from '../contexts/ContextProvider';
 
 const Transaction = () => {
 
-    const { handleClearToken, isLogin, token, handleLogin } = useStateContext();
+    const { handleClearToken, isLogin, token, handleLogin, urldsAccont } = useStateContext();
     const navigate = useNavigate();
 
     const [bankAccData, setBankAccData] = useState(null);
 
     const getdsaccounts = () => {
         axios
-            .get(`http://localhost:5000/api/dsaccounts/getdsaccounts`, {
+            .get(`${urldsAccont}`, {
                 headers: {
                     'Authorization': token,
                     'Content-Type': 'application/json'
@@ -38,7 +38,7 @@ const Transaction = () => {
                 const sortActiveAcc = activeAcc.sort((a, b) => b.balance - a.balance)
                 console.log(sortActiveAcc)
 
-                setBankAccData(activeAcc)
+                setBankAccData(sortActiveAcc)
             })
             .catch((err) => {
                 console.log(err);
@@ -148,7 +148,7 @@ const Transaction = () => {
 
     const rowDataBound = (args) => {
         if (args.row) {
-            var td = args.row.children[3];
+            var td = args.row.children[2];
 
             if (getValue('balance', args.data) > 0) {
                 td.style.color = 'green'
@@ -163,7 +163,8 @@ const Transaction = () => {
     const editSettings = { allowEditing: true, allowAdding: true, allowDeleting: true, mode: 'Dialog', template: dialogTemplate }
     const pageSettings = { pageCount: 5 };
 
-    let headerText = [{ text: "DS Account" }, { text: "DS Item" }, { text: "DS Item TV" }, { text: "Transaction" }];
+    // let headerText = [{ text: "DS Account" }, { text: "DS Item" }, { text: "DS Item TV" }, { text: "Transaction" }];
+    let headerText = [{ text: "DS Account" }, { text: "DS Item" }, { text: "Transaction" }];
     const content0 = () => {
         return <div>
             <GridComponent
@@ -195,7 +196,7 @@ const Transaction = () => {
                     </AggregateDirective>
                 </AggregatesDirective>
 
-                <Inject services={[Page, Search, Toolbar, Edit]} />
+                <Inject services={[Page, Search, Toolbar, Edit, Aggregate]} />
             </GridComponent>
         </div>;
     }
@@ -225,8 +226,8 @@ const Transaction = () => {
                 <TabItemsDirective>
                     <TabItemDirective header={headerText[0]} content={content0} />
                     <TabItemDirective header={headerText[1]} content={tabDSItem} />
-                    <TabItemDirective header={headerText[2]} content={tabDSItemTV} />
-                    <TabItemDirective header={headerText[3]} content={tabDSTrans} />
+                    <TabItemDirective header={headerText[2]} content={tabDSTrans} />
+                    {/* <TabItemDirective header={headerText[3]} content={tabDSTrans} /> */}
                 </TabItemsDirective>
             </TabComponent>
         </div >

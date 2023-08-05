@@ -10,7 +10,10 @@ import { DialogTodolists } from '../pages'
 
 const ModalTodolist = ({ props }) => {
 
-    const { token } = useStateContext();
+    const {
+        token,
+        urlTodolistDone
+    } = useStateContext();
 
     let dialogInstance;
     let checkboxObj;
@@ -22,7 +25,7 @@ const ModalTodolist = ({ props }) => {
     const [dContent, setDcontent] = useState();
 
     const addTodolistDone = (req) => {
-        axios.post('http://localhost:5000/api/todolistsdone', req, {
+        axios.post(`${urlTodolistDone}`, req, {
             headers: {
                 'Authorization': token,
                 'Content-Type': 'application/json'

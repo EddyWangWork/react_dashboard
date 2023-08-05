@@ -10,51 +10,33 @@ import { format, parseISO } from 'date-fns'
 import { useStateContext } from '../../contexts/ContextProvider';
 
 const DialogDSTransaction = ({ props }) => {
-    const { handleClearToken, isLogin, token, handleLogin } = useStateContext();
+    const {
+        handleClearToken, token,
+        urlgetDSItemWithSubV3,
+        urlgetDSTransTypes,
+        urldsAccont
+    } = useStateContext();
     const navigate = useNavigate();
 
-    const [dsItemsTvData, setdsItemsTvData] = useState(null);
     const [dsItemsACData, setdsItemsACData] = useState(null);
     const [dsTransTypeData, setdsTransTypeData] = useState(null);
     const [dsAccData, setdsAccData] = useState(null);
 
 
-    const [updateDate, setupdateDate] = useState(props.updateDate ?? new Date());
-    const [name, setname] = useState(props.name);
+    const [updateDate, setupdateDate] = useState(props.createdDateTime ?? new Date());
+    const [name, setname] = useState(props.dsItemName);
     const [desc, setdesc] = useState(props.description);
-    const [accId, setaccId] = useState(props.dsAccountId);
+    const [accId, setaccId] = useState(props.dsAccountID);
     const [accToId, setaccToId] = useState(null);
-    const [typeId, settypeId] = useState(props.type);
+    const [typeId, settypeId] = useState(props.dsTypeID);
     const [amount, setamount] = useState(props.amount);
 
     const [isTransfer, setisTransfer] = useState(false);
     const [dsAccToData, setdsAccToData] = useState(null);
 
-    const getDSTvItems = () => {
-        axios
-            .get(`http://localhost:5000/api/dsitemsubcategory/getDSItemsCategoryWithSubV3`, {
-                headers: {
-                    'Authorization': token,
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then((response) => {
-                console.log(response.data)
-                setdsItemsTvData(response.data)
-            })
-            .catch((err) => {
-                console.log(err);
-                console.log(err.response.status);
-                if (err.response.status == 401) {
-                    handleClearToken();
-                    navigate('/login', { replace: true });
-                }
-            });
-    }
-
     const getDSACItems = () => {
         axios
-            .get(`http://localhost:5000/api/dsitemsubcategory/getDSItemsCategoryWithSubV3`, {
+            .get(`${urlgetDSItemWithSubV3}`, {
                 headers: {
                     'Authorization': token,
                     'Content-Type': 'application/json'
@@ -62,16 +44,7 @@ const DialogDSTransaction = ({ props }) => {
             })
             .then((response) => {
                 console.log(response.data)
-
-                var lisss = [];
-
-                response.data.map((d, i) => {
-                    d.dsItemSubCategories.map((dd, ii) => {
-                        lisss.push(`${d.name}|${dd.name}`);
-                    })
-                })
-
-                setdsItemsACData(lisss)
+                setdsItemsACData(response.data.names)
             })
             .catch((err) => {
                 console.log(err);
@@ -85,7 +58,7 @@ const DialogDSTransaction = ({ props }) => {
 
     const GetDSTransactionTypes = () => {
         axios
-            .get(`http://localhost:5000/api/dstransactions/GetDSTransactionTypes`, {
+            .get(`${urlgetDSTransTypes}`, {
                 headers: {
                     'Authorization': token,
                     'Content-Type': 'application/json'
@@ -108,7 +81,7 @@ const DialogDSTransaction = ({ props }) => {
 
     const getdsaccounts = () => {
         axios
-            .get(`http://localhost:5000/api/dsaccounts/getdsaccounts`, {
+            .get(`${urldsAccont}`, {
                 headers: {
                     'Authorization': token,
                     'Content-Type': 'application/json'
@@ -131,21 +104,6 @@ const DialogDSTransaction = ({ props }) => {
 
     const handleUpdateDate = (e) => {
         setupdateDate(e.target.value);
-    }
-
-    const handleName = (e) => {
-        var name;
-        if (e.itemData.parentID) {
-            var parentName = dsItemsTvData.filter(x => x.id == e.itemData.parentID)[0].name
-            var childName = `${e.itemData.text}`
-            name = `${parentName}|${childName}`
-        }
-        else {
-            var childName = `${e.itemData.text}`
-            name = `${childName}`
-        }
-        console.log(name);
-        setname(name);
     }
 
     const handleName2 = (e) => {
@@ -192,14 +150,13 @@ const DialogDSTransaction = ({ props }) => {
 
     const dsTransTypefields = { text: 'name', value: 'id' };
     const dsAccfields = { text: 'name', value: 'id' };
-    const dsItemfields = { dataSource: dsItemsTvData, value: 'id', text: 'name', child: 'dsItemSubCategories' };
 
     let refAccId;
     let refTypeId;
     let refUpdateDate;
 
     useEffect(() => {
-        getDSTvItems();
+        console.log(props);
         getDSACItems();
         getdsaccounts();
         GetDSTransactionTypes();
