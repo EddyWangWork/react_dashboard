@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Route, Routes, useNavigate } from 'react-router-dom';
-import { GridComponent, ColumnsDirective, ColumnDirective, Page, Search, Toolbar, Inject, Edit } from '@syncfusion/ej2-react-grids';
-import { format, parseISO } from 'date-fns'
+import { useNavigate } from 'react-router-dom';
+import { GridComponent, ColumnsDirective, ColumnDirective, Page, Search, Toolbar, Inject, Edit, Filter } from '@syncfusion/ej2-react-grids';
 import axios from 'axios';
-import { TabComponent, TabItemDirective, TabItemsDirective, TreeViewComponent } from '@syncfusion/ej2-react-navigations';
-import { DialogComponent } from '@syncfusion/ej2-react-popups';
-import { dsItemsGrid, todolistsDoneGrid } from '../data/dtTransaction';
-import { DialogTodolists, DialogTodolistsDone, DialogDSItem } from '.'
+import { dsItemsGrid } from '../data/dtTransaction';
+import { DialogDSItem } from '.'
 import { Header } from '../components';
 
 import { useStateContext } from '../contexts/ContextProvider';
@@ -214,6 +211,10 @@ const DSItems = () => {
     const editSettings = { allowEditing: true, allowAdding: true, allowDeleting: true, mode: 'Dialog', template: dialogTemplate };
     const pageSettings = { pageCount: 5 };
 
+    const filterOptions = {
+        type: 'Menu'
+    };
+
     return (
         <div>
             <div>
@@ -223,6 +224,8 @@ const DSItems = () => {
                     allowPaging={true}
                     editSettings={editSettings}
                     pageSettings={pageSettings}
+                    allowFiltering={true}
+                    filterSettings={filterOptions}
                     actionBegin={actionBegin}
                     actionComplete={actionComplete}
                     created={gridCreated}
@@ -232,7 +235,7 @@ const DSItems = () => {
                             <ColumnDirective editType='dropdownedit' key={index} {...item} />
                         ))}
                     </ColumnsDirective>
-                    <Inject services={[Page, Search, Toolbar, Edit]} />
+                    <Inject services={[Page, Search, Toolbar, Edit, Filter]} />
                 </GridComponent>
             </div>
             <div>

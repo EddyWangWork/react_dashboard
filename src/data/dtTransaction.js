@@ -42,13 +42,15 @@ export const dsItemsGrid = [
         field: 'name',
         headerText: 'Name',
         width: '120',
-        textAlign: 'Center'
+        textAlign: 'Center',
+        filter: { type: 'CheckBox' }
     },
     {
         field: 'subName',
         headerText: 'SubName',
         width: '120',
-        textAlign: 'Center'
+        textAlign: 'Center',
+        filter: { type: 'CheckBox' }
     },
     {
         field: 'dsItemID',

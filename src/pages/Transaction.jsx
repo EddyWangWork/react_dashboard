@@ -164,7 +164,7 @@ const Transaction = () => {
     const pageSettings = { pageCount: 5 };
 
     // let headerText = [{ text: "DS Account" }, { text: "DS Item" }, { text: "DS Item TV" }, { text: "Transaction" }];
-    let headerText = [{ text: "DS Account" }, { text: "DS Item" }, { text: "Transaction" }];
+    let headerText = [{ text: "DS Account" }, { text: "Transaction" }, { text: "DS Item" }];
     const content0 = () => {
         return <div>
             <GridComponent
@@ -225,8 +225,8 @@ const Transaction = () => {
             <TabComponent heightAdjustMode='Auto'>
                 <TabItemsDirective>
                     <TabItemDirective header={headerText[0]} content={content0} />
-                    <TabItemDirective header={headerText[1]} content={tabDSItem} />
-                    <TabItemDirective header={headerText[2]} content={tabDSTrans} />
+                    <TabItemDirective header={headerText[1]} content={tabDSTrans} />
+                    <TabItemDirective header={headerText[2]} content={tabDSItem} />
                     {/* <TabItemDirective header={headerText[3]} content={tabDSTrans} /> */}
                 </TabItemsDirective>
             </TabComponent>

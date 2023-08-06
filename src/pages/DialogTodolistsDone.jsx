@@ -60,6 +60,17 @@ const DialogTodolistsDone = ({ props }) => {
         setResponse({ remark, doneDate });
     }, [remark, doneDate]);
 
+    let textareaObj;
+    function onCreate() {
+        textareaObj.addAttributes({ rows: 1 });
+        textareaObj.respectiveElement.style.height = "auto";
+        textareaObj.respectiveElement.style.height = (textareaObj.respectiveElement.scrollHeight) + "px";
+    }
+    function onInput() {
+        textareaObj.respectiveElement.style.height = "auto";
+        textareaObj.respectiveElement.style.height = (textareaObj.respectiveElement.scrollHeight) + "px";
+    }
+
     return (
         <div>
             <div className="row custom-margin custom-padding-5">
@@ -74,7 +85,11 @@ const DialogTodolistsDone = ({ props }) => {
                 </div>
                 <div className="col-xs-6 col-sm-6 col-lg-6 col-md-6 mt-5">
                     <TextBoxComponent
+                        ref={scope => { textareaObj = scope; }}
                         id='tdlDesc'
+                        multiline={true}
+                        input={onInput = onInput.bind(this)}
+                        created={onCreate = onCreate.bind(this)}
                         value={props.todolistDescription}
                         placeholder="Description"
                         floatLabelType="Auto"
