@@ -21,18 +21,17 @@ const DialogDSTransaction = ({ props }) => {
     const [dsItemsACData, setdsItemsACData] = useState(null);
     const [dsTransTypeData, setdsTransTypeData] = useState(null);
     const [dsAccData, setdsAccData] = useState(null);
-
+    const [dsAccToData, setdsAccToData] = useState(null);
 
     const [updateDate, setupdateDate] = useState(props.createdDateTime ?? new Date());
     const [name, setname] = useState(props.dsItemName);
     const [desc, setdesc] = useState(props.description);
     const [accId, setaccId] = useState(props.dsAccountID);
-    const [accToId, setaccToId] = useState(null);
+    const [accToId, setaccToId] = useState(props.dsAccountToID);
     const [typeId, settypeId] = useState(props.dsTypeID);
     const [amount, setamount] = useState(props.amount);
 
-    const [isTransfer, setisTransfer] = useState(false);
-    const [dsAccToData, setdsAccToData] = useState(null);
+    const [isTransfer, setisTransfer] = useState(props.dsTypeID == 3);
 
     const getDSACItems = () => {
         axios
@@ -44,7 +43,11 @@ const DialogDSTransaction = ({ props }) => {
             })
             .then((response) => {
                 console.log(response.data)
-                setdsItemsACData(response.data.names)
+                let nameList = [];
+                response.data.map((v) => {
+                    nameList.push(v.name);
+                })
+                setdsItemsACData(nameList)
             })
             .catch((err) => {
                 console.log(err);
@@ -91,6 +94,7 @@ const DialogDSTransaction = ({ props }) => {
                 console.log(response.data)
                 var activeAcc = response.data.filter(x => x.isActive == true)
                 setdsAccData(activeAcc)
+                setdsAccToData(activeAcc.filter(x => x.id != accId));
             })
             .catch((err) => {
                 console.log(err);
@@ -212,6 +216,7 @@ const DialogDSTransaction = ({ props }) => {
                         dataSource={dsAccToData}
                         fields={dsAccfields}
                         onChange={handleAccToId}
+                        value={accToId}
                     />
                 </div>}
                 {!isTransfer && <div className="col-xs-6 col-sm-6 col-lg-6 col-md-6 mt-5">

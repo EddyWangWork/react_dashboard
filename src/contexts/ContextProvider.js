@@ -94,7 +94,7 @@ export const ContextProvider = ({ children }) => {
             urldsAccont, //ds account
             urlDSItem, urlgetDSItemWithSub, urlgetDSItemWithSubV3, urladdWithSubItem, //dsitem
             urlDSItemSub, //dsitem sub
-            urlgetDSTransactionV2, //dsTrans
+            urlDS, urlgetDSTransactionV2, //dsTrans
         }}>
             {children}
         </StateContext.Provider>

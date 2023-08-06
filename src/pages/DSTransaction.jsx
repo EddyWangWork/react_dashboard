@@ -23,12 +23,16 @@ const DSTransaction = () => {
     const {
         handleClearToken, token,
         urlgetDSTransTypes,
+        urlDS,
         urldsAccont,
         urlgetDSTransactionV2,
+        urlgetDSItemWithSubV3
     } = useStateContext();
     const navigate = useNavigate();
 
     const [dsTrans, setDSTrans] = useState(null);
+
+    const [dsItemsACData, setdsItemsACData] = useState(null);
 
     const [dsTransTypeData, setdsTransTypeData] = useState(null);
     const [dsAccData, setdsAccData] = useState(null);
@@ -38,6 +42,28 @@ const DSTransaction = () => {
     const [accIdI, setaccIdI] = useState(null);
 
     const [updateDateI2, setupdateDateI2] = useState(null);
+
+    const getDSACItems = () => {
+        axios
+            .get(`${urlgetDSItemWithSubV3}`, {
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then((response) => {
+                console.log(response.data)
+                setdsItemsACData(response.data)
+            })
+            .catch((err) => {
+                console.log(err);
+                console.log(err.response.status);
+                if (err.response.status == 401) {
+                    handleClearToken();
+                    navigate('/login', { replace: true });
+                }
+            });
+    }
 
     const GetDSTransactionTypes = () => {
         axios
@@ -99,7 +125,6 @@ const DSTransaction = () => {
                     data.createdDateTime = new Date(data.createdDateTime);
                     data.createdDateTimeDay = new Date(data.createdDateTime);
                 });
-                console.log(response.data)
                 setDSTrans(response.data)
             })
             .catch((err) => {
@@ -113,7 +138,7 @@ const DSTransaction = () => {
     }
 
     const addDStransaction = (req) => {
-        axios.post('http://localhost:5000/api/dstransactions', req, {
+        axios.post(`${urlDS}`, req, {
             headers: {
                 'Authorization': token,
                 'Content-Type': 'application/json'
@@ -129,7 +154,7 @@ const DSTransaction = () => {
     }
 
     const editDStransaction = (id, req) => {
-        axios.put(`http://localhost:5000/api/dstransactions/${id}`, req, {
+        axios.put(`${urlDS}/${id}`, req, {
             headers: {
                 'Authorization': token,
                 'Content-Type': 'application/json'
@@ -145,7 +170,7 @@ const DSTransaction = () => {
     }
 
     const deleteDStransaction = (id) => {
-        axios.delete(`http://localhost:5000/api/dstransactions/${id}`, {
+        axios.delete(`${urlDS}/${id}`, {
             headers: {
                 'Authorization': token,
                 'Content-Type': 'application/json'
@@ -312,38 +337,79 @@ const DSTransaction = () => {
 
         if (args.data) {
             if (args.requestType === 'add') {
-                args.data.updateDate = updateDateI
-                args.data.type = typeIdI
-                args.data.dsAccountId = accIdI
+                args.data.createdDateTime = updateDateI
+                args.data.dsTypeID = typeIdI
+                args.data.dsAccountID = accIdI
+            }
+        }
+        if (args.requestType === 'beginEdit') {
+            if (args.rowData.dsTypeID == 4) {
+                args.rowData = dsTrans.find(x => x.id == args.rowData.dsTransferOutID);
             }
         }
 
         if (args.requestType === 'save' && args.form) {
             if (args.action == 'add') {
                 console.log('ADD');
-                var req = {
-                    name: data.nameFull,
-                    description: data.desc,
-                    amount: data.amount,
-                    UnixUpdateTime: +data.updateDate,
-                    type: data.typeId,
-                    DSAccountId: data.accId,
-                    DSAccountTransferId: data.accToId
+                let req = {}
+                if (+data.typeId == 3) {
+                    req = {
+                        dsTypeID: +data.typeId,
+                        dsAccountID: +data.accId,
+                        dsAccountToID: +data.accToId,
+                        dsItemID: 0,
+                        dsItemSubID: 0,
+                        description: data.desc,
+                        amount: data.amount,
+                        createdDateTime: (new Date(data.updateDate.setHours(+8))).toJSON(),
+                    }
                 }
+                else {
+                    var dsItemData = dsItemsACData.find(x => x.name == data.nameFull)
+                    req = {
+                        dsTypeID: +data.typeId,
+                        dsAccountID: +data.accId,
+                        dsAccountToID: 0,
+                        dsItemID: dsItemData.itemID,
+                        dsItemSubID: dsItemData.itemSubID,
+                        description: data.desc,
+                        amount: data.amount,
+                        createdDateTime: (new Date(data.updateDate.setHours(+8))).toJSON(),
+                    }
+                }
+
                 console.log(req);
                 addDStransaction(req);
             }
             else if (args.action == 'edit') {
                 console.log('EDIT');
-                var req = {
-                    name: data.nameFull,
-                    description: data.desc,
-                    amount: data.amount,
-                    UnixUpdateTime: +data.updateDate,
-                    type: data.typeId,
-                    DSAccountId: data.accId,
-                    DSAccountTransferId: data.accToId
+                let req = {}
+                if (+data.typeId == 3) {
+                    req = {
+                        dsTypeID: +data.typeId,
+                        dsAccountID: +data.accId,
+                        dsAccountToID: +data.accToId,
+                        dsItemID: 0,
+                        dsItemSubID: 0,
+                        description: data.desc,
+                        amount: data.amount,
+                        createdDateTime: (new Date(data.updateDate.setHours(+8))).toJSON(),
+                    }
                 }
+                else {
+                    var dsItemData = dsItemsACData.find(x => x.name == data.nameFull)
+                    req = {
+                        dsTypeID: +data.typeId,
+                        dsAccountID: +data.accId,
+                        dsAccountToID: 0,
+                        dsItemID: dsItemData.itemID,
+                        dsItemSubID: dsItemData.itemSubID,
+                        description: data.desc,
+                        amount: data.amount,
+                        createdDateTime: (new Date(data.updateDate.setHours(+8))).toJSON(),
+                    }
+                }
+
                 console.log(data.id);
                 console.log(req);
                 editDStransaction(data.id, req);
@@ -363,7 +429,7 @@ const DSTransaction = () => {
             if ((args.requestType === 'beginEdit' || args.requestType === 'add')) {
                 args.form.ej2_instances[0].addRules('typeId', { required: [true, '* Please select type'] });
                 args.form.ej2_instances[0].addRules('accId', { required: [true, '* Please select account'] });
-                //args.form.ej2_instances[0].addRules('nameFull', { required: [true, '* Please enter name'] });
+                //args.form.ej2_instances[0].addRules('nameFull', { required: [true, '* Please enter name'] }); transfer cannot
                 args.form.ej2_instances[0].addRules('amount', { required: [true, '* Please enter amount'] });
             }
         }
@@ -407,6 +473,7 @@ const DSTransaction = () => {
     const dsAccfields = { text: 'name', value: 'id' };
 
     useEffect(() => {
+        getDSACItems();
         getdsaccounts();
         GetDSTransactionTypes();
     }, []);
