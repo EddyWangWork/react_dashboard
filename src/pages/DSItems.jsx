@@ -204,9 +204,6 @@ const DSItems = () => {
         }
     };
 
-    const actionComplete = (args) => {
-    }
-
     const toolbarOptions = ['Add', 'Edit', 'Delete'];
     const editSettings = { allowEditing: true, allowAdding: true, allowDeleting: true, mode: 'Dialog', template: dialogTemplate };
     const pageSettings = { pageCount: 5 };
@@ -227,7 +224,6 @@ const DSItems = () => {
                     allowFiltering={true}
                     filterSettings={filterOptions}
                     actionBegin={actionBegin}
-                    actionComplete={actionComplete}
                     created={gridCreated}
                 >
                     <ColumnsDirective>

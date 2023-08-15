@@ -15,17 +15,22 @@ export { default as Line } from './Charts/Line';
 export { default as Pie } from './Charts/Pie';
 export { default as Pyramid } from './Charts/Pyramid';
 export { default as Stacked } from './Charts/Stacked';
-export { default as ModalTest } from './ModalTest';
+
 export { default as ModalTodolist } from './ModalTodolist';
-export { default as DialogTodolists } from './DialogTodolists';
 export { default as DialogTodolistsDone } from './DialogTodolistsDone';
 export { default as Login } from './Login';
 export { default as Dashboard } from './Dashboard';
 export { default as Transaction } from './Transaction';
 export { default as DSItems } from './DSItems';
-export { default as DialogDSItem } from './dialogs/DialogDSItem';
 export { default as DSItemsTreeview } from './DSItemsTreeview';
 export { default as DSTransaction } from './DSTransaction';
+export { default as Trip } from './Trip';
+export { default as TripManage } from './TripManage';
+export { default as TripDetailType } from './TripDetailType';
+
+export { default as DialogTodolists } from './DialogTodolists';
+export { default as DialogDSItem } from './dialogs/DialogDSItem';
 export { default as DialogDSTransaction } from './dialogs/DialogDSTransaction';
 export { default as DialogDSAccount } from './dialogs/DialogDSAccount';
+export { default as DialogTripDetailType } from './dialogs/DialogTripDetailType';
 

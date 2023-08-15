@@ -542,7 +542,11 @@ export const links = [
         icon: <RiContactsLine />,
       },
       {
-        name: 'modal',
+        name: 'trips',
+        icon: <RiContactsLine />,
+      },
+      {
+        name: 'tripsbo',
         icon: <RiContactsLine />,
       },
     ],

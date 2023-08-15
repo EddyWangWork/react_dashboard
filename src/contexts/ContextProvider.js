@@ -45,6 +45,11 @@ export const ContextProvider = ({ children }) => {
     const [urlDS, seturlDS] = useState(`${localhostUrl}/DS`);
     const [urlgetDSTransactionV2, seturlgetDSTransactionV2] = useState(`${urlDS}/getDSTransactionV2`);
 
+    //trip
+    const [urltrip, seturltrip] = useState(`${localhostUrl}/Trip`);
+    const [urlgetTrips, seturlgetTrips] = useState(`${urltrip}/getTrips`);
+    const [urlgetTripDetailTypes, seturlgetTripDetailTypes] = useState(`${urltrip}/getTripDetailTypes`);
+
     const setMode = (e) => {
         setCurrentMode(e.target.value);
         localStorage.setItem('themeMode', e.target.value);
@@ -95,6 +100,7 @@ export const ContextProvider = ({ children }) => {
             urlDSItem, urlgetDSItemWithSub, urlgetDSItemWithSubV3, urladdWithSubItem, //dsitem
             urlDSItemSub, //dsitem sub
             urlDS, urlgetDSTransactionV2, //dsTrans
+            urlgetTrips, //trip
         }}>
             {children}
         </StateContext.Provider>
