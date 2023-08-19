@@ -8,27 +8,25 @@ export const dsAccGrid = [
         headerText: 'Name',
         width: '50',
         textAlign: 'Center'
-    }
-    // ,
-    // {
-    //     field: 'description',
-    //     visible: false,
-    //     headerText: 'Description',
-    //     width: '120',
-    //     textAlign: 'Center'
-    // }
-    ,
+    },
     {
         field: 'balance',
         headerText: 'Balance',
-        width: '50',
+        width: '30',
         format: 'C2',
         textAlign: 'Right'
     },
     {
+        field: 'createdDateTime',
+        headerText: 'Date',
+        width: '50',
+        format: { type: 'date', format: 'dd/MM/yyyy' },
+        textAlign: 'Center',
+    },
+    {
         field: 'isActive',
         headerText: 'IsActive',
-        width: '120',
+        width: '50',
         textAlign: 'Center'
     }
 ];
@@ -80,6 +78,7 @@ export const dsTransGrid = [
         headerText: 'Date',
         width: '100',
         format: { type: 'date', format: 'dd/MM/yyyy' },
+        enableGroupByFormat: true,
         textAlign: 'Center',
         allowFiltering: false
     },

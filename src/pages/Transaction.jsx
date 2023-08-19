@@ -33,6 +33,11 @@ const Transaction = () => {
             })
             .then((response) => {
                 console.log(response.data)
+
+                response.data.map((data, index) => {
+                    data.createdDateTime = new Date(data.createdDateTime);
+                });
+
                 var activeAcc = response.data.filter(x => x.isActive == true)
 
                 const sortActiveAcc = activeAcc.sort((a, b) => b.balance - a.balance)
