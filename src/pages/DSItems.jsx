@@ -223,6 +223,7 @@ const DSItems = () => {
                     pageSettings={pageSettings}
                     allowFiltering={true}
                     filterSettings={filterOptions}
+                    allowGrouping={true}
                     actionBegin={actionBegin}
                     created={gridCreated}
                 >

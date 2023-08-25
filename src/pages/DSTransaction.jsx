@@ -26,6 +26,7 @@ const DSTransaction = () => {
         urlDS,
         urldsAccont,
         urlgetDSTransactionV2,
+        urlgetDSTransactionWithDate,
         urlgetDSItemWithSubV3
     } = useStateContext();
     const navigate = useNavigate();
@@ -41,7 +42,8 @@ const DSTransaction = () => {
     const [typeIdI, settypeIdI] = useState(null);
     const [accIdI, setaccIdI] = useState(null);
 
-    const [updateDateI2, setupdateDateI2] = useState(null);
+    const [startDate, setstartDate] = useState(null);
+    const [endDate, setendDate] = useState(null);
 
     //---API Services---//
 
@@ -139,13 +141,35 @@ const DSTransaction = () => {
             });
     }
 
+    const getDSTransactionWithDateAPI = (req) => {
+        axios.
+            post(`${urlgetDSTransactionWithDate}`, req, {
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then((response) => {
+                console.log(response.data)
+                response.data.map((data, index) => {
+                    data.createdDateTime = new Date(data.createdDateTime);
+                    data.createdDateTimeDay = new Date(data.createdDateTime);
+                });
+                setDSTrans(response.data)
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
     const addDStransaction = (req) => {
-        axios.post(`${urlDS}`, req, {
-            headers: {
-                'Authorization': token,
-                'Content-Type': 'application/json'
-            }
-        })
+        axios.
+            post(`${urlDS}`, req, {
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                }
+            })
             .then(response => {
                 console.log(response);
                 refreshData();
@@ -156,12 +180,13 @@ const DSTransaction = () => {
     }
 
     const editDStransaction = (id, req) => {
-        axios.put(`${urlDS}/${id}`, req, {
-            headers: {
-                'Authorization': token,
-                'Content-Type': 'application/json'
-            }
-        })
+        axios.
+            put(`${urlDS}/${id}`, req, {
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                }
+            })
             .then(response => {
                 console.log(response);
                 refreshData();
@@ -172,12 +197,13 @@ const DSTransaction = () => {
     }
 
     const deleteDStransaction = (id) => {
-        axios.delete(`${urlDS}/${id}`, {
-            headers: {
-                'Authorization': token,
-                'Content-Type': 'application/json'
-            }
-        })
+        axios.
+            delete(`${urlDS}/${id}`, {
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                }
+            })
             .then(response => {
                 console.log(response);
                 refreshData();
@@ -190,7 +216,16 @@ const DSTransaction = () => {
     //END---API Services---//
 
     const refreshData = () => {
-        console.log("refreshData")
+        if (startDate && endDate) {
+            getDSTransactionWithDate();
+        }
+        else {
+            getdstransactionsAll();
+        }
+    }
+
+    const getdstransactionsAll = () => {
+        setDSTrans([]);
         getdstransactions();
     }
 
@@ -215,23 +250,34 @@ const DSTransaction = () => {
     };
 
     const dateChange = (e) => {
-        console.log(e);
-        console.log(e.startDate);
-        console.log(e.endDate);
-        console.log(+e.startDate);
-        console.log(+e.endDate);
+        setstartDate(null);
+        setendDate(null);
 
         if (e.startDate) {
+            setstartDate((new Date(e.startDate.setHours(+8))).toJSON());
+            setendDate((new Date(e.endDate.setHours(+8))).toJSON());
+
             const req =
             {
-                UnixStartDate: +e.startDate,
-                UnixEndDate: +e.endDate
+                datefrom: (new Date(e.startDate.setHours(+8))).toJSON(),
+                dateto: (new Date(e.endDate.setHours(+8))).toJSON()
             }
 
-            //getDSTransactionsByDate(req);
+            getDSTransactionWithDateAPI(req);
         } else {
-            refreshData();
+            getdstransactionsAll();
         }
+    }
+
+    const getDSTransactionWithDate = () => {
+        const req =
+        {
+            datefrom: startDate,
+            dateto: endDate
+        }
+
+        console.log(req);
+        getDSTransactionWithDateAPI(req);
     }
 
     const rowDataBound = (args) => {
@@ -471,7 +517,17 @@ const DSTransaction = () => {
     let preUpdateDate;
     let preAccId;
 
-    const toolbarOptions = ['Add', 'Edit', 'Delete'];
+    const toolbarOptions = [
+        'Add', 'Edit', 'Delete',
+        { text: 'Refresh', tooltipText: 'Refresh', prefixIcon: 'e-refresh', id: 'refreshData' }
+    ];
+
+    const clickHandler = (args) => {
+        if (grid && args.item.id === 'refreshData') {
+            refreshData();
+        }
+    };
+
     const editSettings = { allowEditing: true, allowAdding: true, allowDeleting: true, mode: 'Dialog', template: dialogTemplate };
     const pageSettings = { pageCount: 10 };
 
@@ -541,6 +597,7 @@ const DSTransaction = () => {
                     ref={g => grid = g}
                     dataSource={dsTrans}
                     toolbar={toolbarOptions}
+                    toolbarClick={clickHandler}
                     editSettings={editSettings}
                     pageSettings={pageSettings}
                     actionBegin={actionBegin}

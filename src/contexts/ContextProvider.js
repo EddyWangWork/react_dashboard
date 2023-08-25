@@ -44,6 +44,7 @@ export const ContextProvider = ({ children }) => {
     //dsTrans
     const [urlDS, seturlDS] = useState(`${localhostUrl}/DS`);
     const [urlgetDSTransactionV2, seturlgetDSTransactionV2] = useState(`${urlDS}/getDSTransactionV2`);
+    const [urlgetDSTransactionWithDate, seturlgetDSTransactionWithDate] = useState(`${urlDS}/getDSTransactionWithDate`);
 
     //trip
     const [urltrip, seturltrip] = useState(`${localhostUrl}/Trip`);
@@ -99,7 +100,7 @@ export const ContextProvider = ({ children }) => {
             urldsAccont, //ds account
             urlDSItem, urlgetDSItemWithSub, urlgetDSItemWithSubV3, urladdWithSubItem, //dsitem
             urlDSItemSub, //dsitem sub
-            urlDS, urlgetDSTransactionV2, //dsTrans
+            urlDS, urlgetDSTransactionV2, urlgetDSTransactionWithDate, //dsTrans
             urlgetTrips, //trip
         }}>
             {children}
