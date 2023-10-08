@@ -19,6 +19,7 @@ export { default as Stacked } from './Charts/Stacked';
 export { default as ModalTodolist } from './ModalTodolist';
 export { default as DialogTodolistsDone } from './DialogTodolistsDone';
 export { default as Login } from './Login';
+export { default as LoginV2 } from './login/LoginV2';
 export { default as Dashboard } from './Dashboard';
 export { default as Transaction } from './Transaction';
 export { default as DSItems } from './DSItems';
