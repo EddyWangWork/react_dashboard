@@ -56,7 +56,7 @@ function LoginV2() {
     //-----END-------------------------------//
 
     return (
-        <div>
+        <div className="bodyClass">
             <meta charSet="UTF-8" />
             <title>CodePen - Neumorphism Login Form</title>
             {/* <link rel="stylesheet" href="./style.css" /> */}

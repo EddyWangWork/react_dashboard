@@ -21,11 +21,9 @@ const Dashboard = () => {
         if (token) {
             handleLogin();
         }
-        console.log(isLogin);
     }, []);
 
     const getDashboard = () => {
-        console.log(isLogin);
         if (!isLogin) {
             console.log('not login');
             return (

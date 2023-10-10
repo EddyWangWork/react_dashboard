@@ -18,6 +18,7 @@ export const ContextProvider = ({ children }) => {
     const [themeSettings, setThemeSettings] = useState(false)
     const [isLogin, setIsLogin] = useState(false);
     const [token, setToken] = useState(localStorage.getItem("token"));
+    // const [localhostUrl, setlocalhostUrl] = useState('https://allinoneapi.alwaysdata.net');
     const [localhostUrl, setlocalhostUrl] = useState('https://localhost:7069');
 
     const [urllogin, seturllogin] = useState(`${localhostUrl}/Member/login`);
