@@ -32,6 +32,7 @@ const DSTransaction = () => {
     const navigate = useNavigate();
 
     const [dsTrans, setDSTrans] = useState(null);
+    const [dsTransAll, setDSTransAll] = useState(null);
 
     const [dsItemsACData, setdsItemsACData] = useState(null);
 
@@ -130,6 +131,7 @@ const DSTransaction = () => {
                     data.createdDateTimeDay = new Date(data.createdDateTime);
                 });
                 setDSTrans(response.data)
+                setDSTransAll(response.data)
             })
             .catch((err) => {
                 console.log(err);
@@ -250,24 +252,35 @@ const DSTransaction = () => {
     };
 
     const dateChange = (e) => {
-        setstartDate(null);
-        setendDate(null);
-
         if (e.startDate) {
-            setstartDate((new Date(e.startDate.setHours(+8))).toJSON());
-            setendDate((new Date(e.endDate.setHours(+8))).toJSON());
-
-            const req =
-            {
-                datefrom: (new Date(e.startDate.setHours(+8))).toJSON(),
-                dateto: (new Date(e.endDate.setHours(+8))).toJSON()
-            }
-
-            getDSTransactionWithDateAPI(req);
+            var dsTransFilter = dsTransAll.filter(x => +(x.createdDateTime) >= +(e.startDate) && +(x.createdDateTime) <= +(e.endDate));
+            console.log(dsTransFilter);
+            setDSTrans(dsTransFilter);
         } else {
-            getdstransactionsAll();
+            setDSTrans(dsTransAll);
         }
     }
+
+    // call API
+    // const dateChange = (e) => {
+    //     setstartDate(null);
+    //     setendDate(null);
+
+    //     if (e.startDate) {
+    //         setstartDate((new Date(e.startDate.setHours(+8))).toJSON());
+    //         setendDate((new Date(e.endDate.setHours(+8))).toJSON());
+
+    //         const req =
+    //         {
+    //             datefrom: (new Date(e.startDate.setHours(+8))).toJSON(),
+    //             dateto: (new Date(e.endDate.setHours(+8))).toJSON()
+    //         }
+
+    //         getDSTransactionWithDateAPI(req);
+    //     } else {
+    //         getdstransactionsAll();
+    //     }
+    // }
 
     const getDSTransactionWithDate = () => {
         const req =
@@ -474,8 +487,6 @@ const DSTransaction = () => {
         }
     };
 
-
-
     const actionComplete = (args) => {
         if (args.form) {
             if ((args.requestType === 'beginEdit' || args.requestType === 'add')) {
@@ -545,6 +556,23 @@ const DSTransaction = () => {
             <AccordionComponent>
                 <div>
                     <div>
+                        <div> FILTER </div>
+                    </div>
+                    <div className='flex flex-wrap lg:flex-nowrap'>
+                        <DateRangePickerComponent
+                            id="daterangepicker"
+                            width={500}
+                            floatLabelType="Auto"
+                            placeholder='Transaction date'
+                            change={dateChange}
+                        />
+                    </div>
+                </div>
+            </AccordionComponent>
+
+            <AccordionComponent>
+                <div>
+                    <div>
                         <div> PRESET </div>
                     </div>
                     <div className='flex flex-wrap lg:flex-nowrap'>
@@ -585,13 +613,6 @@ const DSTransaction = () => {
                 </div>
             </AccordionComponent>
 
-            <div className="col-xs-6 col-sm-6 col-lg-6 col-md-6">
-                <DateRangePickerComponent
-                    id="daterangepicker"
-                    placeholder='Select a range'
-                    change={dateChange}
-                />
-            </div>
             <div className="col-xs-6 col-sm-6 col-lg-6 col-md-6">
                 <GridComponent
                     ref={g => grid = g}
