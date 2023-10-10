@@ -540,10 +540,28 @@ const DSTransaction = () => {
     };
 
     const editSettings = { allowEditing: true, allowAdding: true, allowDeleting: true, mode: 'Dialog', template: dialogTemplate };
-    const pageSettings = { pageCount: 10 };
+    const pageSettings = { pageSize: 10, pageSizes: true };
 
     const dsTransTypefields = { text: 'name', value: 'id' };
     const dsAccfields = { text: 'name', value: 'id' };
+
+    let initialGridLoad = true;
+    const dataBound = () => {
+        if (initialGridLoad && grid) {
+            initialGridLoad = false;
+            const pager = document.getElementsByClassName('e-gridpager');
+            let topElement;
+            if (grid.allowGrouping || grid.toolbar) {
+                topElement = grid.allowGrouping ? document.getElementsByClassName('e-groupdroparea') :
+                    document.getElementsByClassName('e-toolbar');
+            }
+            else {
+                topElement = document.getElementsByClassName('e-gridheader');
+            }
+            // grid.element.insertBefore(pager[0], topElement[0]);
+            grid.element.insertBefore(pager[1], topElement[0]);
+        }
+    };
 
     useEffect(() => {
         getDSACItems();
@@ -633,6 +651,7 @@ const DSTransaction = () => {
                     rowDataBound={rowDataBound}
                     created={gridCreated}
                     rowSelected={rowSelected}
+                    dataBound={dataBound}
                 >
                     <ColumnsDirective>
                         {dsTransGrid.map((item, index) => (
