@@ -117,6 +117,7 @@ const DSTransaction = () => {
     }
 
     const getdstransactions = () => {
+        grid.showSpinner();
         axios
             .get(`${urlgetDSTransactionV2}`, {
                 headers: {
@@ -132,6 +133,10 @@ const DSTransaction = () => {
                 });
                 setDSTrans(response.data)
                 setDSTransAll(response.data)
+
+                getDSACItems();
+                getdsaccounts();
+                GetDSTransactionTypes();
             })
             .catch((err) => {
                 console.log(err);
@@ -227,14 +232,8 @@ const DSTransaction = () => {
     }
 
     const getdstransactionsAll = () => {
-        setDSTrans([]);
+        // setDSTrans([]);        
         getdstransactions();
-    }
-
-    const gridCreated = () => {
-        if (!dsTrans) {
-            getdstransactions();
-        }
     }
 
     const filterOptions = {
@@ -563,10 +562,16 @@ const DSTransaction = () => {
         }
     };
 
+    const gridCreated = () => {
+        if (!dsTrans) {
+            getdstransactions();
+        }
+    }
+
     useEffect(() => {
-        getDSACItems();
-        getdsaccounts();
-        GetDSTransactionTypes();
+        // getDSACItems();
+        // getdsaccounts();
+        // GetDSTransactionTypes();
     }, []);
 
     return (
