@@ -51,6 +51,7 @@ const Transaction = () => {
                 if (err.response.status == 401) {
                     handleClearToken();
                     navigate('/login', { replace: true });
+                    window.location.reload();
                 }
             });
     }
