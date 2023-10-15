@@ -117,7 +117,9 @@ const DSTransaction = () => {
     }
 
     const getdstransactions = () => {
-        grid.showSpinner();
+        if (grid) {
+            grid.showSpinner();
+        }
         axios
             .get(`${urlgetDSTransactionV2}`, {
                 headers: {
