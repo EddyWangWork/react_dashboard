@@ -46,6 +46,9 @@ const DSTransaction = () => {
     const [startDate, setstartDate] = useState(null);
     const [endDate, setendDate] = useState(null);
 
+    const [startDateF, setstartDateF] = useState(null);
+    const [endDateF, setendDateF] = useState(null);
+
     //---API Services---//
 
     const getDSACItems = () => {
@@ -139,6 +142,10 @@ const DSTransaction = () => {
                 getDSACItems();
                 getdsaccounts();
                 GetDSTransactionTypes();
+
+                if (startDateF) {
+                    getFilterTransactions(startDateF, endDateF, response.data);
+                }
             })
             .catch((err) => {
                 console.log(err);
@@ -225,12 +232,7 @@ const DSTransaction = () => {
     //END---API Services---//
 
     const refreshData = () => {
-        if (startDate && endDate) {
-            getDSTransactionWithDate();
-        }
-        else {
-            getdstransactionsAll();
-        }
+        getdstransactionsAll();
     }
 
     const getdstransactionsAll = () => {
@@ -254,12 +256,19 @@ const DSTransaction = () => {
 
     const dateChange = (e) => {
         if (e.startDate) {
-            var dsTransFilter = dsTransAll.filter(x => +(x.createdDateTime) >= +(e.startDate) && +(x.createdDateTime) <= +(e.endDate));
-            console.log(dsTransFilter);
-            setDSTrans(dsTransFilter);
+            setstartDateF(+(e.startDate));
+            setendDateF(+(e.endDate));
+            // var dsTransFilter = dsTransAll.filter(x => +(x.createdDateTime) >= +(e.startDate) && +(x.createdDateTime) <= +(e.endDate));
+            // setDSTrans(dsTransFilter);
+            getFilterTransactions(+(e.startDate), +(e.endDate), dsTransAll);
         } else {
             setDSTrans(dsTransAll);
         }
+    }
+
+    const getFilterTransactions = (s, e, dstrans) => {
+        var dsTransFilter = dstrans.filter(x => +(x.createdDateTime) >= s && +(x.createdDateTime) <= e);
+        setDSTrans(dsTransFilter);
     }
 
     // call API

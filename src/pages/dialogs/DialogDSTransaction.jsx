@@ -121,7 +121,7 @@ const DialogDSTransaction = ({ props }) => {
     const handleTypeId = (e) => {
         settypeId(e.target.value);
         setisTransfer(e.target.value == 3)
-        refAccId.value = null;
+        // refAccId.value = null;
 
         console.log(e.target.value == 1)
         setTypeColor(e.target.value);
