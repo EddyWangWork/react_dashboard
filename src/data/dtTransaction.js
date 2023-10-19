@@ -76,7 +76,7 @@ export const dsTransGrid = [
     {
         field: 'createdDateTimeDay',
         headerText: 'Date',
-        width: '100',
+        width: '120',
         format: { type: 'date', format: 'dd/MM/yyyy' },
         enableGroupByFormat: true,
         textAlign: 'Center',
@@ -86,7 +86,8 @@ export const dsTransGrid = [
         field: 'dsItemName',
         headerText: 'Name',
         width: '250',
-        textAlign: 'Center'
+        textAlign: 'Center',
+        filter: { type: 'CheckBox' }
     },
     {
         field: 'description',
@@ -101,14 +102,14 @@ export const dsTransGrid = [
     {
         field: 'amount',
         headerText: 'Amount ',
-        width: '150',
+        width: '120',
         format: 'C2',
         textAlign: 'Right'
     },
     {
         field: 'balance',
         headerText: 'Balance',
-        width: '150',
+        width: '120',
         format: 'C2',
         textAlign: 'Right'
     },
@@ -126,7 +127,7 @@ export const dsTransGrid = [
     {
         field: 'dsAccountName',
         headerText: 'Account',
-        width: '100',
+        width: '150',
         textAlign: 'Center',
         filter: { type: 'CheckBox' }
     }

@@ -305,7 +305,7 @@ const DSTransaction = () => {
 
     const rowDataBound = (args) => {
         if (args.row) {
-            var tdAmount = args.row.children.length == 13 ? args.row.children[8] : args.row.children[7];
+            var tdAmount = args.row.children.length == 12 ? args.row.children[7] : args.row.children[6];
 
             if (getValue('dsTypeID', args.data) == 1) {
                 tdAmount.style.color = 'green'
