@@ -549,6 +549,10 @@ export const links = [
         name: 'tripsbo',
         icon: <RiContactsLine />,
       },
+      {
+        name: 'transcompare',
+        icon: <RiContactsLine />,
+      },
     ],
   },
   {

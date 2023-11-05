@@ -6,7 +6,8 @@ import { TooltipComponent } from '@syncfusion/ej2-react-popups';
 import { Navbar, Footer, Sidebar, ThemeSettings } from '../components';
 import {
     Ecommerce, Orders, Calendar, Employees, Stacked, Pyramid, Customers, Trip, Kanban, Line,
-    Area, Bar, Pie, Financial, ColorPicker, ColorMapping, Editor, Login, LoginV2, Todolists, Transaction, TripManage
+    Area, Bar, Pie, Financial, ColorPicker, ColorMapping, Editor, Login, LoginV2, Todolists, Transaction, TripManage,
+    TransactionCompare
 } from '../pages';
 
 import { useStateContext } from '../contexts/ContextProvider';
@@ -81,6 +82,7 @@ const Dashboard = () => {
                                 <Route path="/transactions" element={<Transaction />} />
                                 <Route path="/trips" element={<Trip />} />
                                 <Route path="/tripsbo" element={<TripManage />} />
+                                <Route path="/transcompare" element={<TransactionCompare />} />
 
                                 {/* apps  */}
                                 <Route path="/kanban" element={<Kanban />} />

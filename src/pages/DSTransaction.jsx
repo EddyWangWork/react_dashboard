@@ -136,8 +136,7 @@ const DSTransaction = () => {
                     data.createdDateTime = new Date(data.createdDateTime);
                     data.createdDateTimeDay = new Date(data.createdDateTime);
                 });
-                setDSTrans(response.data)
-                setDSTransAll(response.data)
+                assignTransations(response);
 
                 getDSACItems();
                 getdsaccounts();
@@ -155,6 +154,17 @@ const DSTransaction = () => {
                     navigate('/login', { replace: true });
                 }
             });
+    }
+
+    const assignTransations = (response) => {
+        setDSTrans(response.data)
+        setDSTransAll(response.data)
+        handleTransacions(response.data);
+    }
+
+    const handleTransacions = (tranasctions) => {
+        localStorage.setItem('transactions', []);
+        localStorage.setItem('transactions', JSON.stringify(tranasctions));
     }
 
     const getDSTransactionWithDateAPI = (req) => {

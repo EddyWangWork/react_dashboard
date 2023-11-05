@@ -28,6 +28,7 @@ export { default as DSTransaction } from './DSTransaction';
 export { default as Trip } from './Trip';
 export { default as TripManage } from './TripManage';
 export { default as TripDetailType } from './TripDetailType';
+export { default as TransactionCompare } from './TransactionCompare';
 
 export { default as DialogTodolists } from './DialogTodolists';
 export { default as DialogDSItem } from './dialogs/DialogDSItem';
