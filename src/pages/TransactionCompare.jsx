@@ -25,7 +25,7 @@ window.$ = $;
 
 const TransactionCompare = () => {
 
-    const { handleClearToken, isLogin, token, handleLogin, urldsAccont, dsTransactions } = useStateContext();
+    const { handleClearToken, isLogin, token, handleLogin, urldsAccont, dsTrans } = useStateContext();
     const navigate = useNavigate();
 
     const [countA, setcountA] = useState(0);
@@ -35,6 +35,7 @@ const TransactionCompare = () => {
 
     const [dsA, setdsA] = useState([]);
     const [dsB, setdsB] = useState([]);
+    const [dsC, setdsC] = useState([]);
 
     let refA = useRef(null);
     let refB = useRef(null);
@@ -44,7 +45,7 @@ const TransactionCompare = () => {
         $('.e-listbox-tool').on("click", function () {
             getAmount();
         });
-    }, [dsA])
+    }, [])
 
     let fields = { text: "dsItemName" };
     let toolbar = { items: ["moveTo", "moveFrom", "moveAllTo", "moveAllFrom"] };
@@ -53,116 +54,25 @@ const TransactionCompare = () => {
         console.log(refA.current.listData);
         console.log(refB);
 
-        var arrayA = dsTransactions.filter((x) => refA.current.listData.some(y => y.rowID === x.rowID));
-        var arrayB = dsTransactions.filter((x) => refB.current.listData.some(y => y.rowID === x.rowID));
+        var dsTransFilterA = dsTrans.filter((x) => refA.current.listData.some(y => y.rowID === x.rowID));
+        var dsTransFilterB = dsTrans.filter((x) => refB.current.listData.some(y => y.rowID === x.rowID));
 
-        var totalA = arrayA.reduce((a, v) => a = a + v.amount, 0)
-        var totalB = arrayB.reduce((a, v) => a = a + v.amount, 0)
+        dsTransFilterA.map((v, k) => {
+            v.type = 1;
+        })
 
-        setcountA(arrayA.length);
+        dsTransFilterB.map((v, k) => {
+            v.type = 2;
+        })
+
+        var dsTransFilterC = [...dsTransFilterA, ...dsTransFilterB].sort((a, b) => a.dsItemName > b.dsItemName ? 1 : -1);
+        setdsC(dsTransFilterC);
+
+        var totalA = dsTransFilterA.reduce((a, v) => a = a + v.amount, 0)
+        var totalB = dsTransFilterB.reduce((a, v) => a = a + v.amount, 0)
+
         setamountA(totalA);
-
-        setcountB(arrayB.length);
         setamountB(totalB);
-    }
-
-    const listboxA = () => {
-        return (
-            <div className="listbox1 pl-10">
-                <ListBoxComponent sortOrder='Ascending' ref={refA} height={250} dataSource={dsA} fields={fields} scope="#listbox" toolbarSettings={toolbar} />
-            </div>
-        )
-    }
-
-    const listboxB = () => {
-        return (
-            <div className="listbox2 listbox1 pr-10">
-                <ListBoxComponent sortOrder='Ascending' ref={refB} height={250} id="listbox" dataSource={dsB} fields={fields} />
-            </div>
-        )
-    }
-
-    const box3 = () => {
-        return (
-            <div class="relative overflow-x-auto">
-                <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                    <thead class="text-2xl text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                        <tr>
-                            <th scope="col" class="px-6 py-3">
-                                Category
-                            </th>
-                            <th scope="col" class="px-6 py-3">
-                                Value
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-xl">
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                Item
-                            </th>
-                            <td class="px-6 py-4">
-                                {countA}
-                            </td>
-                        </tr>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                Total
-                            </th>
-                            <td class="px-6 py-4">
-                                {amountA}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        )
-    }
-
-    const box4 = () => {
-        return (
-            <div class="relative overflow-x-auto">
-                <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                    <thead class="text-2xl text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                        <tr>
-                            <th scope="col" class="px-6 py-3">
-                                Category
-                            </th>
-                            <th scope="col" class="px-6 py-3">
-                                Value
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-xl">
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                Item
-                            </th>
-                            <td class="px-6 py-4">
-                                {countB}
-                            </td>
-                        </tr>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                Total
-                            </th>
-                            <td class="px-6 py-4">
-                                {amountB}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        )
-    }
-
-    const box5 = () => {
-        return (
-            <div href="#" class="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
-                <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Noteworthy technology acquisitions 2021</h5>
-                <p class="font-normal text-gray-700 dark:text-gray-400">Here are the biggest enterprise technology acquisitions of 2021 so far, in reverse chronological order.</p>
-            </div>
-        )
     }
 
     const getFilterTransactions = (s, e, dsAll) => {
@@ -173,13 +83,100 @@ const TransactionCompare = () => {
             && x.dsItemName.includes('Commitment'));
         var dsTransFilterB = dsAll.filter(x => (+(x.unixcreatedDateTime) >= s && +(x.unixcreatedDateTime) <= e) && x.dsTypeID == 2
             && !x.dsItemName.includes('Commitment'));
+
+        dsTransFilterA.map((v, k) => {
+            v.type = 1;
+        })
+
+        dsTransFilterB.map((v, k) => {
+            v.type = 2;
+        })
+
+        var dsTransFilterC = [...dsTransFilterA, ...dsTransFilterB].sort((a, b) => a.dsItemName > b.dsItemName ? 1 : -1);
+        console.log(dsTransFilterC);
         setdsA(dsTransFilterA);
         setdsB(dsTransFilterB);
+        setdsC(dsTransFilterC);
+
+        var totalA = dsTransFilterA.reduce((a, v) => a = a + v.amount, 0)
+        var totalB = dsTransFilterB.reduce((a, v) => a = a + v.amount, 0)
+
+        setamountA(totalA);
+        setamountB(totalB);
+    }
+
+    const listboxA = () => {
+        return (
+            <div className="listbox1">
+                <ListBoxComponent sortOrder='Ascending' ref={refA} height={250} dataSource={dsA} fields={fields} scope="#listbox" toolbarSettings={toolbar} />
+            </div>
+        )
+    }
+
+    const listboxB = () => {
+        return (
+            <div className="listbox2 listbox1">
+                <ListBoxComponent sortOrder='Ascending' ref={refB} height={250} id="listbox" dataSource={dsB} fields={fields} />
+            </div>
+        )
+    }
+
+    const tableC = () => {
+        return (
+            <div class="relative overflow-x-auto">
+                <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                    <thead class="text-sm text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 rounded-l-lg">
+                                Product name
+                            </th>
+                            <th scope="col" class="px-6 py-3 rounded-r-lg">
+                                Price(A)
+                            </th>
+                            <th scope="col" class="px-6 py-3 rounded-r-lg">
+                                Price(B)
+                            </th>
+                            <th scope="col" class="px-6 py-3 rounded-l-lg">
+                                Description
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {dsC.map((v, k) => {
+                            return (
+                                <tr key={k} class="bg-white dark:bg-gray-800">
+                                    <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                        {v.dsItemName}
+                                    </th>
+                                    <td class="px-6 py-4">
+                                        {dsTrans.find(x => x.rowID == v.rowID && v.type == 1)?.amount ?? 0}
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        {dsTrans.find(x => x.rowID == v.rowID && v.type == 2)?.amount ?? 0}
+                                    </td>
+                                    <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                        {v.description}
+                                    </th>
+                                </tr>
+                            )
+                        })}
+                    </tbody>
+                    <tfoot>
+                        <tr class="font-semibold text-gray-900 dark:text-white">
+                            <th scope="row" class="px-6 py-3 text-xl">Total</th>
+                            <td class="px-6 py-3">{amountA}</td>
+                            <td></td>
+                            <td class="px-6 py-3">{amountB}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        )
     }
 
     const dateChange = (e) => {
         if (e.startDate) {
-            getFilterTransactions(+(e.startDate), +(e.endDate), dsTransactions);
+            getFilterTransactions(+(e.startDate), +(e.endDate), dsTrans);
         } else {
             // setDSTrans(dsTransAll);
         }
@@ -211,10 +208,11 @@ const TransactionCompare = () => {
         <div>
             <div class="grid grid-cols-2 gap-6 py-5">
                 <div class="pl-10 col-span-2">{dateFilter()}</div>
-                <div>{listboxA()}</div>
-                <div>{listboxB()}</div>
-                <div class="pl-10 pr-24">{box3()}</div>
-                <div class="pr-10">{box4()}</div>
+                <div className='pl-10'>{listboxA()}</div>
+                <div className='pr-10'>{listboxB()}</div>
+                <div class="pl-10 pr-10 col-span-2">{tableC()}</div>
+                {/* <div class="pl-10 pr-24">{tableA()}</div>
+            <div class="pr-10">{tableB()}</div> */}
             </div>
         </div>
     );

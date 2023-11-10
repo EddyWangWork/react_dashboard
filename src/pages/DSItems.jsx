@@ -21,6 +21,9 @@ const DSItems = () => {
     const [dsItemsData, setdsItemsData] = useState(null);
 
     const getDSItems = () => {
+        if (grid) {
+            grid.showSpinner();
+        }
         axios
             .get(`${urlgetDSItemWithSub}`, {
                 headers: {
@@ -204,6 +207,7 @@ const DSItems = () => {
         }
     };
 
+    let grid;
     const toolbarOptions = ['Add', 'Edit', 'Delete'];
     const editSettings = { allowEditing: true, allowAdding: true, allowDeleting: true, mode: 'Dialog', template: dialogTemplate };
     const pageSettings = { pageCount: 5 };
@@ -216,6 +220,7 @@ const DSItems = () => {
         <div>
             <div>
                 <GridComponent
+                    ref={x => grid = x}
                     dataSource={dsItemsData}
                     toolbar={toolbarOptions}
                     allowPaging={true}

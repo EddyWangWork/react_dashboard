@@ -12,9 +12,33 @@ window.$ = $;
 
 
 function LoginV2() {
-    const { handleLogin, handleSetToken, token, localhostUrl, urllogin } = useStateContext();
+    const { handleLogin, handleSetToken, token, localhostUrl,
+        urllogin, urlgetDSTransactionV2, setdsTrans } = useStateContext();
 
     const [formData, setFormData] = useState({ name: '', email: '' });
+
+    const getdstransactions = (token) => {
+        axios
+            .get(`${urlgetDSTransactionV2}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then((response) => {
+                console.log(response.data)
+                response.data.map((data, index) => {
+                    data.createdDateTime = new Date(data.createdDateTime);
+                    data.createdDateTimeDay = new Date(data.createdDateTime);
+                });
+                setdsTrans(response.data);
+            })
+            .catch((err) => {
+                console.log(token);
+                console.log(err);
+                console.log(err.response.status);
+            });
+    }
 
     const navigate = useNavigate();
     const handleSubmit = (token) => {
@@ -39,6 +63,7 @@ function LoginV2() {
                 console.log(response);
                 console.log(response.data['token']);
                 handleSubmit(response.data['token']);
+                getdstransactions(response.data['token']);
             })
             .catch(error => {
                 console.log(error);

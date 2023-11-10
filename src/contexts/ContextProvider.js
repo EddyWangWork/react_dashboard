@@ -54,6 +54,7 @@ export const ContextProvider = ({ children }) => {
 
     //global
     const [dsTransactions, setdsTransactions] = useState(JSON.parse(localStorage.getItem("transactions")));
+    const [dsTrans, setdsTrans] = useState([]);
 
     const setMode = (e) => {
         setCurrentMode(e.target.value);
@@ -107,7 +108,8 @@ export const ContextProvider = ({ children }) => {
             urlDS, urlgetDSTransactionV2, urlgetDSTransactionWithDate, //dsTrans
             urlgetTrips, //trip
 
-            dsTransactions
+            dsTransactions,
+            dsTrans, setdsTrans
         }}>
             {children}
         </StateContext.Provider>

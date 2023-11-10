@@ -48,6 +48,9 @@ const Todolists = () => {
     }
 
     const getTodolistsAll = (category) => {
+        if (grid) {
+            grid.showSpinner();
+        }
         axios
             .get(`${localhostUrl}/Todolist`, {
                 headers: {
@@ -78,6 +81,9 @@ const Todolists = () => {
     }
 
     const getTodolistsDone = () => {
+        if (gridtdlDone) {
+            gridtdlDone.showSpinner();
+        }
         axios
             .get(`${localhostUrl}/TodolistDone`, {
                 headers: {

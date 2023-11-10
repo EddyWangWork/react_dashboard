@@ -24,6 +24,9 @@ const Transaction = () => {
     const [bankAccData, setBankAccData] = useState(null);
 
     const getdsaccounts = () => {
+        if (grid) {
+            grid.showSpinner();
+        }
         axios
             .get(`${urldsAccont}`, {
                 headers: {
@@ -165,6 +168,7 @@ const Transaction = () => {
         }
     };
 
+    let grid;
     const toolbarOptions = ['Add', 'Edit', 'Delete'];
     const editSettings = { allowEditing: true, allowAdding: true, allowDeleting: true, mode: 'Dialog', template: dialogTemplate }
     const pageSettings = { pageCount: 5 };
@@ -174,6 +178,7 @@ const Transaction = () => {
     const content0 = () => {
         return <div>
             <GridComponent
+                ref={x => grid = x}
                 dataSource={bankAccData}
                 toolbar={toolbarOptions}
                 allowPaging={true}
