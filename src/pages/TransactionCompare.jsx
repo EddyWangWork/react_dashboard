@@ -28,14 +28,11 @@ const TransactionCompare = () => {
     const { handleClearToken, isLogin, token, handleLogin, urldsAccont, dsTrans } = useStateContext();
     const navigate = useNavigate();
 
-    const [countA, setcountA] = useState(0);
-    const [countB, setcountB] = useState(0);
     const [amountA, setamountA] = useState(0);
     const [amountB, setamountB] = useState(0);
 
     const [dsA, setdsA] = useState([]);
     const [dsB, setdsB] = useState([]);
-    const [dsC, setdsC] = useState([]);
 
     let refA = useRef(null);
     let refB = useRef(null);
@@ -57,19 +54,20 @@ const TransactionCompare = () => {
         var dsTransFilterA = dsTrans.filter((x) => refA.current.listData.some(y => y.rowID === x.rowID));
         var dsTransFilterB = dsTrans.filter((x) => refB.current.listData.some(y => y.rowID === x.rowID));
 
-        dsTransFilterA.map((v, k) => {
-            v.type = 1;
-        })
+        var dsTransFilterAA = structuredClone(dsTransFilterA);
+        dsTransFilterAA.map((data, index) => {
+            data.dsItemName = `${data.dsItemName} ${data.description != null ? `(${data.description})` : ''}`
+        });
+        var dsTransFilterBB = structuredClone(dsTransFilterB);
+        dsTransFilterBB.map((data, index) => {
+            data.dsItemName = `${data.dsItemName} ${data.description != null ? `(${data.description})` : ''}`
+        });
 
-        dsTransFilterB.map((v, k) => {
-            v.type = 2;
-        })
+        setdsA(dsTransFilterAA.sort((a, b) => a.amount - b.amount));
+        setdsB(dsTransFilterBB.sort((a, b) => a.amount - b.amount));
 
-        var dsTransFilterC = [...dsTransFilterA, ...dsTransFilterB].sort((a, b) => a.dsItemName > b.dsItemName ? 1 : -1);
-        setdsC(dsTransFilterC);
-
-        var totalA = dsTransFilterA.reduce((a, v) => a = a + v.amount, 0)
-        var totalB = dsTransFilterB.reduce((a, v) => a = a + v.amount, 0)
+        var totalA = dsTransFilterAA.reduce((a, v) => a = a + v.amount, 0)
+        var totalB = dsTransFilterBB.reduce((a, v) => a = a + v.amount, 0)
 
         setamountA(totalA);
         setamountB(totalB);
@@ -79,30 +77,38 @@ const TransactionCompare = () => {
         dsAll.map((data, index) => {
             data.unixcreatedDateTime = +(new Date(data.createdDateTime));
         });
+        console.log('getFilterTransactions');
+        console.log(dsAll);
         var dsTransFilterA = dsAll.filter(x => (+(x.unixcreatedDateTime) >= s && +(x.unixcreatedDateTime) <= e) && x.dsTypeID == 2
             && x.dsItemName.includes('Commitment'));
         var dsTransFilterB = dsAll.filter(x => (+(x.unixcreatedDateTime) >= s && +(x.unixcreatedDateTime) <= e) && x.dsTypeID == 2
             && !x.dsItemName.includes('Commitment'));
 
-        dsTransFilterA.map((v, k) => {
-            v.type = 1;
-        })
+        var dsTransFilterAA = structuredClone(dsTransFilterA);
+        dsTransFilterAA.map((data, index) => {
+            data.dsItemName = `${data.dsItemName} ${data.description != null ? `(${data.description})` : ''}`
+        });
+        var dsTransFilterBB = structuredClone(dsTransFilterB);
+        dsTransFilterBB.map((data, index) => {
+            data.dsItemName = `${data.dsItemName} ${data.description != null ? `(${data.description})` : ''}`
+        });
 
-        dsTransFilterB.map((v, k) => {
-            v.type = 2;
-        })
+        setdsA(dsTransFilterAA.sort((a, b) => a.amount - b.amount));
+        setdsB(dsTransFilterBB.sort((a, b) => a.amount - b.amount));
 
-        var dsTransFilterC = [...dsTransFilterA, ...dsTransFilterB].sort((a, b) => a.dsItemName > b.dsItemName ? 1 : -1);
-        console.log(dsTransFilterC);
-        setdsA(dsTransFilterA);
-        setdsB(dsTransFilterB);
-        setdsC(dsTransFilterC);
-
-        var totalA = dsTransFilterA.reduce((a, v) => a = a + v.amount, 0)
-        var totalB = dsTransFilterB.reduce((a, v) => a = a + v.amount, 0)
+        var totalA = dsTransFilterAA.reduce((a, v) => a = a + v.amount, 0)
+        var totalB = dsTransFilterBB.reduce((a, v) => a = a + v.amount, 0)
 
         setamountA(totalA);
         setamountB(totalB);
+    }
+
+    const dateChange = (e) => {
+        if (e.startDate) {
+            getFilterTransactions(+(e.startDate), +(e.endDate), dsTrans);
+        } else {
+            // setDSTrans(dsTransAll);
+        }
     }
 
     const listboxA = () => {
@@ -121,52 +127,38 @@ const TransactionCompare = () => {
         )
     }
 
-    const tableC = () => {
+    const tableA = () => {
         return (
             <div class="relative overflow-x-auto">
-                <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                    <thead class="text-sm text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
+                <table class="w-full text-xs text-left text-gray-500 dark:text-gray-400">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
-                            <th scope="col" class="px-6 py-3 rounded-l-lg">
+                            <th scope="col" class="px-6 py-3 rounded-l-lg text-center">
                                 Product name
                             </th>
-                            <th scope="col" class="px-6 py-3 rounded-r-lg">
-                                Price(A)
-                            </th>
-                            <th scope="col" class="px-6 py-3 rounded-r-lg">
-                                Price(B)
-                            </th>
-                            <th scope="col" class="px-6 py-3 rounded-l-lg">
-                                Description
+                            <th scope="col" class="px-6 py-3 rounded-r-lg text-center">
+                                Price
                             </th>
                         </tr>
                     </thead>
                     <tbody>
-                        {dsC.map((v, k) => {
+                        {dsA.map((v, k) => {
                             return (
                                 <tr key={k} class="bg-white dark:bg-gray-800">
-                                    <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                    <th scope="row" class="text-center px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                         {v.dsItemName}
                                     </th>
-                                    <td class="px-6 py-4">
-                                        {dsTrans.find(x => x.rowID == v.rowID && v.type == 1)?.amount ?? 0}
+                                    <td class="px-6 py-4 text-center">
+                                        {dsTrans.find(x => x.rowID == v.rowID)?.amount.toFixed(2) ?? 0}
                                     </td>
-                                    <td class="px-6 py-4">
-                                        {dsTrans.find(x => x.rowID == v.rowID && v.type == 2)?.amount ?? 0}
-                                    </td>
-                                    <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                        {v.description}
-                                    </th>
                                 </tr>
                             )
                         })}
                     </tbody>
                     <tfoot>
                         <tr class="font-semibold text-gray-900 dark:text-white">
-                            <th scope="row" class="px-6 py-3 text-xl">Total</th>
-                            <td class="px-6 py-3">{amountA}</td>
-                            <td></td>
-                            <td class="px-6 py-3">{amountB}</td>
+                            <th scope="row" class="px-6 py-3 text-xs text-center">Total</th>
+                            <td class="px-6 py-3 text-center">{amountA.toFixed(2)}</td>
                         </tr>
                     </tfoot>
                 </table>
@@ -174,12 +166,43 @@ const TransactionCompare = () => {
         )
     }
 
-    const dateChange = (e) => {
-        if (e.startDate) {
-            getFilterTransactions(+(e.startDate), +(e.endDate), dsTrans);
-        } else {
-            // setDSTrans(dsTransAll);
-        }
+    const tableB = () => {
+        return (
+            <div class="relative overflow-x-auto">
+                <table class="w-full text-xs text-left text-gray-500 dark:text-gray-400">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 rounded-l-lg text-center">
+                                Product name
+                            </th>
+                            <th scope="col" class="px-6 py-3 rounded-r-lg text-center">
+                                Price
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {dsB.map((v, k) => {
+                            return (
+                                <tr key={k} class="bg-white dark:bg-gray-800">
+                                    <th scope="row" class="text-center px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                        {v.dsItemName}
+                                    </th>
+                                    <td class="px-6 py-4 text-center">
+                                        {dsTrans.find(x => x.rowID == v.rowID)?.amount.toFixed(2) ?? 0}
+                                    </td>
+                                </tr>
+                            )
+                        })}
+                    </tbody>
+                    <tfoot>
+                        <tr class="font-semibold text-gray-900 dark:text-white">
+                            <th scope="row" class="px-6 py-3 text-xs text-center">Total</th>
+                            <td class="px-6 py-3 text-center">{amountB.toFixed(2)}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        )
     }
 
     const dateFilter = () => {
@@ -199,7 +222,6 @@ const TransactionCompare = () => {
                         />
                     </div>
                 </div>
-
             </div>
         )
     }
@@ -210,9 +232,8 @@ const TransactionCompare = () => {
                 <div class="pl-10 col-span-2">{dateFilter()}</div>
                 <div className='pl-10'>{listboxA()}</div>
                 <div className='pr-10'>{listboxB()}</div>
-                <div class="pl-10 pr-10 col-span-2">{tableC()}</div>
-                {/* <div class="pl-10 pr-24">{tableA()}</div>
-            <div class="pr-10">{tableB()}</div> */}
+                <div class="pl-10">{tableA()}</div>
+                <div class="pr-10">{tableB()}</div>
             </div>
         </div>
     );
