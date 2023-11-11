@@ -16,6 +16,8 @@ function LoginV2() {
         urllogin, urlgetDSTransactionV2, setdsTrans } = useStateContext();
 
     const [formData, setFormData] = useState({ name: '', email: '' });
+    const [isLogining, setisLogining] = useState(false);
+    const [errorMsg, seterrorMsg] = useState(null);
 
     const getdstransactions = (token) => {
         axios
@@ -58,6 +60,9 @@ function LoginV2() {
     const signin = (event) => {
         event.preventDefault();
 
+        setisLogining(true);
+        seterrorMsg(null);
+
         axios.post(`${urllogin}`, formData)
             .then(response => {
                 console.log(response);
@@ -66,19 +71,18 @@ function LoginV2() {
                 getdstransactions(response.data['token']);
             })
             .catch(error => {
+                setisLogining(false);
                 console.log(error);
+                console.log(error.message);
+                // console.log(error.response.data);
+                // seterrorMsg(error.response != null ? error.response.data : error.message);
+                seterrorMsg(error.response?.data ?? error.message);
             });
     }
 
     React.useEffect(() => {
 
     }, [])
-
-    //-----DATA AREA-------------------------------//
-
-    //-----DATAEND-------------------------------// 
-
-    //-----END-------------------------------//
 
     return (
         <div className="bodyClass">
@@ -101,12 +105,35 @@ function LoginV2() {
                         {/* <input className="form__input" type="password" placeholder="Password" /><a className="form__link">Forgot your password?</a> */}
                         <input type="password" name="password" placeholder="Password" className="form__input" onChange={handleInputChange} required />
                         <a className="form__link">Forgot your password?</a>
-                        <button className="form__button button submit" onClick={signin} >SIGN IN</button>
+                        <button disabled={isLogining} className="form__button button submit" onClick={signin} >
+                            SIGN IN
+                            {isLogining && <svg xmlns="http://www.w3.org/2000/svg" width="18px" fill="#fff" class="ml-2 inline animate-spin"
+                                viewBox="0 0 26.349 26.35">
+                                <circle cx="13.792" cy="3.082" r="3.082" data-original="#000000" />
+                                <circle cx="13.792" cy="24.501" r="1.849" data-original="#000000" />
+                                <circle cx="6.219" cy="6.218" r="2.774" data-original="#000000" />
+                                <circle cx="21.365" cy="21.363" r="1.541" data-original="#000000" />
+                                <circle cx="3.082" cy="13.792" r="2.465" data-original="#000000" />
+                                <circle cx="24.501" cy="13.791" r="1.232" data-original="#000000" />
+                                <path
+                                    d="M4.694 19.84a2.155 2.155 0 0 0 0 3.05 2.155 2.155 0 0 0 3.05 0 2.155 2.155 0 0 0 0-3.05 2.146 2.146 0 0 0-3.05 0z"
+                                    data-original="#000000" />
+                                <circle cx="21.364" cy="6.218" r=".924" data-original="#000000" />
+                            </svg>}
+                        </button>
+                        {errorMsg && <div id="toast-danger" class="mt-5 flex items-center w-full max-w-sm p-4 mb-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800" role="alert">
+                            <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-red-500 bg-red-100 rounded-lg dark:bg-red-800 dark:text-red-200">
+                                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 11.793a1 1 0 1 1-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414L8.586 10 6.293 7.707a1 1 0 0 1 1.414-1.414L10 8.586l2.293-2.293a1 1 0 0 1 1.414 1.414L11.414 10l2.293 2.293Z" />
+                                </svg>
+                                <span class="sr-only">Error icon</span>
+                            </div>
+                            <div class="pl-2 ms-3 text-xl font-normal">{errorMsg}</div>
+                        </div>}
                     </form>
                 </div>
                 <div className="container b-container" id="b-container">
                     <form className="form" id="b-form" method action>
-
                         <h2 className="form_title title">Create Account</h2>
                         <input className="form__input" type="text" placeholder="Name" />
                         <input className="form__input" type="text" placeholder="Email" />
@@ -125,7 +152,9 @@ function LoginV2() {
                     <div className="switch__container is-hidden" id="switch-c2">
                         <h2 className="switch__title title">Welcome Back !</h2>
                         <p className="switch__description description">To keep connected with us please login with your personal info</p>
-                        <button className="switch__button button switch-btn">SIGN IN</button>
+                        <button className="switch__button button switch-btn">
+                            SIGN IN
+                        </button>
                     </div>
                 </div>
             </div>
