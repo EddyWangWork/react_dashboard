@@ -1,27 +1,10 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { Route, Routes, useNavigate } from 'react-router-dom';
-import {
-    GridComponent, ColumnsDirective, ColumnDirective,
-    AggregateColumnDirective, AggregateColumnsDirective, AggregateDirective, AggregatesDirective, Aggregate,
-    Page, Search, Toolbar, Inject, Edit
-} from '@syncfusion/ej2-react-grids';
-import { format, parseISO } from 'date-fns'
-import axios from 'axios';
-import { TabComponent, TabItemDirective, TabItemsDirective } from '@syncfusion/ej2-react-navigations';
 import { DialogComponent } from '@syncfusion/ej2-react-popups';
-import { createElement, getValue } from '@syncfusion/ej2-base';
-import { dsAccGrid, todolistsDoneGrid } from '../data/dtTransaction';
-import { DSItems, DSItemsTreeview, DSTransaction, DialogDSAccount } from '../pages'
-import { Header } from '../components';
-import { DateRangePickerComponent, DatePickerComponent } from '@syncfusion/ej2-react-calendars';
-import { ListBoxComponent } from '@syncfusion/ej2-react-dropdowns';
-import { useStateContext } from '../contexts/ContextProvider';
-import $ from 'jquery';
-import jQuery from 'jquery';
+import { default as $, default as jQuery } from 'jquery';
+import React, { useState } from 'react';
 window.jQuery = jQuery;
 window.$ = $;
 
-const TransactionCompare2 = ({ dsTrans }) => {
+const TransactionCompare2 = ({ dsTrans, dialogOpen }) => {
 
     const [result, setresult] = useState([]);
     const [dlstatus, setdlstatus] = useState(false);
@@ -71,71 +54,9 @@ const TransactionCompare2 = ({ dsTrans }) => {
         settotalresult(totalresult);
     }
 
-    function onOverlayClick() {
-        setdlstatus(false);
-    }
-    function dialogClose() {
-        setdlstatus(false);
-    }
-    function dialogOpen(e) {
-        console.log(e);
-        console.log(e.target.id);
-        console.log(e.target.parentElement.id);
-        var dsTransFilter = dsTrans.filter(x => x.yearMonth == e.target.id ?? e.target.parentElement.id);
-        console.log(dsTransFilter.sort((a, b) => b.amount - a.amount));
-        setdsTransList(dsTransFilter.sort((a, b) => b.amount - a.amount));
-        setdlstatus(true);
-    }
-
-    const dlTrans = () => {
-        return (
-            <div className="App" id='dialog-target'>
-                {/* <button className='e-control e-btn' id='targetButton1' role='button' onClick={handleClick.bind(this)}>Open</button> */}
-
-                <DialogComponent width='550px' isModal={true} target='#dialog-target' visible={dlstatus} close={dialogClose} overlayClick={onOverlayClick}>
-                    {dlTransList()}
-                </DialogComponent>
-            </div>
-        )
-    }
-
-    const dlTransList = () => {
-        return (
-            <div class="relative overflow-x-auto">
-                <table class="w-full text-xs text-left text-gray-500 dark:text-gray-400">
-                    <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
-                        <tr className='text-center'>
-                            <th scope="col" class="px-6 py-3 rounded-l-lg">
-                                Detail
-                            </th>
-                            <th scope="col" class="px-6 py-3 rounded-l-lg">
-                                Month
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody className='text-center'>
-                        {dsTransList?.map((v, k) => {
-                            return (
-                                <tr key={k} class="bg-white dark:bg-gray-800">
-                                    <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                        {v.dsItemName}
-                                    </th>
-                                    <td class="px-6 py-4">
-                                        {v.amount.toFixed(2)}
-                                    </td>
-                                </tr>
-                            )
-                        })}
-                    </tbody>
-                </table>
-            </div>
-        )
-    }
-
     const tableC = () => {
         return (
             <div class="relative overflow-x-auto">
-                {dlTrans()}
                 <table class="w-full text-xs text-left text-gray-500 dark:text-gray-400">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
                         <tr className='text-center'>

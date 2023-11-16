@@ -99,6 +99,7 @@ export const ContextProvider = ({ children }) => {
                     data.createdDateTimeDay = new Date(data.createdDateTime);
                 });
                 setdsTrans(response.data);
+                setdsTransError(null);
             })
             .catch((err) => {
                 console.log(token);

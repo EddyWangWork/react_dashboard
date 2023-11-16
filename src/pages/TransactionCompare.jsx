@@ -24,7 +24,7 @@ window.$ = $;
 
 const TransactionCompare = () => {
 
-    const { dsTrans, getdstransactions } = useStateContext();
+    const { dsTrans, getdstransactions, dsTransError, handleClearToken } = useStateContext();
     const navigate = useNavigate();
 
     const [mode, setmode] = useState(1);
@@ -36,6 +36,9 @@ const TransactionCompare = () => {
     const [dsA, setdsA] = useState([]);
     const [dsB, setdsB] = useState([]);
 
+    const [dsTransList, setdsTransList] = useState([]);
+    const [dlstatus, setdlstatus] = useState(false);
+
     let refA = useRef(null);
     let refB = useRef(null);
 
@@ -43,7 +46,16 @@ const TransactionCompare = () => {
         if (dsTrans.length == 0) {
             getdstransactions();
         }
-        getAmount();
+        if (dsTransError) {
+            handleClearToken();
+            navigate('/login', { replace: true });
+            window.location.reload();
+        }
+
+        if (refA.current?.listData) {
+            getAmount();
+        }
+
         $('.e-listbox-tool').on("click", function () {
             getAmount();
         });
@@ -264,23 +276,101 @@ const TransactionCompare = () => {
         )
     }
 
+    /*Modal*/
+
+    function onOverlayClick() {
+        setdlstatus(false);
+    }
+    function dialogClose() {
+        setdlstatus(false);
+    }
+    function dialogOpen(e) {
+        console.log(e);
+        console.log(e.target.id);
+        console.log(e.target.id == '');
+        console.log(e.target.parentElement.id);
+        console.log(e.target.parentElement.id == '');
+
+        dsTransFilter.map((v, k) => {
+            v.yearMonth = `${new Date(v.createdDateTime).getFullYear()}-${new Date(v.createdDateTime).getMonth() + 1}`
+        })
+        var targetId = e.target.id != '' ? e.target.id : e.target.parentElement.id;
+        var dsTransListFilter = dsTransFilter.filter(x => x.yearMonth == targetId);
+        setdsTransList(dsTransListFilter.sort((a, b) => b.amount - a.amount));
+        setdlstatus(true);
+    }
+
+    const dlTrans = () => {
+        return (
+            <div className="App" id='dialog-target'>
+                {/* <button className='e-control e-btn' id='targetButton1' role='button' onClick={handleClick.bind(this)}>Open</button> */}
+
+                <DialogComponent width='550px' isModal={true} target='#dialog-target' visible={dlstatus} close={dialogClose} overlayClick={onOverlayClick}>
+                    {dlTransList()}
+                </DialogComponent>
+            </div>
+        )
+    }
+
+    const dlTransList = () => {
+        return (
+            <div class="relative overflow-x-auto">
+                <table class="w-full text-xs text-left text-gray-500 dark:text-gray-400">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
+                        <tr className='text-center'>
+                            <th scope="col" class="px-6 py-3 rounded-l-lg">
+                                Detail
+                            </th>
+                            <th scope="col" class="px-6 py-3 rounded-l-lg">
+                                Month
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody className='text-center'>
+                        {dsTransList?.map((v, k) => {
+                            return (
+                                <tr key={k} class="bg-white dark:bg-gray-800">
+                                    <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                        {v.dsItemName}
+                                    </th>
+                                    <td class="px-6 py-4">
+                                        {v.amount.toFixed(2)}
+                                    </td>
+                                </tr>
+                            )
+                        })}
+                    </tbody>
+                </table>
+            </div>
+        )
+    }
+
+    /*END Modal*/
+
     return (
-        <div class="grid grid-cols-2 gap-6 py-5">
-            <div class="pl-10">{modeFilter()}</div>
-            <div>{dateFilter()}</div>
-            {mode == 1 &&
-                <>
-                    <div className='pl-10'>{listboxA()}</div>
-                    <div className='pr-10'>{listboxB()}</div>
-                    <div class="pl-10">{tableA()}</div>
-                    <div class="pr-10">{tableB()}</div>
-                </>
-            }
-            {mode == 2 &&
-                <div className='col-span-2 pl-10 pr-10'>
-                    <TransactionCompare2 dsTrans={dsTransFilter}></TransactionCompare2>
-                </div>
-            }
+        <div>
+            <div clas>{dlTrans()}</div>
+            <div class="grid grid-cols-2 gap-6 py-5">
+                <div class="pl-10">{modeFilter()}</div>
+                <div>{dateFilter()}</div>
+                {mode == 1 &&
+                    <>
+                        <div className='pl-10'>{listboxA()}</div>
+                        <div className='pr-10'>{listboxB()}</div>
+                        <div class="pl-10">{tableA()}</div>
+                        <div class="pr-10">{tableB()}</div>
+                    </>
+                }
+                {mode == 2 &&
+                    <div className='col-span-2 pl-10 pr-10'>
+                        <TransactionCompare2
+                            dsTrans={dsTransFilter}
+                            dialogOpen={dialogOpen}
+                        >
+                        </TransactionCompare2>
+                    </div>
+                }
+            </div>
         </div>
     );
 }
