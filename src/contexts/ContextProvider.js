@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
+import axios from "axios";
 
 const StateContext = createContext();
 
@@ -55,6 +56,7 @@ export const ContextProvider = ({ children }) => {
     //global
     const [dsTransactions, setdsTransactions] = useState(JSON.parse(localStorage.getItem("transactions")));
     const [dsTrans, setdsTrans] = useState([]);
+    const [dsTransError, setdsTransError] = useState(null);
 
     const setMode = (e) => {
         setCurrentMode(e.target.value);
@@ -81,6 +83,30 @@ export const ContextProvider = ({ children }) => {
         localStorage.setItem('token', '');
         setToken('');
     };
+
+    const getdstransactions = () => {
+        axios
+            .get(`${urlgetDSTransactionV2}`, {
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then((response) => {
+                console.log(response.data)
+                response.data.map((data, index) => {
+                    data.createdDateTime = new Date(data.createdDateTime);
+                    data.createdDateTimeDay = new Date(data.createdDateTime);
+                });
+                setdsTrans(response.data);
+            })
+            .catch((err) => {
+                console.log(token);
+                console.log(err);
+                console.log(err.response.status);
+                setdsTransError(err.response.status);
+            });
+    }
 
     return (
         <StateContext.Provider value={{
@@ -109,7 +135,8 @@ export const ContextProvider = ({ children }) => {
             urlgetTrips, //trip
 
             dsTransactions,
-            dsTrans, setdsTrans
+            dsTrans, setdsTrans, getdstransactions,
+            dsTransError
         }}>
             {children}
         </StateContext.Provider>

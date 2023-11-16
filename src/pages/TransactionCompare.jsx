@@ -11,8 +11,9 @@ import { TabComponent, TabItemDirective, TabItemsDirective } from '@syncfusion/e
 import { DialogComponent } from '@syncfusion/ej2-react-popups';
 import { createElement, getValue } from '@syncfusion/ej2-base';
 import { dsAccGrid, todolistsDoneGrid } from '../data/dtTransaction';
-import { DSItems, DSItemsTreeview, DSTransaction, DialogDSAccount } from '../pages'
+import { TransactionCompare2, DSItemsTreeview, DSTransaction, DialogDSAccount } from '../pages'
 import { Header } from '../components';
+import { DropDownListComponent } from '@syncfusion/ej2-react-dropdowns';
 import { DateRangePickerComponent, DatePickerComponent } from '@syncfusion/ej2-react-calendars';
 import { ListBoxComponent } from '@syncfusion/ej2-react-dropdowns';
 import { useStateContext } from '../contexts/ContextProvider';
@@ -21,12 +22,13 @@ import jQuery from 'jquery';
 window.jQuery = jQuery;
 window.$ = $;
 
-
-
 const TransactionCompare = () => {
 
-    const { handleClearToken, isLogin, token, handleLogin, urldsAccont, dsTrans } = useStateContext();
+    const { dsTrans, getdstransactions } = useStateContext();
     const navigate = useNavigate();
+
+    const [mode, setmode] = useState(1);
+    const [dsTransFilter, setdsTransFilter] = useState(null);
 
     const [amountA, setamountA] = useState(0);
     const [amountB, setamountB] = useState(0);
@@ -38,6 +40,9 @@ const TransactionCompare = () => {
     let refB = useRef(null);
 
     React.useEffect(() => {
+        if (dsTrans.length == 0) {
+            getdstransactions();
+        }
         getAmount();
         $('.e-listbox-tool').on("click", function () {
             getAmount();
@@ -83,6 +88,7 @@ const TransactionCompare = () => {
             && x.dsItemName.includes('Commitment'));
         var dsTransFilterB = dsAll.filter(x => (+(x.unixcreatedDateTime) >= s && +(x.unixcreatedDateTime) <= e) && x.dsTypeID == 2
             && !x.dsItemName.includes('Commitment'));
+        var dsTransFilterAll = dsAll.filter(x => (+(x.unixcreatedDateTime) >= s && +(x.unixcreatedDateTime) <= e) && x.dsTypeID == 2);
 
         var dsTransFilterAA = structuredClone(dsTransFilterA);
         dsTransFilterAA.map((data, index) => {
@@ -95,6 +101,7 @@ const TransactionCompare = () => {
 
         setdsA(dsTransFilterAA.sort((a, b) => a.amount - b.amount));
         setdsB(dsTransFilterBB.sort((a, b) => a.amount - b.amount));
+        setdsTransFilter(dsTransFilterAll);
 
         var totalA = dsTransFilterAA.reduce((a, v) => a = a + v.amount, 0)
         var totalB = dsTransFilterBB.reduce((a, v) => a = a + v.amount, 0)
@@ -205,6 +212,37 @@ const TransactionCompare = () => {
         )
     }
 
+    const modeChange = (e) => {
+        console.log(e);
+        console.log(e.value);
+        setmode(e.value);
+    }
+
+    let dataMode = [
+        { 'name': 'Compare', 'id': 1 },
+        { 'name': 'Month', 'id': 2 }
+    ]
+    const ddModeFields = { text: 'name', value: 'id' };
+
+    const modeFilter = () => {
+        return (
+            <div href="#" class="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+                <div>
+                    <div> MODE </div>
+                </div>
+                <div className='flex flex-wrap lg:flex-nowrap'>
+                    <DropDownListComponent
+                        onChange={modeChange}
+                        dataSource={dataMode}
+                        fields={ddModeFields}
+                        placeholder="Mode"
+                    // floatLabelType="Auto"
+                    />
+                </div>
+            </div>
+        )
+    }
+
     const dateFilter = () => {
         return (
             <div>
@@ -227,14 +265,22 @@ const TransactionCompare = () => {
     }
 
     return (
-        <div>
-            <div class="grid grid-cols-2 gap-6 py-5">
-                <div class="pl-10 col-span-2">{dateFilter()}</div>
-                <div className='pl-10'>{listboxA()}</div>
-                <div className='pr-10'>{listboxB()}</div>
-                <div class="pl-10">{tableA()}</div>
-                <div class="pr-10">{tableB()}</div>
-            </div>
+        <div class="grid grid-cols-2 gap-6 py-5">
+            <div class="pl-10">{modeFilter()}</div>
+            <div>{dateFilter()}</div>
+            {mode == 1 &&
+                <>
+                    <div className='pl-10'>{listboxA()}</div>
+                    <div className='pr-10'>{listboxB()}</div>
+                    <div class="pl-10">{tableA()}</div>
+                    <div class="pr-10">{tableB()}</div>
+                </>
+            }
+            {mode == 2 &&
+                <div className='col-span-2 pl-10 pr-10'>
+                    <TransactionCompare2 dsTrans={dsTransFilter}></TransactionCompare2>
+                </div>
+            }
         </div>
     );
 }

@@ -521,18 +521,18 @@ export const links = [
   {
     title: 'Pages',
     links: [
-      {
-        name: 'orders',
-        icon: <AiOutlineShoppingCart />,
-      },
-      {
-        name: 'employees',
-        icon: <IoMdContacts />,
-      },
-      {
-        name: 'customers',
-        icon: <RiContactsLine />,
-      },
+      // {
+      //   name: 'orders',
+      //   icon: <AiOutlineShoppingCart />,
+      // },
+      // {
+      //   name: 'employees',
+      //   icon: <IoMdContacts />,
+      // },
+      // {
+      //   name: 'customers',
+      //   icon: <RiContactsLine />,
+      // },
       {
         name: 'todolists',
         icon: <RiContactsLine />,
