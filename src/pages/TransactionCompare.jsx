@@ -1,24 +1,11 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { Route, Routes, useNavigate } from 'react-router-dom';
-import {
-    GridComponent, ColumnsDirective, ColumnDirective,
-    AggregateColumnDirective, AggregateColumnsDirective, AggregateDirective, AggregatesDirective, Aggregate,
-    Page, Search, Toolbar, Inject, Edit
-} from '@syncfusion/ej2-react-grids';
-import { format, parseISO } from 'date-fns'
-import axios from 'axios';
-import { TabComponent, TabItemDirective, TabItemsDirective } from '@syncfusion/ej2-react-navigations';
+import { DateRangePickerComponent } from '@syncfusion/ej2-react-calendars';
+import { DropDownListComponent, ListBoxComponent } from '@syncfusion/ej2-react-dropdowns';
 import { DialogComponent } from '@syncfusion/ej2-react-popups';
-import { createElement, getValue } from '@syncfusion/ej2-base';
-import { dsAccGrid, todolistsDoneGrid } from '../data/dtTransaction';
-import { TransactionCompare2, DSItemsTreeview, DSTransaction, DialogDSAccount } from '../pages'
-import { Header } from '../components';
-import { DropDownListComponent } from '@syncfusion/ej2-react-dropdowns';
-import { DateRangePickerComponent, DatePickerComponent } from '@syncfusion/ej2-react-calendars';
-import { ListBoxComponent } from '@syncfusion/ej2-react-dropdowns';
+import { default as $, default as jQuery } from 'jquery';
+import React, { useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useStateContext } from '../contexts/ContextProvider';
-import $ from 'jquery';
-import jQuery from 'jquery';
+import { TransactionCompare2 } from '../pages';
 window.jQuery = jQuery;
 window.$ = $;
 
@@ -39,6 +26,9 @@ const TransactionCompare = () => {
     const [dsTransList, setdsTransList] = useState([]);
     const [dlstatus, setdlstatus] = useState(false);
 
+    const [dateFilterStart, setdateFilterStart] = useState(new Date());
+    const [dateFilterEnd, setdateFilterEnd] = useState(new Date());
+
     let refA = useRef(null);
     let refB = useRef(null);
 
@@ -46,6 +36,9 @@ const TransactionCompare = () => {
         if (dsTrans.length == 0) {
             getdstransactions();
         }
+
+        console.log(dsTransError);
+
         if (dsTransError) {
             handleClearToken();
             navigate('/login', { replace: true });
@@ -80,8 +73,8 @@ const TransactionCompare = () => {
             data.dsItemName = `${data.dsItemName} ${data.description != null ? `(${data.description})` : ''}`
         });
 
-        setdsA(dsTransFilterAA.sort((a, b) => a.amount - b.amount));
-        setdsB(dsTransFilterBB.sort((a, b) => a.amount - b.amount));
+        setdsA(dsTransFilterAA.sort((a, b) => b.amount - a.amount));
+        setdsB(dsTransFilterBB.sort((a, b) => b.amount - a.amount));
 
         var totalA = dsTransFilterAA.reduce((a, v) => a = a + v.amount, 0)
         var totalB = dsTransFilterBB.reduce((a, v) => a = a + v.amount, 0)
@@ -111,8 +104,8 @@ const TransactionCompare = () => {
             data.dsItemName = `${data.dsItemName} ${data.description != null ? `(${data.description})` : ''}`
         });
 
-        setdsA(dsTransFilterAA.sort((a, b) => a.amount - b.amount));
-        setdsB(dsTransFilterBB.sort((a, b) => a.amount - b.amount));
+        setdsA(dsTransFilterAA.sort((a, b) => b.amount - a.amount));
+        setdsB(dsTransFilterBB.sort((a, b) => b.amount - a.amount));
         setdsTransFilter(dsTransFilterAll);
 
         var totalA = dsTransFilterAA.reduce((a, v) => a = a + v.amount, 0)
@@ -225,8 +218,8 @@ const TransactionCompare = () => {
     }
 
     const modeChange = (e) => {
-        console.log(e);
-        console.log(e.value);
+        setdateFilterStart(new Date());
+        setdateFilterEnd(new Date());
         setmode(e.value);
     }
 
@@ -268,6 +261,11 @@ const TransactionCompare = () => {
                             width={500}
                             floatLabelType="Auto"
                             placeholder='Transaction date'
+                            start='Year'
+                            depth='Year'
+                            format='MM/yyyy'
+                            startDate={dateFilterStart}
+                            endDate={dateFilterEnd}
                             change={dateChange}
                         />
                     </div>
@@ -296,6 +294,12 @@ const TransactionCompare = () => {
         })
         var targetId = e.target.id != '' ? e.target.id : e.target.parentElement.id;
         var dsTransListFilter = dsTransFilter.filter(x => x.yearMonth == targetId);
+
+        var totalsumup = 0;
+        dsTransListFilter.sort((a, b) => b.amount - a.amount).map((v, k) => {
+            totalsumup += v.amount;
+            v.sumup = totalsumup;
+        })
         setdsTransList(dsTransListFilter.sort((a, b) => b.amount - a.amount));
         setdlstatus(true);
     }
@@ -319,10 +323,13 @@ const TransactionCompare = () => {
                     <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
                         <tr className='text-center'>
                             <th scope="col" class="px-6 py-3 rounded-l-lg">
-                                Detail
+                                ITEM
                             </th>
                             <th scope="col" class="px-6 py-3 rounded-l-lg">
-                                Month
+                                AMOUNT
+                            </th>
+                            <th scope="col" class="px-6 py-3 rounded-l-lg">
+                                SUM
                             </th>
                         </tr>
                     </thead>
@@ -335,6 +342,9 @@ const TransactionCompare = () => {
                                     </th>
                                     <td class="px-6 py-4">
                                         {v.amount.toFixed(2)}
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        {v.sumup.toFixed(2)}
                                     </td>
                                 </tr>
                             )
