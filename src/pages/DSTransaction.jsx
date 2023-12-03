@@ -15,6 +15,7 @@ import { TabComponent, TabItemDirective, TabItemsDirective, AccordionComponent, 
 import { DialogComponent } from '@syncfusion/ej2-react-popups';
 import { dsTransGrid, todolistsDoneGrid } from '../data/dtTransaction';
 import { DialogDSTransaction } from '../pages'
+import { toaster } from 'evergreen-ui'
 import { Header, Button } from '../components';
 
 import { useStateContext } from '../contexts/ContextProvider';
@@ -145,6 +146,7 @@ const DSTransaction = () => {
                 if (startDateF) {
                     getFilterTransactions(startDateF, endDateF, response.data);
                 }
+                toaster.notify('Load success', null)
             })
             .catch((err) => {
                 console.log(err);

@@ -16,6 +16,7 @@ const TransactionCompare = () => {
 
     const [mode, setmode] = useState(1);
     const [dsTransFilter, setdsTransFilter] = useState(null);
+    const [dsTransCreditFilter, setdsTransCreditFilter] = useState(null);
 
     const [amountA, setamountA] = useState(0);
     const [amountB, setamountB] = useState(0);
@@ -87,13 +88,13 @@ const TransactionCompare = () => {
         dsAll.map((data, index) => {
             data.unixcreatedDateTime = +(new Date(data.createdDateTime));
         });
-        console.log('getFilterTransactions');
-        console.log(dsAll);
         var dsTransFilterA = dsAll.filter(x => (+(x.unixcreatedDateTime) >= s && +(x.unixcreatedDateTime) <= e) && x.dsTypeID == 2
             && x.dsItemName.includes('Commitment'));
         var dsTransFilterB = dsAll.filter(x => (+(x.unixcreatedDateTime) >= s && +(x.unixcreatedDateTime) <= e) && x.dsTypeID == 2
             && !x.dsItemName.includes('Commitment'));
+
         var dsTransFilterAll = dsAll.filter(x => (+(x.unixcreatedDateTime) >= s && +(x.unixcreatedDateTime) <= e) && x.dsTypeID == 2);
+        var dsTransFilterCreditAll = dsAll.filter(x => (+(x.unixcreatedDateTime) >= s && +(x.unixcreatedDateTime) <= e) && x.dsTypeID == 1);
 
         var dsTransFilterAA = structuredClone(dsTransFilterA);
         dsTransFilterAA.map((data, index) => {
@@ -107,6 +108,7 @@ const TransactionCompare = () => {
         setdsA(dsTransFilterAA.sort((a, b) => b.amount - a.amount));
         setdsB(dsTransFilterBB.sort((a, b) => b.amount - a.amount));
         setdsTransFilter(dsTransFilterAll);
+        setdsTransCreditFilter(dsTransFilterCreditAll);
 
         var totalA = dsTransFilterAA.reduce((a, v) => a = a + v.amount, 0)
         var totalB = dsTransFilterBB.reduce((a, v) => a = a + v.amount, 0)
@@ -375,6 +377,7 @@ const TransactionCompare = () => {
                     <div className='col-span-2 pl-10 pr-10'>
                         <TransactionCompare2
                             dsTrans={dsTransFilter}
+                            dsTransCredit={dsTransCreditFilter}
                             dialogOpen={dialogOpen}
                         >
                         </TransactionCompare2>

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 window.jQuery = jQuery;
 window.$ = $;
 
-const TransactionCompare2 = ({ dsTrans, dialogOpen }) => {
+const TransactionCompare2 = ({ dsTrans, dsTransCredit, dialogOpen }) => {
 
     const [result, setresult] = useState([]);
     const [dlstatus, setdlstatus] = useState(false);
@@ -17,22 +17,35 @@ const TransactionCompare2 = ({ dsTrans, dialogOpen }) => {
 
     React.useEffect(() => {
         if (dsTrans) {
+            processCredit();
             getAmount();
         }
     }, [dsTrans])
 
-    let dataBudget = [
-        { 'date': '2023-1', 'amount': 7000 },
-        { 'date': '2023-2', 'amount': 7500 },
-        { 'date': '2023-3', 'amount': 7500 }
-    ]
+    const processCredit = () => {
+        const yearMonths = [];
+        var budgetList = [];
+
+        dsTransCredit.sort((a, b) => a.createdDateTime > b.createdDateTime ? 1 : -1).map((v) => {
+            var dateValue = `${new Date(v.createdDateTime).getFullYear()}-${new Date(v.createdDateTime).getMonth() + 1}`;
+            v.yearMonth = dateValue;
+            var findItem = yearMonths.find((x) => x === dateValue);
+            if (!findItem) yearMonths.push(dateValue);
+        });
+        yearMonths.map((v) => {
+            var dataFilter = dsTransCredit.filter((x) => x.yearMonth == v);
+            var totalIncome = dataFilter.reduce((a, v) => a = a + v.amount, 0);
+            budgetList.push({ 'date': v, 'amount': totalIncome })
+        });
+        return budgetList;
+    }
 
     const getAmount = () => {
         dsTrans.map((v, k) => {
             v.yearMonth = `${new Date(v.createdDateTime).getFullYear()}-${new Date(v.createdDateTime).getMonth() + 1}`
         })
 
-        console.log(dsTrans)
+        var dataBudget = processCredit();
 
         let result = [];
         dataBudget.map((v, k) => {
@@ -108,9 +121,9 @@ const TransactionCompare2 = ({ dsTrans, dialogOpen }) => {
                         <tr class="font-semibold text-gray-900 dark:text-white">
                             <th scope="row" class="px-6 py-3 text-xl">Total</th>
                             <td></td>
-                            <td class="px-6 py-3">{totalbudget}</td>
-                            <td class="px-6 py-3">{totalexpenses}</td>
-                            <td class="px-6 py-3">{totalresult}</td>
+                            <td class="px-6 py-3">{totalbudget.toFixed(2)}</td>
+                            <td class="px-6 py-3">{totalexpenses.toFixed(2)}</td>
+                            <td class="px-6 py-3">{totalresult.toFixed(2)}</td>
                         </tr>
                     </tfoot>
                 </table>
