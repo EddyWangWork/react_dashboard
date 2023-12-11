@@ -15,3 +15,8 @@ export { default as Pie } from './Charts/Pie';
 export { default as ChartsHeader } from './ChartsHeader';
 export { default as Header } from './Header';
 
+export { default as ADonut } from './Apex/ADonut';
+export { default as ALine } from './Apex/ALine';
+export { default as ALine2 } from './Apex/ALine2';
+export { default as ABar } from './Apex/ABar';
+

@@ -9,9 +9,9 @@ const TransactionCompare2 = ({ dsTrans, dsTransCredit, dialogOpen }) => {
     const [result, setresult] = useState([]);
     const [dlstatus, setdlstatus] = useState(false);
 
-    const [totalbudget, settotalbudget] = useState([]);
-    const [totalexpenses, settotalexpenses] = useState([]);
-    const [totalresult, settotalresult] = useState([]);
+    const [totalbudget, settotalbudget] = useState(0);
+    const [totalexpenses, settotalexpenses] = useState(0);
+    const [totalresult, settotalresult] = useState(0);
 
     const [dsTransList, setdsTransList] = useState([]);
 

@@ -48,6 +48,11 @@ export const ContextProvider = ({ children }) => {
     const [urlgetDSTransactionV2, seturlgetDSTransactionV2] = useState(`${urlDS}/getDSTransactionV2`);
     const [urlgetDSTransactionWithDate, seturlgetDSTransactionWithDate] = useState(`${urlDS}/getDSTransactionWithDate`);
 
+    //statistic
+    const [urlgetDSMonthlyExpenses, seturlgetDSMonthlyExpenses] = useState(`${urlDS}/getDSMonthlyExpenses`);
+    const [urlgetDSYearCreditDebitDiff, seturlgetDSYearCreditDebitDiff] = useState(`${urlDS}/getDSYearCreditDebitDiff`);
+    const [urlgetDSYearExpenses, seturlgetDSYearExpenses] = useState(`${urlDS}/getDSYearExpenses`);
+
     //trip
     const [urltrip, seturltrip] = useState(`${localhostUrl}/Trip`);
     const [urlgetTrips, seturlgetTrips] = useState(`${urltrip}/getTrips`);
@@ -133,6 +138,7 @@ export const ContextProvider = ({ children }) => {
             urlDSItem, urlgetDSItemWithSub, urlgetDSItemWithSubV3, urladdWithSubItem, //dsitem
             urlDSItemSub, //dsitem sub
             urlDS, urlgetDSTransactionV2, urlgetDSTransactionWithDate, //dsTrans
+            urlgetDSMonthlyExpenses, urlgetDSYearCreditDebitDiff, urlgetDSYearExpenses,//statistic
             urlgetTrips, //trip
 
             dsTransactions,

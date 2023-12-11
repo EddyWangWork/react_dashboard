@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 
 import './index.css'
 import App from './App';
+import '@elastic/eui/dist/eui_theme_dark.css';
 import { ContextProvider } from './contexts/ContextProvider';
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
