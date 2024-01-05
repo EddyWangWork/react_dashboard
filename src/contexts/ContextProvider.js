@@ -29,6 +29,7 @@ export const ContextProvider = ({ children }) => {
     const [urlgetDSTransTypes, seturlgetDSTransTypes] = useState(`${localhostUrl}/Common/getDSTransTypes`);
 
     //todolist
+    const [urlTodolist, seturlTodolist] = useState(`${localhostUrl}/Todolist`);
     const [urlTodolistDone, seturlTodolistDone] = useState(`${localhostUrl}/TodolistDone`);
 
     //ds account
@@ -133,6 +134,7 @@ export const ContextProvider = ({ children }) => {
 
             urllogin,
             urlgetTodolistTypes, urlgetDSTransTypes, //common
+            urlTodolist,
             urlTodolistDone, //todolist            
             urldsAccont, //ds account
             urlDSItem, urlgetDSItemWithSub, urlgetDSItemWithSubV3, urladdWithSubItem, //dsitem
