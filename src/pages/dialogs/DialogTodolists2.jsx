@@ -12,7 +12,8 @@ import {
     EuiModalFooter,
     EuiModalHeader,
     EuiModalHeaderTitle,
-    EuiSpacer
+    EuiSpacer,
+    EuiTextArea
 } from '@elastic/eui';
 import axios from 'axios';
 import moment from 'moment';
@@ -45,8 +46,9 @@ const DialogTodolists2 = ({ cbCatData, rowData, buttonProp, setactionDone }) => 
     const [remark, setremark] = useState('');
     const [doneDate, setdoneDate] = useState(moment());
 
-    // const [selectedCat, setSelectedCat] = useState([cbCatData[0]]);
     const [selectedCat, setSelectedCat] = useState(cbCatData != null ? [cbCatData[0]] : [{}]);
+
+    const isSubmitError = () => name == '' || (!isModeDone && category == 0);
 
     const addTodolist = (req) => {
         axios.post(`${urlTodolist}`, req, {
@@ -262,9 +264,12 @@ const DialogTodolists2 = ({ cbCatData, rowData, buttonProp, setactionDone }) => 
         }
         else {
             setname(rowData.original.name);
-            setdesc(getNullOrEmpty(rowData.original.description) ?? '-');
+            if (buttonProp.mode == 11)
+                setdesc(rowData.original.description);
+            else
+                setdesc(getNullOrEmpty(rowData.original.description) ?? '-');
             setupdatedDate(moment(rowData.original.updateDate));
-            setcategory(rowData.original.category);
+            setcategory(rowData.original.categoryID);
             setcategoryText(rowData.original.category);
             if (!isModeDone)
                 setSelectedCat([cbCatData.find(x => x.id == rowData.original.categoryID)]);
@@ -303,13 +308,13 @@ const DialogTodolists2 = ({ cbCatData, rowData, buttonProp, setactionDone }) => 
 
     const formSample = (
         <Fragment>
-            <EuiForm isInvalid={showErrors} error={errors} component="form">
-                <EuiFormRow label="Name" isInvalid={showErrors}>
-                    <EuiFieldText readOnly={isModeDone || isModeDelete} name="name" value={name} onChange={ocName} isInvalid={showErrors} />
+            <EuiForm error={errors} component="form">
+                <EuiFormRow label="Name" isInvalid={name == ''}>
+                    <EuiFieldText readOnly={isModeDone || isModeDelete} name="name" value={name} onChange={ocName} isInvalid={name == ''} />
                 </EuiFormRow>
 
                 <EuiFormRow label="Description" isInvalid={showErrors}>
-                    <EuiFieldText readOnly={isModeDone || isModeDelete} name="description" value={desc} onChange={ocDesc} isInvalid={showErrors} />
+                    <EuiTextArea readOnly={isModeDone || isModeDelete} name="description" value={desc} onChange={ocDesc} isInvalid={showErrors} />
                 </EuiFormRow>
 
                 {!isModeDone && <EuiFormRow label="Date">
@@ -361,7 +366,7 @@ const DialogTodolists2 = ({ cbCatData, rowData, buttonProp, setactionDone }) => 
 
                 <EuiModalFooter>
                     <EuiButtonEmpty onClick={closeModal}>Cancel</EuiButtonEmpty>
-                    <EuiButton onClick={completeAction}>
+                    <EuiButton disabled={isSubmitError()} onClick={completeAction}>
                         Save
                     </EuiButton>
                 </EuiModalFooter>
