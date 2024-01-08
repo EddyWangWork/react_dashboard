@@ -8,7 +8,7 @@ import axios from 'axios';
 import { format } from 'date-fns';
 import { React, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import { DialogTodolists2 } from '../pages';
 import { useStateContext } from '../contexts/ContextProvider';
 
 const TodolistsCard = () => {
@@ -19,6 +19,8 @@ const TodolistsCard = () => {
     } = useStateContext();
 
     const [tdlData, setTdlData] = useState([]);
+
+    const [actionDone, setactionDone] = useState(false);
 
     const navigate = useNavigate();
 
@@ -56,9 +58,15 @@ const TodolistsCard = () => {
             .then((response) => {
                 console.log(response.data)
                 response.data.map((data, index) => {
-                    var date = new Date(data.updateDate);
-                    data.updateDate = format(date, 'dd/MM/yyyy');
                     data.category = category.find(x => x.id == data.categoryID).name;
+
+                    data.original = {};
+                    data.original.id = data.id;
+                    data.original.name = data.name;
+                    data.original.description = data.description;
+                    data.original.updateDate = data.updateDate;
+                    data.original.category = data.category;
+                    data.original.categoryID = data.categoryID;
                 });
                 setTdlData(response.data);
             })
@@ -74,8 +82,9 @@ const TodolistsCard = () => {
     }
 
     useEffect(() => {
+        setactionDone(false);
         getTodolistsCategory();
-    }, []);
+    }, [actionDone]);
 
     return (
         <div className="pt-6 grid grid-cols-3 gap-8">
@@ -84,7 +93,7 @@ const TodolistsCard = () => {
                     return <EuiFlexItem key={i} className='bg-blue-500 shadow-lg shadow-blue-500/50 rounded-lg'>
                         <EuiCard
                             className='select-text'
-                            // title={v.name}
+                            title='-'
                             description={
                                 <>
                                     <EuiText size="s">
@@ -97,7 +106,11 @@ const TodolistsCard = () => {
                             }
                             footer={
                                 <div>
-                                    <EuiButton aria-label="Go to Developers Tools">Done</EuiButton>
+                                    <DialogTodolists2
+                                        rowData={v}
+                                        buttonProp={{ mode: 2, iconType: 'check', label: 'check', color: 'success', bColor: 'border-green-900/75' }}
+                                        setactionDone={setactionDone}
+                                    />
                                 </div>
                             }
                             betaBadgeProps={{

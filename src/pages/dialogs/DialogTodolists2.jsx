@@ -45,7 +45,8 @@ const DialogTodolists2 = ({ cbCatData, rowData, buttonProp, setactionDone }) => 
     const [remark, setremark] = useState('');
     const [doneDate, setdoneDate] = useState(moment());
 
-    const [selectedCat, setSelectedCat] = useState([cbCatData[0]]);
+    // const [selectedCat, setSelectedCat] = useState([cbCatData[0]]);
+    const [selectedCat, setSelectedCat] = useState(cbCatData != null ? [cbCatData[0]] : [{}]);
 
     const addTodolist = (req) => {
         axios.post(`${urlTodolist}`, req, {
@@ -265,7 +266,8 @@ const DialogTodolists2 = ({ cbCatData, rowData, buttonProp, setactionDone }) => 
             setupdatedDate(moment(rowData.original.updateDate));
             setcategory(rowData.original.category);
             setcategoryText(rowData.original.category);
-            setSelectedCat([cbCatData.find(x => x.id == rowData.original.categoryID)]);
+            if (!isModeDone)
+                setSelectedCat([cbCatData.find(x => x.id == rowData.original.categoryID)]);
         }
     }
 
@@ -273,17 +275,21 @@ const DialogTodolists2 = ({ cbCatData, rowData, buttonProp, setactionDone }) => 
         setname('');
         setdesc('');
         setupdatedDate(moment());
-        setcategory(cbCatData[0]?.id);
-        setSelectedCat([cbCatData[0]]);
+        setcategory(cbCatData != null ? cbCatData[0].id : 0);
+        setSelectedCat([cbCatData != null ? cbCatData[0] : {}]);
         setremark('');
     }
 
     useEffect(() => {
+        if (cbCatData?.length == 0) {
+            cbCatData = null;
+        }
+
         if (rowData?.original) {
             setModalValue();
         }
         else {
-            clearValue();
+            clearValue(cbCatData);
         }
     }, [isModalVisible]);
 
@@ -327,12 +333,12 @@ const DialogTodolists2 = ({ cbCatData, rowData, buttonProp, setactionDone }) => 
                     <EuiFieldText readOnly={isModeDone} name="type" value={categoryText} />
                 </EuiFormRow>}
 
-                {isModeDone && <EuiFormRow label="Remark" >
-                    <EuiFieldText name="remark" readOnly={isModeDelete} value={remark} onChange={ocRemark} />
-                </EuiFormRow>}
-
                 {isModeDone && <EuiFormRow label="DoneDate">
                     <EuiDatePicker readOnly={isModeDelete} selected={doneDate} onChange={handleDoneDate} />
+                </EuiFormRow>}
+
+                {isModeDone && <EuiFormRow label="Remark" >
+                    <EuiFieldText name="remark" readOnly={isModeDelete} value={remark} onChange={ocRemark} />
                 </EuiFormRow>}
 
                 <EuiSpacer />
