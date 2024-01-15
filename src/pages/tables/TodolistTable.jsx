@@ -110,6 +110,7 @@ const TodolistTable = () => {
     );
 
     useEffect(() => {
+        setisLoadingData(true);
         setactionDone(false);
         getTodolistsCategory();
     }, [actionDone]);

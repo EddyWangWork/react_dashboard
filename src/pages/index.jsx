@@ -31,9 +31,8 @@ export { default as TripManage } from './TripManage';
 export { default as TripDetailType } from './TripDetailType';
 export { default as TransactionCompare } from './TransactionCompare';
 export { default as TransactionCompare2 } from './TransactionCompare2';
-export { default as TodolistTable } from './tables/TodolistTable';
-export { default as TodolistDoneTable } from './tables/TodolistDoneTable';
 export { default as TodolistsCard } from './TodolistsCard';
+export { default as Transaction2 } from './Transaction2';
 
 export { default as DialogTodolists } from './DialogTodolists';
 export { default as DialogDSItem } from './dialogs/DialogDSItem';
@@ -41,4 +40,11 @@ export { default as DialogDSTransaction } from './dialogs/DialogDSTransaction';
 export { default as DialogDSAccount } from './dialogs/DialogDSAccount';
 export { default as DialogTripDetailType } from './dialogs/DialogTripDetailType';
 export { default as DialogTodolists2 } from './dialogs/DialogTodolists2';
+export { default as DialogDSAccount2 } from './dialogs/DialogDSAccount2';
+export { default as DialogDSItem2 } from './dialogs/DialogDSItem2';
+
+export { default as TodolistTable } from './tables/TodolistTable';
+export { default as TodolistDoneTable } from './tables/TodolistDoneTable';
+export { default as AccTable } from './tables/AccTable';
+export { default as DSItemTable } from './tables/DSItemTable';
 

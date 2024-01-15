@@ -205,7 +205,6 @@ const DialogTodolists2 = ({ cbCatData, rowData, buttonProp, setactionDone }) => 
                         categoryId: category,
                     }
                     addTodolist(req);
-                    setactionDone(true);
                 }; break;
             case 11:
                 {
@@ -215,12 +214,10 @@ const DialogTodolists2 = ({ cbCatData, rowData, buttonProp, setactionDone }) => 
                         categoryId: category,
                     }
                     editTodolist(rowData.original.id, req);
-                    setactionDone(true);
                 }; break;
             case 12:
                 {
                     deleteTodolist(rowData.original.id, req);
-                    setactionDone(true);
                 }; break;
             case 2:
                 {
@@ -230,7 +227,6 @@ const DialogTodolists2 = ({ cbCatData, rowData, buttonProp, setactionDone }) => 
                         remark: remark
                     }
                     addTodolistDone(req);
-                    setactionDone(true);
                 }; break;
             case 21:
                 {
@@ -239,17 +235,16 @@ const DialogTodolists2 = ({ cbCatData, rowData, buttonProp, setactionDone }) => 
                         UnixUpdateTime: new Date(doneDate).getTime()
                     }
                     editTodolistDone(rowData.original.id, req);
-                    setactionDone(true);
                 }; break;
             case 22:
                 {
                     deleteTodolistDone(rowData.original.id);
-                    setactionDone(true);
                 }; break;
             default:
                 { };
         }
 
+        setactionDone(true);
         clearValue();
         closeModal();
     }

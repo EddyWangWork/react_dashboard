@@ -161,6 +161,7 @@ const TodolistDoneTable = () => {
     });
 
     useEffect(() => {
+        setisLoadingData(true);
         setactionDone(false);
         getTodolistsCategory();
         getTodolistsDone();
