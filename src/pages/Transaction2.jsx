@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import {
     EuiTabbedContent
 } from '@elastic/eui';
-import { AccTable, DSItemTable } from '../pages'
+import { AccTable, DSTransactionTable, DSItemTable } from '../pages'
 import { Header } from '../components';
 
 const Transaction2 = () => {
@@ -16,6 +16,11 @@ const Transaction2 = () => {
             id: 'account',
             name: 'Account',
             content: <AccTable />,
+        },
+        {
+            id: 'dsTransaction',
+            name: 'Transactions',
+            content: <DSTransactionTable />,
         },
         {
             id: 'dsItem',

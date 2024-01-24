@@ -42,9 +42,11 @@ export { default as DialogTripDetailType } from './dialogs/DialogTripDetailType'
 export { default as DialogTodolists2 } from './dialogs/DialogTodolists2';
 export { default as DialogDSAccount2 } from './dialogs/DialogDSAccount2';
 export { default as DialogDSItem2 } from './dialogs/DialogDSItem2';
+export { default as DialogDSTransaction2 } from './dialogs/DialogDSTransaction2';
 
 export { default as TodolistTable } from './tables/TodolistTable';
 export { default as TodolistDoneTable } from './tables/TodolistDoneTable';
 export { default as AccTable } from './tables/AccTable';
 export { default as DSItemTable } from './tables/DSItemTable';
+export { default as DSTransactionTable } from './tables/DSTransactionTable';
 
