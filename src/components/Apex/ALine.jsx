@@ -1,46 +1,76 @@
+import {
+    EuiCard,
+    EuiIcon,
+    EuiSelect
+} from '@elastic/eui';
+import axios from 'axios';
+import moment from 'moment';
+import React, { useEffect, useState } from 'react';
 import Chart from "react-apexcharts";
+import { useNavigate } from 'react-router-dom';
+import { useStateContext } from '../../contexts/ContextProvider';
 
 function ALine() {
 
-    const dataValue = {
-        credit: [
-            6266.95,
-            12906.95,
-            8123.63,
-            10290.32,
-            1614.87,
-            16056.54,
-            8003.77,
-            7984.51,
-            10921.45,
-            9489.69,
-            0
-        ],
-        debit: [
-            13578.34,
-            8268.05,
-            12945.82,
-            11293.66,
-            14119.98,
-            11013.58,
-            6515.54,
-            8897.60,
-            11274.89,
-            7700.50,
-            4962.44
-        ]
+    const { handleClearToken, token, dsTrans, urlgetDSYearCreditDebitDiff } = useStateContext();
+
+    const [dsYearCreditDebitDiff, setdsYearCreditDebitDiff] = useState([]);
+    const [options, setoptions] = useState([]);
+    const [year, setyear] = useState(options[0]?.value);
+
+    const navigate = useNavigate();
+
+    const getDSYearCreditDebitDiff = (year) => {
+        axios
+            .get(`${urlgetDSYearCreditDebitDiff}?&year=${year}`, {
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then((response) => {
+                setdsYearCreditDebitDiff(response.data);
+            })
+            .catch((err) => {
+                console.log(err);
+                console.log(err.response.status);
+                if (err.response.status == 401) {
+                    handleClearToken();
+                    navigate('/login', { replace: true });
+                    window.location.reload();
+                }
+            });
     }
+
+    const getOptions = () => {
+        var optionsDSYear = [...new Set(dsTrans.map(q => new moment(q.createdDateTime).format('YYYY')))];
+        optionsDSYear = optionsDSYear.sort((a, b) => b - a);
+        var optionList = [];
+        optionsDSYear.map((v) => {
+            optionList.push({ value: +v, text: v })
+        })
+
+        setoptions(optionList);
+        getDSYearCreditDebitDiff(optionList[0].value);
+    }
+
+    const onChange = (e) => {
+        setyear(e.target.value);
+        getDSYearCreditDebitDiff(e.target.value);
+    };
 
     let chartOptions = {
         options: {
             series: [
                 {
                     name: "Credit",
-                    data: dataValue.credit
+                    // data: dataValue.credit
+                    data: dsYearCreditDebitDiff.map(x => x.credit)
                 },
                 {
                     name: "Debit",
-                    data: dataValue.debit
+                    // data: dataValue.debit
+                    data: dsYearCreditDebitDiff.map(x => x.debit)
                 }
             ],
             chart: {
@@ -80,7 +110,8 @@ function ALine() {
                 size: 1
             },
             xaxis: {
-                categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'],
+                // categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                categories: dsYearCreditDebitDiff.map(x => x.yearMonth),
                 title: {
                     text: 'Month'
                 }
@@ -100,13 +131,40 @@ function ALine() {
         },
     };
 
+    useEffect(() => {
+        if (dsTrans.length > 0)
+            getOptions();
+    }, [dsTrans]);
+
     return (
-        <Chart
-            options={chartOptions.options}
-            series={chartOptions.options.series}
-            type="line"
-            width="800"
-        />
+        <EuiCard
+            icon={<EuiIcon size="xxl" type="dashboardApp" />}
+            title=
+            {
+                <div class="flex justify-center ...">
+                    <EuiSelect
+                        options={options}
+                        value={year}
+                        onChange={(e) => onChange(e)}
+                        aria-label="Use aria labels when no actual label is in use"
+                    />
+                </div>
+            }
+            betaBadgeProps={{
+                label: 'Beta',
+                tooltipContent:
+                    'This module is not GA. Please help us by reporting any bugs.',
+            }}
+        >
+            <div class="flex justify-center ...">
+                <Chart
+                    options={chartOptions.options}
+                    series={chartOptions.options.series}
+                    type="line"
+                    width="800"
+                />
+            </div>
+        </EuiCard>
     );
 }
 ;

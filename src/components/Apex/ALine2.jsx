@@ -1,10 +1,10 @@
 import {
     EuiCard,
     EuiIcon,
-    EuiSelect,
-    EuiText
+    EuiSelect
 } from '@elastic/eui';
 import axios from 'axios';
+import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import Chart from "react-apexcharts";
 import { useNavigate } from 'react-router-dom';
@@ -13,13 +13,13 @@ import { useStateContext } from '../../contexts/ContextProvider';
 function ALine2() {
 
     const {
-        handleClearToken, token, handleLogin, localhostUrl,
-        urlgetDSYearExpenses
+        handleClearToken, token, dsTrans, urlgetDSYearExpenses
     } = useStateContext();
 
-    const [dsYearExpenses, setdsYearExpenses] = useState({});
     const [dsYearExpensesItems, setdsYearExpensesItems] = useState([]);
     const [dsYearExpensesDetail, setdsYearExpensesDetail] = useState([{ name: '', data: [] }]);
+    const [options, setoptions] = useState([]);
+    const [year, setyear] = useState(options[0]?.value);
 
     const navigate = useNavigate();
 
@@ -32,11 +32,10 @@ function ALine2() {
                 }
             })
             .then((response) => {
-                var ssss = [];
-                response.data.dsYearDetails.map(x => ssss.push({ name: x.yearMonth, data: x.amount }));
-                setdsYearExpensesDetail(ssss);
+                var yearExpensesDetailList = [];
+                response.data.dsYearDetails.map(x => yearExpensesDetailList.push({ name: x.yearMonth, data: x.amount }));
+                setdsYearExpensesDetail(yearExpensesDetailList);
                 setdsYearExpensesItems(response.data.dsItemNames);
-                setdsYearExpenses(response.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -48,6 +47,23 @@ function ALine2() {
                 }
             });
     }
+
+    const getOptions = () => {
+        var optionsDSYear = [...new Set(dsTrans.map(q => new moment(q.createdDateTime).format('YYYY')))];
+        optionsDSYear = optionsDSYear.sort((a, b) => b - a);
+        var optionList = [];
+        optionsDSYear.map((v) => {
+            optionList.push({ value: +v, text: v })
+        })
+
+        setoptions(optionList);
+        getDSYearExpenses(optionList[0].value);
+    }
+
+    const onChange = (e) => {
+        setyear(e.target.value);
+        getDSYearExpenses(e.target.value);
+    };
 
     let chartOptions = {
         options: {
@@ -109,60 +125,41 @@ function ALine2() {
         },
     };
 
-    const options = [
-        { value: 2020, text: '2020' },
-        { value: 2021, text: '2021' },
-        { value: 2022, text: '2022' },
-        { value: 2023, text: '2023' },
-    ];
-
-    const [year, setyear] = useState(options[0].value);
-
-    const onChange = (e) => {
-        setyear(e.target.value);
-        getDSYearExpenses(e.target.value);
-    };
-
-    const ecardLine2 = () => {
-        return (
-            <EuiCard
-                icon={<EuiIcon size="xxl" type="dashboardApp" />}
-                title=
-                {
-                    <div class="flex justify-center">
-                        <EuiSelect
-                            options={options}
-                            value={year}
-                            onChange={(e) => onChange(e)}
-                            aria-label="Use aria labels when no actual label is in use"
-                        />
-                    </div>
-                }
-                betaBadgeProps={{
-                    label: 'Beta',
-                    tooltipContent:
-                        'This module is not GA. Please help us by reporting any bugs.',
-                }}
-            >
-                {/* <div class="flex justify-center"> */}
-                <div>
-                    <Chart
-                        options={chartOptions.options}
-                        series={chartOptions.options.series}
-                        type="line"
-                        width="750"
-                    />
-                </div>
-            </EuiCard>
-        )
-    }
-
     useEffect(() => {
-        getDSYearExpenses(options[0].value);
-    }, []);
+        if (dsTrans.length > 0)
+            getOptions();
+
+    }, [dsTrans]);
 
     return (
-        ecardLine2()
+        <EuiCard
+            icon={<EuiIcon size="xxl" type="dashboardApp" />}
+            title=
+            {
+                <div class="flex justify-center">
+                    <EuiSelect
+                        options={options}
+                        value={year}
+                        onChange={(e) => onChange(e)}
+                        aria-label="Use aria labels when no actual label is in use"
+                    />
+                </div>
+            }
+            betaBadgeProps={{
+                label: 'Beta',
+                tooltipContent:
+                    'This module is not GA. Please help us by reporting any bugs.',
+            }}
+        >
+            <div class="flex justify-center">
+                <Chart
+                    options={chartOptions.options}
+                    series={chartOptions.options.series}
+                    type="line"
+                    width="750"
+                />
+            </div>
+        </EuiCard>
     );
 }
 ;

@@ -339,6 +339,11 @@ const DSTransactionTable = () => {
                 muiTableBodyCellProps: {
                     align: 'right',
                 },
+                Cell: ({ cell }) => (
+                    <div>
+                        {cell.getValue().toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </div>
+                ),
             },
             {
                 accessorKey: 'dsTypeName', //dsAccountName
@@ -405,9 +410,6 @@ const DSTransactionTable = () => {
                     <div href="#" className="block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700" >
                         <div className='grid gap-2 grid-cols-5'>
                             <div>
-                                <EuiDatePicker preventOpenOnFocus={true} dateFormat="YYYY/MM/DD" name="presetDate" selected={presetDate} onChange={ocPresetDate} />
-                            </div>
-                            <div>
                                 <EuiComboBox
                                     aria-label="Accessible screen reader label"
                                     placeholder="Select a single option"
@@ -428,6 +430,9 @@ const DSTransactionTable = () => {
                                     onChange={ocSelectedPresetAcc}
                                     isClearable={false}
                                 />
+                            </div>
+                            <div>
+                                <EuiDatePicker preventOpenOnFocus={true} dateFormat="YYYY/MM/DD" name="presetDate" selected={presetDate} onChange={ocPresetDate} />
                             </div>
                             <div className='col-span-2'>
                                 <EuiComboBox

@@ -5,6 +5,7 @@ import {
     EuiText
 } from '@elastic/eui';
 import axios from 'axios';
+import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import Chart from "react-apexcharts";
 import { useNavigate } from 'react-router-dom';
@@ -12,18 +13,19 @@ import { useStateContext } from '../../contexts/ContextProvider';
 
 function ADonut() {
 
-    const {
-        handleClearToken, token, handleLogin, localhostUrl,
-        urlgetDSMonthlyExpenses
-    } = useStateContext();
+    const { handleClearToken, token, dsTrans, urlgetDSMonthlyExpenses } = useStateContext();
 
     const [dsMonthlyExpenses, setdsMonthlyExpenses] = useState([]);
+    const [options, setoptions] = useState([]);
+    const [yearMonth, setyearMonth] = useState(options[0]?.value);
 
     const navigate = useNavigate();
 
-    const getDSMonthlyExpenses = (month) => {
+    const getDSMonthlyExpenses = (req) => {
+        var vYearMonth = req.split('-');
+
         axios
-            .get(`${urlgetDSMonthlyExpenses}?&year=2023&month=${month}`, {
+            .get(`${urlgetDSMonthlyExpenses}?&year=${vYearMonth[0]}&month=${vYearMonth[1]}`, {
                 headers: {
                     'Authorization': token,
                     'Content-Type': 'application/json'
@@ -43,13 +45,30 @@ function ADonut() {
             });
     }
 
+    const getOptions = () => {
+        var optionsDSYear = [...new Set(dsTrans.map(q => new moment(q.createdDateTime).format('YYYY-MM')))];
+        optionsDSYear = optionsDSYear.sort((a, b) => b - a);
+        console.log(optionsDSYear);
+        var optionList = [];
+        optionsDSYear.map((v) => {
+            optionList.push({ value: v, text: v })
+        })
+
+        setoptions(optionList);
+        getDSMonthlyExpenses(optionList[0].value);
+    }
+
+    const onChange = (e) => {
+        setyearMonth(e.target.value);
+        getDSMonthlyExpenses(e.target.value);
+    };
+
     let chartOptions = {
         options: {
             series: dsMonthlyExpenses.map(x => x.amount),
             labels: dsMonthlyExpenses.map(x => x.dsItemName),
             legend: {
                 position: "left",
-                // horizontalAlign: 'center',
                 fontFamily: "Inter, sans-serif",
                 fontSize: '11%',
                 formatter: function (val, opts) {
@@ -102,28 +121,6 @@ function ADonut() {
         },
     };
 
-    const options = [
-        { value: '1', text: 'Jan' },
-        { value: '2', text: 'Feb' },
-        { value: '3', text: 'Mar' },
-        { value: '4', text: 'Apr' },
-        { value: '5', text: 'May' },
-        { value: '6', text: 'Jun' },
-        { value: '7', text: 'Jul' },
-        { value: '8', text: 'Aug' },
-        { value: '9', text: 'Sep' },
-        { value: '10', text: 'Oct' },
-        { value: '11', text: 'Nov' },
-        { value: '12', text: 'Dec' },
-    ];
-
-    const [month, setmonth] = useState(options[0].value);
-
-    const onChange = (e) => {
-        setmonth(e.target.value);
-        getDSMonthlyExpenses(e.target.value);
-    };
-
     const ecardDonut = () => {
         return (
             <EuiCard
@@ -133,7 +130,7 @@ function ADonut() {
                     <div class="flex justify-center ...">
                         <EuiSelect
                             options={options}
-                            value={month}
+                            value={yearMonth}
                             onChange={(e) => onChange(e)}
                             aria-label="Use aria labels when no actual label is in use"
                         />
@@ -160,17 +157,12 @@ function ADonut() {
     }
 
     useEffect(() => {
-        getDSMonthlyExpenses(options[0].value);
-    }, []);
+        if (dsTrans.length > 0)
+            getOptions();
+    }, [dsTrans]);
 
     return (
         ecardDonut()
-        // <Chart
-        //     options={chartOptions.options}
-        //     series={chartOptions.options.series}
-        //     type="donut"
-        //     width="500"
-        // />
     );
 }
 ;

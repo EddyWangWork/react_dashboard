@@ -1,10 +1,10 @@
 import {
     EuiCard,
     EuiIcon,
-    EuiSelect,
-    EuiText
+    EuiSelect
 } from '@elastic/eui';
 import axios from 'axios';
+import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import Chart from "react-apexcharts";
 import { useNavigate } from 'react-router-dom';
@@ -12,12 +12,11 @@ import { useStateContext } from '../../contexts/ContextProvider';
 
 function ABar() {
 
-    const {
-        handleClearToken, token, handleLogin, localhostUrl,
-        urlgetDSYearCreditDebitDiff
-    } = useStateContext();
+    const { handleClearToken, token, dsTrans, urlgetDSYearCreditDebitDiff } = useStateContext();
 
     const [dsYearCreditDebitDiff, setdsYearCreditDebitDiff] = useState([]);
+    const [options, setoptions] = useState([]);
+    const [year, setyear] = useState(options[0]?.value);
 
     const navigate = useNavigate();
 
@@ -43,47 +42,22 @@ function ABar() {
             });
     }
 
-    const dataValue = {
-        credit: [
-            6266.95,
-            12906.95,
-            8123.63,
-            10290.32,
-            1614.87,
-            16056.54,
-            8003.77,
-            7984.51,
-            10921.45,
-            9489.69,
-            0.00
-        ],
-        debit: [
-            13578.34,
-            8268.05,
-            12945.82,
-            11293.66,
-            14119.98,
-            11013.58,
-            6515.54,
-            8897.60,
-            11274.89,
-            7700.50,
-            4962.44
-        ],
-        cashflow: [
-            -7311.39,
-            4638.90,
-            -4822.19,
-            -1003.34,
-            -12505.11,
-            5042.96,
-            1488.23,
-            -913.09,
-            -353.44,
-            1789.19,
-            -4962.44
-        ]
+    const getOptions = () => {
+        var optionsDSYear = [...new Set(dsTrans.map(q => new moment(q.createdDateTime).format('YYYY')))];
+        optionsDSYear = optionsDSYear.sort((a, b) => b - a);
+        var optionList = [];
+        optionsDSYear.map((v) => {
+            optionList.push({ value: +v, text: v })
+        })
+
+        setoptions(optionList);
+        getDSYearCreditDebitDiff(optionList[0].value);
     }
+
+    const onChange = (e) => {
+        setyear(e.target.value);
+        getDSYearCreditDebitDiff(e.target.value);
+    };
 
     let chartOptions = {
         options: {
@@ -108,6 +82,7 @@ function ABar() {
                     endingShape: 'rounded'
                 },
             },
+            colors: ['#3ffc00', '#ff0019', '#eab308'],
             dataLabels: {
                 enabled: false
             },
@@ -117,7 +92,6 @@ function ABar() {
                 colors: ['transparent']
             },
             xaxis: {
-                // categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Dec'],
                 categories: dsYearCreditDebitDiff.map(x => x.yearMonth),
             },
             yaxis: {
@@ -136,20 +110,6 @@ function ABar() {
                 }
             }
         },
-    };
-
-    const options = [
-        { value: 2020, text: '2020' },
-        { value: 2021, text: '2021' },
-        { value: 2022, text: '2022' },
-        { value: 2023, text: '2023' },
-    ];
-
-    const [year, setyear] = useState(options[0].value);
-
-    const onChange = (e) => {
-        setyear(e.target.value);
-        getDSYearCreditDebitDiff(e.target.value);
     };
 
     const ecardBar = () => {
@@ -186,8 +146,9 @@ function ABar() {
     }
 
     useEffect(() => {
-        getDSYearCreditDebitDiff(options[0].value);
-    }, []);
+        if (dsTrans.length > 0)
+            getOptions();
+    }, [dsTrans]);
 
     return (
         ecardBar()

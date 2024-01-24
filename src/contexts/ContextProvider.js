@@ -69,16 +69,15 @@ export const ContextProvider = ({ children }) => {
         localStorage.setItem('themeMode', e.target.value);
         setThemeSettings(false);
     }
+
     const setColor = (color) => {
         setCurrentColor(color);
         localStorage.setItem('colorMode', color);
         setThemeSettings(false);
     }
-    const handleClicked = (clicked) => { setIsClicked({ ...initialState, [clicked]: true }) };
 
-    const handleLogin = () => {
-        setIsLogin(true);
-    }
+    const handleClicked = (clicked) => { setIsClicked({ ...initialState, [clicked]: true }) };
+    const handleLogin = () => { setIsLogin(true); }
 
     const handleSetToken = (token) => {
         localStorage.setItem('token', `Bearer ${token}`);
@@ -104,6 +103,7 @@ export const ContextProvider = ({ children }) => {
                     data.createdDateTime = new Date(data.createdDateTime);
                     data.createdDateTimeDay = new Date(data.createdDateTime);
                 });
+
                 setdsTrans(response.data);
                 setdsTransError(null);
             })

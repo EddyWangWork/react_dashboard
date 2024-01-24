@@ -282,7 +282,7 @@ const DialogDSTransaction2 = ({ rowData, presetData, buttonProp, setactionDone, 
         <Fragment>
             <EuiForm component="form">
                 <EuiFormRow label="Date">
-                    <EuiDatePicker name="date" readOnly={isModeDelete} selected={date} onChange={ocDate} />
+                    <EuiDatePicker preventOpenOnFocus={true} dateFormat="YYYY/MM/DD" name="date" readOnly={isModeDelete} selected={date} onChange={ocDate} />
                 </EuiFormRow>
 
                 <EuiFormRow label="Type">
