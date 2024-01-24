@@ -121,7 +121,8 @@ const DSTransactionTable = () => {
             })
             .then((response) => {
                 console.log(response.data)
-                var activeAcc = response.data.filter(x => x.isActive == true)
+                // var activeAcc = response.data.filter(x => x.isActive == true)
+                var activeAcc = response.data;
                 setclDSAccountName([...new Set(activeAcc.map(q => q.name))]);
 
                 var cbData = [];
