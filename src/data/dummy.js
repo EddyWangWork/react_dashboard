@@ -575,6 +575,10 @@ export const links = [
         icon: <BsKanban />,
       },
       {
+        name: 'kanban2',
+        icon: <BsKanban />,
+      },
+      {
         name: 'editor',
         icon: <FiEdit />,
       },

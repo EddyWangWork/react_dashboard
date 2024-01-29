@@ -59,6 +59,9 @@ export const ContextProvider = ({ children }) => {
     const [urlgetTrips, seturlgetTrips] = useState(`${urltrip}/getTrips`);
     const [urlgetTripDetailTypes, seturlgetTripDetailTypes] = useState(`${urltrip}/getTripDetailTypes`);
 
+    //kanban
+    const urlKanban = `${localhostUrl}/Kanban`;
+
     //global
     const [dsTransactions, setdsTransactions] = useState(JSON.parse(localStorage.getItem("transactions")));
     const [dsTrans, setdsTrans] = useState([]);
@@ -142,6 +145,7 @@ export const ContextProvider = ({ children }) => {
             urlDS, urlgetDSTransactionV2, urlgetDSTransactionWithDate, //dsTrans
             urlgetDSMonthlyExpenses, urlgetDSYearCreditDebitDiff, urlgetDSYearExpenses,//statistic
             urlgetTrips, //trip
+            urlKanban, //kanban
 
             dsTransactions,
             dsTrans, setdsTrans, getdstransactions,

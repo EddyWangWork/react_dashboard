@@ -5,8 +5,10 @@ import { TooltipComponent } from '@syncfusion/ej2-react-popups';
 
 import { Navbar, Footer, Sidebar, ThemeSettings } from '../components';
 import {
-    Ecommerce, Ecommerce2, Orders, Calendar, Employees, Stacked, Pyramid, Customers, Trip, Kanban, Line,
-    Area, Bar, Pie, Financial, ColorPicker, ColorMapping, Editor, Login, LoginV2, Todolists, Transaction,
+    Ecommerce, Ecommerce2, Orders, Calendar, Employees, Stacked, Pyramid, Customers,
+    Trip, Kanban, Kanban2, Line,
+    Area, Bar, Pie, Financial, ColorPicker, ColorMapping, Editor, Login,
+    LoginV2, Todolists, Transaction,
     Transaction2, TripManage, TransactionCompare
 } from '../pages';
 
@@ -88,6 +90,7 @@ const Dashboard = () => {
 
                                 {/* apps  */}
                                 <Route path="/kanban" element={<Kanban />} />
+                                <Route path="/kanban2" element={<Kanban2 />} />
                                 <Route path="/editor" element={<Editor />} />
                                 <Route path="/calendar" element={<Calendar />} />
                                 <Route path="/color-picker" element={<ColorPicker />} />

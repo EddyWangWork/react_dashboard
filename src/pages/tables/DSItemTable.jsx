@@ -142,7 +142,7 @@ const DSItemTable = () => {
                 </div>
             }
         },
-        [hasValue],
+        [hasValue]
     );
 
     useEffect(() => {
