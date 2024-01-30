@@ -124,6 +124,11 @@ const Kanban2 = () => {
                 );
 
                 actions[destination.droppableId](items);
+
+                var dataChange = items[destination.index];
+
+                dataChange.priority = destination.index + 1;
+                editKanban(dataChange.id, dataChange);
             } else {
                 const sourceId = source.droppableId;
                 const destinationId = destination.droppableId;
@@ -138,10 +143,6 @@ const Kanban2 = () => {
                 actions[destinationId](result[destinationId]);
 
                 var dataChange = result[destinationId].find((x) => data.find(x => x.status == +sourceId).kanbanDetails.some(y => y.id == x.id))
-
-                //update via API
-                console.log(dataChange);
-                console.log(destinationId);
 
                 dataChange.status = destinationId
                 editKanban(dataChange.id, dataChange);

@@ -137,7 +137,7 @@ const DialogKanban = ({ rowData, buttonProp, setactionDone }) => {
                         "title": title,
                         "content": content,
                         "status": 1,
-                        "priority": 0
+                        "priority": 1
                     }
                     console.log(req);
                     addKanban(req);
