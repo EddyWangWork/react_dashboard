@@ -4,7 +4,14 @@ npm install --legacy-peer-deps
 npm install react-helmet --legacy-peer-deps
 npm install jquery --legacy-peer-deps
 
-------------------
+------------------------------------------------------------------------
 db - restore
-------------------
+------------------------------------------------------------------------
 https://www.sqlshack.com/sql-server-transaction-log-backup-truncate-and-shrink-operations/
+
+
+------------------------------------------------------------------------
+netlify - reroute issue
+------------------------------------------------------------------------
+1. add file Public/_redirects
+    /*  /index.html  200

@@ -24,21 +24,15 @@ const Dashboard = () => {
         if (token) {
             handleLogin();
         }
-    }, []);
+    }, [token]);
 
-    const getDashboard = () => {
-        if (!isLogin) {
-            console.log('not login');
-            return (
-                <div>
-                    <LoginV2 />
-                </div>
-            )
-        }
-        else {
-            console.log('login');
-            return (
-                <div className="flex relative dark:bg-main-dark-bg">
+    const getDashboard = () => (
+        <div>
+            {
+                !token && <LoginV2 />
+            }
+            {
+                token && <div className="flex relative dark:bg-main-dark-bg">
                     <div className='fixed right-4 bottom-4' style={{ zIndex: '1000' }}>
                         <TooltipComponent content="Settings" position='Top'>
                             <button
@@ -111,9 +105,9 @@ const Dashboard = () => {
                         </div>
                     </div>
                 </div>
-            )
-        }
-    }
+            }
+        </div>
+    )
 
     return (
         <div className={currentMode === 'Dark' ? 'dark' : ''}>
