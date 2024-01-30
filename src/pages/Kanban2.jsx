@@ -44,11 +44,18 @@ const Kanban2 = () => {
     const [list2, setList2] = useState([]);
     const [list3, setList3] = useState([]);
 
+    const kanbanTitles = [
+        { id: 1, title: 'To Do', count: list1.length },
+        { id: 2, title: 'In Progress', count: list2.length },
+        { id: 3, title: 'Done', count: list3.length },
+    ]
+
     const DataInit = useMemo(
         () => {
-            if (data.length > 0 && isInit) {
+            if ((data.length > 0 && isInit) || actionDone) {
                 updateKanbanList();
-                setisInit(false)
+                setisInit(false);
+                setactionDone(false);
             }
         }, [data]
     );
@@ -144,12 +151,6 @@ const Kanban2 = () => {
         }
     };
 
-    const kanbanTitles = [
-        { id: 1, title: 'To Do', count: list1.length },
-        { id: 2, title: 'In Progress', count: list2.length },
-        { id: 3, title: 'Done', count: list3.length },
-    ]
-
     const kanbanTitleCss = (v) => v == 1 ? 'text-sky-800' : v == 2 ? 'text-yellow-800' : 'text-green-800';
 
     const kanbanTitle = (v) => {
@@ -169,12 +170,27 @@ const Kanban2 = () => {
         v == 1 ? 'bg-blue-500 shadow-blue-500/50' :
             v == 2 ? 'bg-yellow-500 shadow-yellow-500/50' : 'bg-green-500 shadow-green-500/50';
 
-    const cardTemplate = (title, content, state, kanbanId) => {
+    const cardTemplate = (title, content, state, kanbanId, id) => {
         return <div className={`${kanbanContentCss(kanbanId)} rounded-lg shadow-lg`}>
             <EuiCard
-                onClick={() => { console.log({ title, content, state, kanbanId }) }}
                 textAlign="left"
-                title={<span className='text-sm'>{title}</span>}
+                title={
+                    <div className='grid gap-2 grid-cols-2'>
+                        <span className='text-sm'>{title}</span>
+                        <div className='flex flex-row-reverse gap-1'>
+                            <DialogKanban
+                                rowData={data.find(x => x.status == kanbanId).kanbanDetails.find(y => y.id == id)}
+                                buttonProp={{ mode: 3, iconType: 'error', label: 'error', color: 'danger', bColor: 'border-rose-400/75' }}
+                                setactionDone={setactionDone}
+                            />
+                            <DialogKanban
+                                rowData={data.find(x => x.status == kanbanId).kanbanDetails.find(y => y.id == id)}
+                                buttonProp={{ mode: 2, iconType: 'wrench', label: 'wrench', color: 'success', bColor: 'border-indigo-900/75' }}
+                                setactionDone={setactionDone}
+                            />
+                        </div>
+                    </div>
+                }
                 description={
                     <span className='text-sm text-stone-400'>
                         {content}
@@ -206,10 +222,10 @@ const Kanban2 = () => {
     }
 
     useEffect(() => {
-        if (data.length == 0) {
+        if (isInit || actionDone) {
             getKanban();
         }
-    }, []);
+    }, [actionDone]);
 
     const ViewKanban = () => useMemo(
         () => {
@@ -235,7 +251,7 @@ const Kanban2 = () => {
                                     {list1.map(({ title, content, id, guid }, idx) => (
                                         <EuiDraggable key={id} index={idx} draggableId={guid} spacing="m">
                                             {(provided, state) => (
-                                                cardTemplate(title, content, state, kanbanTitles[0].id)
+                                                cardTemplate(title, content, state, kanbanTitles[0].id, id)
                                             )}
                                         </EuiDraggable>
                                     ))}
@@ -253,7 +269,7 @@ const Kanban2 = () => {
                                     {list2.map(({ title, content, id, guid }, idx) => (
                                         <EuiDraggable key={id} index={idx} draggableId={guid} spacing="m">
                                             {(provided, state) => (
-                                                cardTemplate(title, content, state, kanbanTitles[1].id)
+                                                cardTemplate(title, content, state, kanbanTitles[1].id, id)
                                             )}
                                         </EuiDraggable>
                                     ))}
@@ -271,7 +287,7 @@ const Kanban2 = () => {
                                     {list3.map(({ title, content, id, guid }, idx) => (
                                         <EuiDraggable key={id} index={idx} draggableId={guid} spacing="m">
                                             {(provided, state) => (
-                                                cardTemplate(title, content, state, kanbanTitles[2].id)
+                                                cardTemplate(title, content, state, kanbanTitles[2].id, id)
                                             )}
                                         </EuiDraggable>
                                     ))}
