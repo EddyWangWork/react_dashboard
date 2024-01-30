@@ -1,19 +1,18 @@
-import React, { useState, useEffect, useMemo } from 'react';
 import {
+    EuiCard,
     EuiDragDropContext,
-    EuiFlexGroup,
-    EuiFlexItem,
     EuiDraggable,
     EuiDroppable,
-    EuiPanel,
+    EuiFlexGroup,
+    EuiFlexItem,
+    EuiSkeletonLoading,
+    EuiSkeletonRectangle,
     euiDragDropMove,
     euiDragDropReorder,
-    htmlIdGenerator,
-    EuiCard,
-    EuiCode,
-    EuiButton
+    htmlIdGenerator
 } from '@elastic/eui';
 import axios from 'axios';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '../components';
 import { useStateContext } from '../contexts/ContextProvider';
@@ -32,6 +31,7 @@ const Kanban2 = () => {
     const [isInit, setisInit] = useState(true);
     const [isDragend, setisDragend] = useState(false);
     const [actionDone, setactionDone] = useState(false);
+    const [isLoading, setisLoading] = useState(true);
 
     const updateKanban = (v) => data.find(x => x.status == v)?.kanbanDetails ?? [];
     const updateKanbanList = () => {
@@ -56,6 +56,7 @@ const Kanban2 = () => {
                 updateKanbanList();
                 setisInit(false);
                 setactionDone(false);
+                setisLoading(false);
             }
         }, [data]
     );
@@ -163,6 +164,7 @@ const Kanban2 = () => {
             <DialogKanban
                 buttonProp={{ mode: 1, iconType: 'plus', label: 'plus', color: 'accent', bColor: 'border-fuchsia-900/75' }}
                 setactionDone={setactionDone}
+                setisLoading={setisLoading}
             />
         </div>
     }
@@ -183,11 +185,13 @@ const Kanban2 = () => {
                                 rowData={data.find(x => x.status == kanbanId).kanbanDetails.find(y => y.id == id)}
                                 buttonProp={{ mode: 3, iconType: 'error', label: 'error', color: 'danger', bColor: 'border-rose-400/75' }}
                                 setactionDone={setactionDone}
+                                setisLoading={setisLoading}
                             />
                             <DialogKanban
                                 rowData={data.find(x => x.status == kanbanId).kanbanDetails.find(y => y.id == id)}
                                 buttonProp={{ mode: 2, iconType: 'wrench', label: 'wrench', color: 'success', bColor: 'border-indigo-900/75' }}
                                 setactionDone={setactionDone}
+                                setisLoading={setisLoading}
                             />
                         </div>
                     </div>
@@ -226,7 +230,7 @@ const Kanban2 = () => {
         if (isInit || actionDone) {
             getKanban();
         }
-    }, [actionDone]);
+    }, [actionDone, isLoading]);
 
     const ViewKanban = () => useMemo(
         () => {
@@ -238,68 +242,77 @@ const Kanban2 = () => {
 
                 return <div className='m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl'>
                     <Header category='Page' title='Kanban' />
-                    <EuiDragDropContext onDragEnd={onDragEnd}>
-                        <EuiFlexGroup>
-                            <EuiFlexItem>
-                                {kanbanTitle(kanbanTitles[0])}
-                                <EuiDroppable
-                                    droppableId="1"
-                                    type="TYPE_ONE"
-                                    spacing="m"
-                                    withPanel
-                                    grow={false}
-                                >
-                                    {list1.map(({ title, content, id, guid }, idx) => (
-                                        <EuiDraggable key={id} index={idx} draggableId={guid} spacing="m">
-                                            {(provided, state) => (
-                                                cardTemplate(title, content, state, kanbanTitles[0].id, id)
-                                            )}
-                                        </EuiDraggable>
-                                    ))}
-                                </EuiDroppable>
-                            </EuiFlexItem>
-                            <EuiFlexItem>
-                                {kanbanTitle(kanbanTitles[1])}
-                                <EuiDroppable
-                                    droppableId="2"
-                                    type="TYPE_ONE"
-                                    spacing="m"
-                                    withPanel
-                                    grow={false}
-                                >
-                                    {list2.map(({ title, content, id, guid }, idx) => (
-                                        <EuiDraggable key={id} index={idx} draggableId={guid} spacing="m">
-                                            {(provided, state) => (
-                                                cardTemplate(title, content, state, kanbanTitles[1].id, id)
-                                            )}
-                                        </EuiDraggable>
-                                    ))}
-                                </EuiDroppable>
-                            </EuiFlexItem>
-                            <EuiFlexItem>
-                                {kanbanTitle(kanbanTitles[2])}
-                                <EuiDroppable
-                                    droppableId="3"
-                                    type="TYPE_ONE"
-                                    spacing="m"
-                                    withPanel
-                                    grow={true}
-                                >
-                                    {list3.map(({ title, content, id, guid }, idx) => (
-                                        <EuiDraggable key={id} index={idx} draggableId={guid} spacing="m">
-                                            {(provided, state) => (
-                                                cardTemplate(title, content, state, kanbanTitles[2].id, id)
-                                            )}
-                                        </EuiDraggable>
-                                    ))}
-                                </EuiDroppable>
-                            </EuiFlexItem>
-                        </EuiFlexGroup>
-                    </EuiDragDropContext>
+                    <EuiSkeletonLoading
+                        isLoading={isLoading}
+                        contentAriaLabel="Demo loading section"
+                        loadingContent={
+                            <EuiSkeletonRectangle width="100%" height={250} />
+                        }
+                        loadedContent={
+                            <EuiDragDropContext onDragEnd={onDragEnd}>
+                                <EuiFlexGroup>
+                                    <EuiFlexItem>
+                                        {kanbanTitle(kanbanTitles[0])}
+                                        <EuiDroppable
+                                            droppableId="1"
+                                            type="TYPE_ONE"
+                                            spacing="m"
+                                            withPanel
+                                            grow={false}
+                                        >
+                                            {list1.map(({ title, content, id, guid }, idx) => (
+                                                <EuiDraggable key={id} index={idx} draggableId={guid} spacing="m">
+                                                    {(provided, state) => (
+                                                        cardTemplate(title, content, state, kanbanTitles[0].id, id)
+                                                    )}
+                                                </EuiDraggable>
+                                            ))}
+                                        </EuiDroppable>
+                                    </EuiFlexItem>
+                                    <EuiFlexItem>
+                                        {kanbanTitle(kanbanTitles[1])}
+                                        <EuiDroppable
+                                            droppableId="2"
+                                            type="TYPE_ONE"
+                                            spacing="m"
+                                            withPanel
+                                            grow={false}
+                                        >
+                                            {list2.map(({ title, content, id, guid }, idx) => (
+                                                <EuiDraggable key={id} index={idx} draggableId={guid} spacing="m">
+                                                    {(provided, state) => (
+                                                        cardTemplate(title, content, state, kanbanTitles[1].id, id)
+                                                    )}
+                                                </EuiDraggable>
+                                            ))}
+                                        </EuiDroppable>
+                                    </EuiFlexItem>
+                                    <EuiFlexItem>
+                                        {kanbanTitle(kanbanTitles[2])}
+                                        <EuiDroppable
+                                            droppableId="3"
+                                            type="TYPE_ONE"
+                                            spacing="m"
+                                            withPanel
+                                            grow={true}
+                                        >
+                                            {list3.map(({ title, content, id, guid }, idx) => (
+                                                <EuiDraggable key={id} index={idx} draggableId={guid} spacing="m">
+                                                    {(provided, state) => (
+                                                        cardTemplate(title, content, state, kanbanTitles[2].id, id)
+                                                    )}
+                                                </EuiDraggable>
+                                            ))}
+                                        </EuiDroppable>
+                                    </EuiFlexItem>
+                                </EuiFlexGroup>
+                            </EuiDragDropContext>
+                        }
+                    />
                 </div >
             }
         },
-        [isDragend, list1, list2, list3],
+        [isDragend, list1, list2, list3, isLoading],
     );
 
     return (

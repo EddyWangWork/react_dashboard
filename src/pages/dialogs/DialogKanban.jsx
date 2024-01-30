@@ -15,7 +15,7 @@ import axios from 'axios';
 import { Fragment, useEffect, useState } from 'react';
 import { useStateContext } from '../../contexts/ContextProvider';
 
-const DialogKanban = ({ rowData, buttonProp, setactionDone }) => {
+const DialogKanban = ({ rowData, buttonProp, setactionDone, setisLoading }) => {
 
     const {
         token, urlKanban,
@@ -46,6 +46,7 @@ const DialogKanban = ({ rowData, buttonProp, setactionDone }) => {
         })
             .then(response => {
                 console.log(response);
+                setactionDone(true);
             })
             .catch(error => {
                 console.log(error);
@@ -61,6 +62,7 @@ const DialogKanban = ({ rowData, buttonProp, setactionDone }) => {
         })
             .then(response => {
                 console.log(response);
+                setactionDone(true);
             })
             .catch(error => {
                 console.log(error);
@@ -76,6 +78,7 @@ const DialogKanban = ({ rowData, buttonProp, setactionDone }) => {
         })
             .then(response => {
                 console.log(response);
+                setactionDone(true);
             })
             .catch(error => {
                 console.log(error);
@@ -139,7 +142,6 @@ const DialogKanban = ({ rowData, buttonProp, setactionDone }) => {
                         "status": 1,
                         "priority": 1
                     }
-                    console.log(req);
                     addKanban(req);
                 }; break;
             case 2:
@@ -151,8 +153,6 @@ const DialogKanban = ({ rowData, buttonProp, setactionDone }) => {
                         "status": rowData.status,
                         "priority": 0
                     }
-                    console.log(rowData.id);
-                    console.log(req);
                     editKanban(rowData.id, req);
                 }; break;
             case 3:
@@ -163,12 +163,12 @@ const DialogKanban = ({ rowData, buttonProp, setactionDone }) => {
                 { };
         }
 
-        setactionDone(true);
+        setisLoading(true);
         closeModal();
     }
 
     const setFieldsIsError = (v) => {
-        settitle(v);
+        setisTitleError(v);
     }
 
     useEffect(() => {
