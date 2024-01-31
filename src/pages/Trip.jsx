@@ -1,4 +1,21 @@
 import React, { useEffect, useState, ChangeEvent } from 'react';
+import {
+    EuiCard,
+    EuiDragDropContext,
+    EuiDraggable,
+    EuiDroppable,
+    EuiFlexGroup,
+    EuiFlexItem,
+    EuiSkeletonLoading,
+    EuiSkeletonRectangle,
+    euiDragDropMove,
+    euiDragDropReorder,
+    htmlIdGenerator,
+    EuiPanel,
+    EuiText,
+    EuiTitle,
+    EuiLink
+} from '@elastic/eui';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { DialogComponent } from '@syncfusion/ej2-react-popups';
@@ -14,6 +31,8 @@ import {
 import { Chrono } from "react-chrono";
 import Slider from "react-slick";
 import Moment from 'moment';
+import { Header } from '../components';
+import moment from 'moment';
 
 const Trip = ({ }) => {
 
@@ -75,37 +94,57 @@ const Trip = ({ }) => {
     }
 
     React.useEffect(() => {
-        getCardInfo();
-        getTitlesApi();
+        // getCardInfo();
+        // getTitlesApi();
     }, [])
 
     //-----DATA AREA-------------------------------//
 
     const dummyData = [
         {
-            "name": "Brazil",
+            "name": "Langkawi",
             "tripDtos": [
                 {
-                    "date": "2023-08-01T00:00:00",
+                    "date": "2023-08-31T00:00:00",
                     "tripDetailDtos": [
                         {
                             "tripDetailTypesInfo": [
                                 {
                                     "typeName": "Flight",
-                                    "typeValue": [
-                                        "Depart:1200 - Arrived: 1500"
+                                    "typeValues": [
+                                        {
+                                            "typeValue": "depart: 08:00",
+                                            "typeVTypeLink": "https://www.google.com.my/"
+                                        }
                                     ]
                                 },
                                 {
                                     "typeName": "Breakfast",
-                                    "typeValue": [
-                                        "-"
-                                    ]
-                                },
-                                {
-                                    "typeName": "Dinner",
-                                    "typeValue": [
-                                        "-"
+                                    "typeValues": [
+                                        {
+                                            "typeValue": "ABC Sdn Bhd",
+                                            "typeVTypeLink": ""
+                                        },
+                                        {
+                                            "typeValue": "FFF Sdn Bhd",
+                                            "typeVTypeLink": "https://www.google.com.my/"
+                                        },
+                                        {
+                                            "typeValue": "WRDS Sdn Bhd",
+                                            "typeVTypeLink": ""
+                                        },
+                                        {
+                                            "typeValue": "ABC Sdn Bhd",
+                                            "typeVTypeLink": ""
+                                        },
+                                        {
+                                            "typeValue": "FFF Sdn Bhd",
+                                            "typeVTypeLink": "https://www.google.com.my/"
+                                        },
+                                        {
+                                            "typeValue": "WRDS Sdn Bhd",
+                                            "typeVTypeLink": ""
+                                        }
                                     ]
                                 }
                             ]
@@ -113,26 +152,26 @@ const Trip = ({ }) => {
                     ]
                 },
                 {
-                    "date": "2023-08-02T00:00:00",
+                    "date": "2023-09-01T00:00:00",
                     "tripDetailDtos": [
                         {
                             "tripDetailTypesInfo": [
                                 {
                                     "typeName": "Flight",
-                                    "typeValue": [
-                                        "-"
+                                    "typeValues": [
+                                        {
+                                            "typeValue": "-",
+                                            "typeVTypeLink": ""
+                                        }
                                     ]
                                 },
                                 {
                                     "typeName": "Breakfast",
-                                    "typeValue": [
-                                        "-"
-                                    ]
-                                },
-                                {
-                                    "typeName": "Dinner",
-                                    "typeValue": [
-                                        "-"
+                                    "typeValues": [
+                                        {
+                                            "typeValue": "-",
+                                            "typeVTypeLink": ""
+                                        }
                                     ]
                                 }
                             ]
@@ -140,26 +179,26 @@ const Trip = ({ }) => {
                     ]
                 },
                 {
-                    "date": "2023-08-03T00:00:00",
+                    "date": "2023-09-02T00:00:00",
                     "tripDetailDtos": [
                         {
                             "tripDetailTypesInfo": [
                                 {
                                     "typeName": "Flight",
-                                    "typeValue": [
-                                        "-"
+                                    "typeValues": [
+                                        {
+                                            "typeValue": "-",
+                                            "typeVTypeLink": ""
+                                        }
                                     ]
                                 },
                                 {
                                     "typeName": "Breakfast",
-                                    "typeValue": [
-                                        "-"
-                                    ]
-                                },
-                                {
-                                    "typeName": "Dinner",
-                                    "typeValue": [
-                                        "-"
+                                    "typeValues": [
+                                        {
+                                            "typeValue": "-",
+                                            "typeVTypeLink": ""
+                                        }
                                     ]
                                 }
                             ]
@@ -207,7 +246,7 @@ const Trip = ({ }) => {
         ))
     }
 
-    return (
+    const viewOld = () => (
         <div className="App">
             {
                 data2.length > 0 ?
@@ -224,8 +263,208 @@ const Trip = ({ }) => {
                     <h3>no data</h3>
             }
         </div>
+    )
+
+    const getPanels = () => (
+        dummyData[0].tripDtos.map((v, i) => (
+            <div>
+                <EuiPanel color='primary'>
+                    <EuiTitle size="xs">
+                        <h1>{moment(v.date).format('YYYY/MM/DD')} - <span className='italic'>{dummyData[0].name}</span></h1>
+                    </EuiTitle>
+                    <div className='grid grid-cols-3 gap-1 pt-2'>
+                        {
+                            v.tripDetailDtos[0].tripDetailTypesInfo.map((vv, ii) => (
+                                <EuiPanel>
+                                    <EuiText size="s">
+                                        {vv.typeName}
+                                    </EuiText>
+                                    <EuiPanel>
+                                        <EuiText size="xs" color="subdued">
+                                            <ul>
+                                                {vv.typeValues.map((vvv, iii) => (
+                                                    <li>
+                                                        {
+                                                            vvv.typeVTypeLink && <EuiLink href={vvv.typeVTypeLink} target="_blank">
+                                                                {vvv.typeValue}
+                                                            </EuiLink>
+                                                        }
+                                                        {
+                                                            !vvv.typeVTypeLink && vvv.typeValue
+                                                        }
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </EuiText>
+                                    </EuiPanel>
+                                </EuiPanel>
+                            ))
+                        }
+                    </div>
+                </EuiPanel>
+            </div>
+        ))
+    )
+
+    const viewNew2 = () => (
+        <div className='m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl'>
+            <Header category='Page' title='Trip' />
+            <div className='flex flex-col gap-2'>
+                <EuiPanel>
+
+                </EuiPanel>
+                <EuiPanel>
+                    <div className='flex flex-col gap-2 pt-2'>
+                        {getPanels()}
+                    </div>
+                </EuiPanel>
+            </div>
+        </div>
+
+    )
+
+    const viewNew = () => (
+        <div className='m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl'>
+            <Header category='Page' title='Trip' />
+            <div>
+                <EuiPanel color='primary'>
+                    <EuiTitle size="xs">
+                        <h1>2024-02-09</h1>
+                    </EuiTitle>
+                    <div className='grid grid-cols-3 gap-1 pt-2'>
+                        <EuiPanel>
+                            <EuiText size="s">
+                                Flight
+                            </EuiText>
+                            <EuiPanel>
+                                <EuiText size="s">
+                                    <ul>
+                                        <li>List item one</li>
+                                        <li>List item two</li>
+                                        <li>Dolphins</li>
+                                    </ul>
+                                </EuiText>
+                            </EuiPanel>
+                        </EuiPanel>
+                        <EuiPanel>
+                            <EuiText size="s">
+                                Breakfast
+                            </EuiText>
+                            <EuiPanel>
+                                <EuiText size="s">
+                                    <ul>
+                                        <li>List item one</li>
+                                        <li>List item two</li>
+                                        <li>Dolphins</li>
+                                    </ul>
+                                </EuiText>
+                            </EuiPanel>
+                        </EuiPanel>
+                        <EuiPanel>
+                            <EuiText size="s">
+                                Breakfast
+                            </EuiText>
+                            <EuiPanel>
+                                <EuiText size="s">
+                                    <ul>
+                                        <li>List item one</li>
+                                        <li>List item two</li>
+                                        <li>Dolphins</li>
+                                    </ul>
+                                </EuiText>
+                            </EuiPanel>
+                        </EuiPanel>
+                        <EuiPanel>
+                            <EuiText size="s">
+                                Breakfast
+                            </EuiText>
+                            <EuiPanel>
+                                <EuiText size="s">
+                                    <ul>
+                                        <li>List item one</li>
+                                        <li>List item two</li>
+                                        <li>Dolphins</li>
+                                    </ul>
+                                </EuiText>
+                            </EuiPanel>
+                        </EuiPanel>
+                    </div>
+                </EuiPanel>
+            </div>
+            <div className='pt-2'>
+                <EuiPanel color='primary'>
+                    <EuiTitle size="xs">
+                        <h1>2024-02-09</h1>
+                    </EuiTitle>
+                    <div className='grid grid-cols-3 gap-1 pt-2'>
+                        <EuiPanel>
+                            <EuiText size="s">
+                                Flight
+                            </EuiText>
+                            <EuiPanel>
+                                <EuiText size="s">
+                                    <ul>
+                                        <li>List item one</li>
+                                        <li>List item two</li>
+                                        <li>Dolphins</li>
+                                    </ul>
+                                </EuiText>
+                            </EuiPanel>
+                        </EuiPanel>
+                        <EuiPanel>
+                            <EuiText size="s">
+                                Breakfast
+                            </EuiText>
+                            <EuiPanel>
+                                <EuiText size="s">
+                                    <ul>
+                                        <li>List item one</li>
+                                        <li>List item two</li>
+                                        <li>Dolphins</li>
+                                    </ul>
+                                </EuiText>
+                            </EuiPanel>
+                        </EuiPanel>
+                        <EuiPanel>
+                            <EuiText size="s">
+                                Breakfast
+                            </EuiText>
+                            <EuiPanel>
+                                <EuiText size="s">
+                                    <ul>
+                                        <li>List item one</li>
+                                        <li>List item two</li>
+                                        <li>Dolphins</li>
+                                    </ul>
+                                </EuiText>
+                            </EuiPanel>
+                        </EuiPanel>
+                        <EuiPanel>
+                            <EuiText size="s">
+                                Breakfast
+                            </EuiText>
+                            <EuiPanel>
+                                <EuiText size="s">
+                                    <ul>
+                                        <li>List item one</li>
+                                        <li>List item two</li>
+                                        <li>Dolphins</li>
+                                    </ul>
+                                </EuiText>
+                            </EuiPanel>
+                        </EuiPanel>
+                    </div>
+                </EuiPanel>
+            </div>
+        </div>
+
+    )
+
+    return (
+        <div>
+            {viewNew2()}
+        </div>
     );
-}
-    ;
+};
 
 export default Trip;
