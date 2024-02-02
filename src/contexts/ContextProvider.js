@@ -59,7 +59,10 @@ export const ContextProvider = ({ children }) => {
     const [urlgetTrips, seturlgetTrips] = useState(`${urltrip}/getTrips`);
     const [urlgetTripDetailTypes, seturlgetTripDetailTypes] = useState(`${urltrip}/getTripDetailTypes`);
     const urladdtrip = `${urltrip}/addtrip`;
+    const urlupdatetrip = `${urltrip}/updatetrip`;
+    const urldeletetrip = `${urltrip}/deletetrip`;
     const urladdtripdetailtype = `${urltrip}/addtripdetailtype`;
+    const urladdtripdetail = `${urltrip}/addtripdetail`;
 
     //kanban
     const urlKanban = `${localhostUrl}/Kanban`;
@@ -146,7 +149,9 @@ export const ContextProvider = ({ children }) => {
             urlDSItemSub, //dsitem sub
             urlDS, urlgetDSTransactionV2, urlgetDSTransactionWithDate, //dsTrans
             urlgetDSMonthlyExpenses, urlgetDSYearCreditDebitDiff, urlgetDSYearExpenses,//statistic
-            urlgetTrips, urladdtrip, urladdtripdetailtype, //trip
+            urlgetTrips, urlupdatetrip, urladdtrip, urldeletetrip, //trip
+            urladdtripdetailtype, //tripdetailtype
+            urladdtripdetail, //tripdetail
             urlKanban, //kanban
 
             dsTransactions,

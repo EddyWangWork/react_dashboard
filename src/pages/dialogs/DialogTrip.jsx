@@ -20,16 +20,22 @@ import { useStateContext } from '../../contexts/ContextProvider';
 import moment from 'moment';
 
 
-const DialogTrip = ({ rowData, buttonProp, setactionDone, setisLoading }) => {
+const DialogTrip = ({ rowData, buttonProp, setactionDone, setisLoading, setactionDoneRes }) => {
 
-    const { token, urladdtrip, urladdtripdetailtype } = useStateContext();
+    const { token,
+        urladdtrip, urlupdatetrip, urldeletetrip,
+        urladdtripdetailtype,
+        urladdtripdetail
+    } = useStateContext();
 
     let modal;
     const [isModalVisible, setIsModalVisible] = useState(false);
     const showModal = () => setIsModalVisible(true)
     const closeModal = () => setIsModalVisible(false)
 
-    const isModeDelete = [3].some(x => x == buttonProp.mode);
+    const isModeTrip = [1, 2, 3].some(x => x == buttonProp.mode);
+    const isModeTripDetailType = [11, 22, 33].some(x => x == buttonProp.mode);
+    const isModeDelete = [3, 33, 333].some(x => x == buttonProp.mode);
 
     const borderColor = buttonProp.bColor ?? 'border-blue-900/75';
 
@@ -39,17 +45,55 @@ const DialogTrip = ({ rowData, buttonProp, setactionDone, setisLoading }) => {
 
     const [typeName, settypeName] = useState('');
 
+    const [typeInfoName, settypeInfoName] = useState('');
+    const [typeInfoLink, settypeInfoLink] = useState('');
+
     const [isNameError, setisNameError] = useState(false);
     const [isTypeNameError, setisTypeNameError] = useState(false);
+    const [isTypeInfoNameError, setisTypeInfoNameError] = useState(false);
 
     const isSubmitError = () => (
         (buttonProp.mode == 1 && name == '') ||
-        (buttonProp.mode == 11 && typeName == '')
+        (buttonProp.mode == 11 && typeName == '') ||
+        (buttonProp.mode == 111 && typeInfoName == '')
     )
 
     const addtrip = (req) => {
         axios
             .post(`${urladdtrip}`, req, {
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then((response) => {
+                console.log(response.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
+
+    const updatetrip = (id, req) => {
+        axios
+            .put(`${urlupdatetrip}/${id}`, req, {
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then((response) => {
+                console.log(response.data);
+                setactionDoneRes({ id: response.data.id })
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
+
+    const deletetrip = (id) => {
+        axios
+            .delete(`${urldeletetrip}/${id}`, {
                 headers: {
                     'Authorization': token,
                     'Content-Type': 'application/json'
@@ -79,14 +123,34 @@ const DialogTrip = ({ rowData, buttonProp, setactionDone, setisLoading }) => {
             });
     }
 
+    const addtripdetail = (req) => {
+        axios
+            .post(`${urladdtripdetail}`, req, {
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then((response) => {
+                console.log(response.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
+
     const modalName = () => {
         switch (buttonProp.mode) {
             case 1:
                 return 'Add Trip'
             case 11:
                 return 'Add Trip Detail Type'
+            case 111:
+                return 'Add Trip Detail Info'
             case 2:
                 return 'Edit Trip'
+            case 22:
+                return 'Edit Trip Detail Type'
             case 3:
                 return 'Delete Trip'
             default:
@@ -102,6 +166,12 @@ const DialogTrip = ({ rowData, buttonProp, setactionDone, setisLoading }) => {
             case 'typeName':
                 settypeName(e.target.value);
                 break;
+            case 'typeInfoName':
+                settypeInfoName(e.target.value);
+                break;
+            case 'typeInfoLink':
+                settypeInfoLink(e.target.value);
+                break;
             default:
                 { };
         }
@@ -115,6 +185,9 @@ const DialogTrip = ({ rowData, buttonProp, setactionDone, setisLoading }) => {
             case 'typeName':
                 setisTypeNameError(typeName == '');
                 break;
+            case 'typeInfoName':
+                setisTypeInfoNameError(typeInfoName == '');
+                break;
             default:
                 { };
         }
@@ -123,15 +196,25 @@ const DialogTrip = ({ rowData, buttonProp, setactionDone, setisLoading }) => {
     const setFieldsIsError = (v) => {
         setisNameError(v);
         setisTypeNameError(v);
+        setisTypeInfoNameError(v);
     }
 
     const setModalValue = () => {
-        setname(rowData.title);
+        if (isModeTrip) {
+            setname(rowData.tripName);
+            setStartDate(new moment(rowData.fromDate));
+            setEndDate(new moment(rowData.toDate));
+        }
+
+        if (isModeTripDetailType) {
+            settypeName(rowData.typeName);
+        }
     }
 
     const clearValue = () => {
         setname('');
         settypeName('');
+        settypeInfoName('');
     }
 
     const completeAction = () => {
@@ -152,13 +235,29 @@ const DialogTrip = ({ rowData, buttonProp, setactionDone, setisLoading }) => {
                     }
                     addtripdetailtype(req);
                 }; break;
+            case 111:
+                {
+                    var req = {
+                        "tripID": rowData.tripID,
+                        "tripDetailTypeID": rowData.tripDetailTypeID,
+                        "date": rowData.tripDate,
+                        "name": typeInfoName,
+                        "linkname": typeInfoLink
+                    }
+                    addtripdetail(req);
+                }; break;
             case 2:
                 {
-
+                    var req = {
+                        "name": name,
+                        "fromDate": startDate.format('YYYY-MM-DD'),
+                        "toDate": endDate.format('YYYY-MM-DD'),
+                    }
+                    updatetrip(rowData.tripID, req);
                 }; break;
             case 3:
                 {
-
+                    deletetrip(rowData.tripID);
                 }; break;
             default:
                 { };
@@ -166,6 +265,7 @@ const DialogTrip = ({ rowData, buttonProp, setactionDone, setisLoading }) => {
 
         // setisLoading(true);
         setactionDone(true);
+        clearValue();
         closeModal();
     }
 
@@ -210,6 +310,7 @@ const DialogTrip = ({ rowData, buttonProp, setactionDone, setisLoading }) => {
                             dateFormat={'YYYY/MM/DD'}
                         />
                     }
+                    readOnly={isModeDelete}
                 />
             </EuiFormRow>
         </div>
@@ -223,16 +324,29 @@ const DialogTrip = ({ rowData, buttonProp, setactionDone, setisLoading }) => {
         </div>
     )
 
+    const formTripTypeInfo = () => (
+        <div>
+            <EuiFormRow label="TypeInfoName" isInvalid={isTypeInfoNameError}>
+                <EuiFieldText name="typeInfoName" value={typeInfoName} readOnly={isModeDelete} onChange={ocHandler} onBlur={onBlurFunc} isInvalid={isTypeInfoNameError} />
+            </EuiFormRow>
+
+            <EuiFormRow label="TypeInfoLink">
+                <EuiFieldText name="typeInfoLink" value={typeInfoLink} readOnly={isModeDelete} onChange={ocHandler} onBlur={onBlurFunc} />
+            </EuiFormRow>
+        </div>
+    )
+
     const formSample = (
         <EuiPanel>
             <EuiForm component="form">
-                {buttonProp.mode == 1 && formTrip()}
+                {isModeTrip && formTrip()}
                 {buttonProp.mode == 11 && formTripType()}
+                {buttonProp.mode == 111 && formTripTypeInfo()}
             </EuiForm>
         </EuiPanel>
     );
 
-    const getInitFocus = buttonProp.mode == 1 ? "[name=name]" : "[name=typeName]"
+    const getInitFocus = isModeTrip ? "[name=name]" : buttonProp.mode == 11 ? "[name=typeName]" : "[name=typeInfoName]"
 
     if (isModalVisible) {
         modal = (
@@ -261,7 +375,7 @@ const DialogTrip = ({ rowData, buttonProp, setactionDone, setisLoading }) => {
     return (
         <div>
             <EuiButtonIcon
-                display="base"
+                display="empty"
                 iconType={buttonProp.iconType}
                 aria-label={buttonProp.label}
                 color={buttonProp.color}
