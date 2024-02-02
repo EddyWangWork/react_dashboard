@@ -1,55 +1,39 @@
-import React, { useEffect, useState, ChangeEvent } from 'react';
 import {
-    EuiCard,
-    EuiDragDropContext,
-    EuiDraggable,
-    EuiDroppable,
-    EuiFlexGroup,
-    EuiFlexItem,
-    EuiSkeletonLoading,
-    EuiSkeletonRectangle,
-    euiDragDropMove,
-    euiDragDropReorder,
-    htmlIdGenerator,
+    EuiComboBox,
+    EuiLink,
     EuiPanel,
     EuiText,
-    EuiTitle,
-    EuiLink
+    EuiPopover,
+    EuiPopoverTitle,
+    EuiButtonEmpty,
+    EuiPopoverFooter,
+    EuiButton,
+    EuiButtonIcon
 } from '@elastic/eui';
-import { Route, Routes, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { DialogComponent } from '@syncfusion/ej2-react-popups';
-import { TextBoxComponent } from '@syncfusion/ej2-react-inputs';
-import { DropDownListComponent } from '@syncfusion/ej2-react-dropdowns';
-import { useStateContext } from '../contexts/ContextProvider';
-import { CheckBoxComponent } from '@syncfusion/ej2-react-buttons';
-import { ToastUtility } from '@syncfusion/ej2-react-notifications';
-import {
-    ChartComponent, SeriesCollectionDirective, SeriesDirective, Inject, Legend, DateTime,
-    Tooltip, DataLabel, LineSeries, Crosshair
-} from '@syncfusion/ej2-react-charts';
-import { Chrono } from "react-chrono";
-import Slider from "react-slick";
-import Moment from 'moment';
-import { Header } from '../components';
 import moment from 'moment';
+import React, { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Header } from '../components';
+import { useStateContext } from '../contexts/ContextProvider';
+import { DialogTrip } from '../pages';
 
 const Trip = ({ }) => {
 
     const { handleClearToken, isLogin, token, handleLogin, urlgetTrips } = useStateContext();
+    const navigate = useNavigate();
 
-    const [data1, setData] = useState([]);
-    const [data2, setData2] = useState([]);
+    const textColors = ['text-[#166534]', 'text-[#3f6212]', 'text-[#854d0e]', 'text-[#92400e]', 'text-[#9a3412]']
 
-    function successShow() {
-        ToastUtility.show('Load successfully', 'Success', 2000);
-    }
+    const [cbTrips, setcbTrips] = useState([]);
+    const [selectedTrip, setselectedTrip] = useState([{ id: 1, label: 'No Data' }]);
+    const ocSelectedTrip = (v) => setselectedTrip(v);
 
-    function dangerShow(e) {
-        ToastUtility.show(e, 'Error', 2000);
-    }
+    const [data, setData] = useState([]);
+    const [actionDone, setactionDone] = useState(false);
+    const [isLoading, setisLoading] = useState(true);
 
-    const getTitlesApi = async () => {
+    const getTrips = () => {
         axios
             .get(`${urlgetTrips}`, {
                 headers: {
@@ -59,223 +43,77 @@ const Trip = ({ }) => {
             })
             .then((response) => {
                 console.log(response.data);
-                let titles = []
-                var firstTrip = response.data[0]
-                firstTrip.tripDtos.map((v, i) => {
-                    let title = (Moment(v.date).format('DD-MM-yyyy dddd'));
-                    let cardTitle = `day:${i + 1}`;
-                    titles.push({ title: title, cardTitle: cardTitle })
+                var cbData = [];
+                response.data.map((v, i) => {
+                    cbData.push({ 'id': v.name, 'label': v.name })
                 })
-                setData2(titles);
+                setcbTrips(cbData);
+                setData(response.data);
             })
-            .catch(error => {
-                dangerShow(error.response.data)
+            .catch((err) => {
+                console.log(err);
+                console.log(err.response.status);
+                if (err.response.status == 401) {
+                    handleClearToken();
+                    navigate('/login', { replace: true });
+                }
             });
     }
 
-    function getCardInfo() {
-        axios
-            .get(`${urlgetTrips}`, {
-                headers: {
-                    'Authorization': token,
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then((response) => {
-                console.log(response.data);
-                var firstTrip = response.data[0]
-                console.log(firstTrip.tripDtos);
-                setData(firstTrip.tripDtos);
-                successShow();
-            })
-            .catch(error => {
-                dangerShow(error.response.data)
-            });
-    }
+    const CBTripsOnChange = useMemo(
+        () => {
+            if (cbTrips.length != 0) {
+                setselectedTrip([cbTrips[0]])
+            }
+        },
+        [cbTrips]
+    )
 
     React.useEffect(() => {
-        // getCardInfo();
-        // getTitlesApi();
-    }, [])
-
-    //-----DATA AREA-------------------------------//
-
-    const dummyData = [
-        {
-            "name": "Langkawi",
-            "tripDtos": [
-                {
-                    "date": "2023-08-31T00:00:00",
-                    "tripDetailDtos": [
-                        {
-                            "tripDetailTypesInfo": [
-                                {
-                                    "typeName": "Flight",
-                                    "typeValues": [
-                                        {
-                                            "typeValue": "depart: 08:00",
-                                            "typeVTypeLink": "https://www.google.com.my/"
-                                        }
-                                    ]
-                                },
-                                {
-                                    "typeName": "Breakfast",
-                                    "typeValues": [
-                                        {
-                                            "typeValue": "ABC Sdn Bhd",
-                                            "typeVTypeLink": ""
-                                        },
-                                        {
-                                            "typeValue": "FFF Sdn Bhd",
-                                            "typeVTypeLink": "https://www.google.com.my/"
-                                        },
-                                        {
-                                            "typeValue": "WRDS Sdn Bhd",
-                                            "typeVTypeLink": ""
-                                        },
-                                        {
-                                            "typeValue": "ABC Sdn Bhd",
-                                            "typeVTypeLink": ""
-                                        },
-                                        {
-                                            "typeValue": "FFF Sdn Bhd",
-                                            "typeVTypeLink": "https://www.google.com.my/"
-                                        },
-                                        {
-                                            "typeValue": "WRDS Sdn Bhd",
-                                            "typeVTypeLink": ""
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "date": "2023-09-01T00:00:00",
-                    "tripDetailDtos": [
-                        {
-                            "tripDetailTypesInfo": [
-                                {
-                                    "typeName": "Flight",
-                                    "typeValues": [
-                                        {
-                                            "typeValue": "-",
-                                            "typeVTypeLink": ""
-                                        }
-                                    ]
-                                },
-                                {
-                                    "typeName": "Breakfast",
-                                    "typeValues": [
-                                        {
-                                            "typeValue": "-",
-                                            "typeVTypeLink": ""
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "date": "2023-09-02T00:00:00",
-                    "tripDetailDtos": [
-                        {
-                            "tripDetailTypesInfo": [
-                                {
-                                    "typeName": "Flight",
-                                    "typeValues": [
-                                        {
-                                            "typeValue": "-",
-                                            "typeVTypeLink": ""
-                                        }
-                                    ]
-                                },
-                                {
-                                    "typeName": "Breakfast",
-                                    "typeValues": [
-                                        {
-                                            "typeValue": "-",
-                                            "typeVTypeLink": ""
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
+        if (data.length == 0 || actionDone) {
+            getTrips();
+            setactionDone(false);
         }
-    ]
+    }, [actionDone])
 
-    //-----END-------------------------------//
-
-    const getcard3 = () => {
-        return data1.map((v, i) => (
-            <div key={i}>
-                {v.tripDetailDtos.map((v2, i) => (
-                    <div key={i} style={{ margin: `10px`, display: `flex`, flexDirection: `row`, justifyContent: `center` }}>
-                        <div className="e-card e-card-horizontal" style={{ width: `900px` }}>
-                            {v2.tripDetailTypesInfo.map((v3, i) => (
-                                <div key={i} className="e-card-stacked">
-                                    <div className="e-card-header">
-                                        <div className="e-card-header-caption">
-                                            <div className="e-card-header-title">{v3.typeName}</div>
-                                        </div>
-                                    </div>
-                                    <div className="e-card-content">
-                                        <ul className='ul2'>
-                                            {v3.typeValues.map((v4, i) => {
-                                                // <li key={i}><a href={v4.typeVTypeLink} target='self'>{v4.typeValue}</a></li>
-                                                if (v4.typeVTypeLink != '') {
-                                                    return <li key={i}><a href={v4.typeVTypeLink} target='self'>{v4.typeValue}</a></li>
-                                                }
-                                                else {
-                                                    return <li key={i}>{v4.typeValue}</li>
-                                                }
-                                            })}
-                                        </ul>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                ))}
-            </div>
-        ))
-    }
-
-    const viewOld = () => (
-        <div className="App">
-            {
-                data2.length > 0 ?
-                    <Chrono
-                        items={data2}
-                        mode="VERTICAL"
-                        slideShow
-                    >
-                        {
-                            getcard3()
-                        }
-                    </Chrono>
-                    :
-                    <h3>no data</h3>
-            }
+    const viewSelectTrip = () => (
+        <div className='flex flex-row gap-2'>
+            <EuiComboBox
+                aria-label="Accessible screen reader label"
+                placeholder="Select a single option"
+                singleSelection={{ asPlainText: true }}
+                options={cbTrips}
+                selectedOptions={selectedTrip}
+                onChange={ocSelectedTrip}
+                isClearable={false}
+            />
+            <DialogTrip
+                buttonProp={{ mode: 1, iconType: 'plus', label: 'plus', color: 'accent', bColor: 'border-fuchsia-900/75' }}
+                setactionDone={setactionDone}
+                setisLoading={setisLoading}
+            />
         </div>
     )
 
     const getPanels = () => (
-        dummyData[0].tripDtos.map((v, i) => (
+        data.find(x => x.name == selectedTrip[0].id)?.tripDtos.map((v, i) => (
             <div>
-                <EuiPanel color='primary'>
-                    <EuiTitle size="xs">
-                        <h1>{moment(v.date).format('YYYY/MM/DD')} - <span className='italic'>{dummyData[0].name}</span></h1>
-                    </EuiTitle>
+                <EuiPanel key={i} color='primary'>
+
+                    <h1 className={textColors[i]}>{moment(v.date).format('YYYY/MM/DD dddd')}</h1>
+                    <div className='flex flex-row gap-2'>
+                        <h1 className='text-[#292524]'><span className='italic'>{selectedTrip[0].id} (Day {i + 1})</span></h1>
+                        <DialogTrip
+                            buttonProp={{ mode: 11, iconType: 'plus', label: 'plus', color: 'accent', bColor: 'border-fuchsia-900/75' }}
+                            setactionDone={setactionDone}
+                            setisLoading={setisLoading}
+                        />
+                    </div>
+
                     <div className='grid grid-cols-3 gap-1 pt-2'>
                         {
-                            v.tripDetailDtos[0].tripDetailTypesInfo.map((vv, ii) => (
-                                <EuiPanel>
+                            v.tripDetailDto.tripDetailTypesInfo.map((vv, ii) => (
+                                <EuiPanel key={ii}>
                                     <EuiText size="s">
                                         {vv.typeName}
                                     </EuiText>
@@ -283,7 +121,7 @@ const Trip = ({ }) => {
                                         <EuiText size="xs" color="subdued">
                                             <ul>
                                                 {vv.typeValues.map((vvv, iii) => (
-                                                    <li>
+                                                    <li key={iii}>
                                                         {
                                                             vvv.typeVTypeLink && <EuiLink href={vvv.typeVTypeLink} target="_blank">
                                                                 {vvv.typeValue}
@@ -300,169 +138,47 @@ const Trip = ({ }) => {
                                 </EuiPanel>
                             ))
                         }
+                        {/* {
+                            <EuiPanel>
+                                <div class="flex justify-center">
+                                    <DialogTrip
+                                        buttonProp={{ mode: 11, iconType: 'plus', label: 'plus', color: 'accent', bColor: 'border-fuchsia-900/75' }}
+                                        setactionDone={setactionDone}
+                                        setisLoading={setisLoading}
+                                    />
+                                </div>
+                            </EuiPanel>
+                        } */}
                     </div>
                 </EuiPanel>
             </div>
         ))
     )
 
-    const viewNew2 = () => (
-        <div className='m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl'>
-            <Header category='Page' title='Trip' />
-            <div className='flex flex-col gap-2'>
-                <EuiPanel>
-
-                </EuiPanel>
-                <EuiPanel>
-                    <div className='flex flex-col gap-2 pt-2'>
-                        {getPanels()}
-                    </div>
-                </EuiPanel>
+    const ViewNew3 = () => useMemo(
+        () => (
+            data && <div className='m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl'>
+                <Header category='Page' title='Trip' />
+                <div className='flex flex-col gap-2'>
+                    <EuiPanel>
+                        <div>
+                            {cbTrips.length != 0 && viewSelectTrip()}
+                        </div>
+                    </EuiPanel>
+                    <EuiPanel>
+                        <div className='flex flex-col gap-2 pt-2'>
+                            {getPanels()}
+                        </div>
+                    </EuiPanel>
+                </div>
             </div>
-        </div>
-
-    )
-
-    const viewNew = () => (
-        <div className='m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl'>
-            <Header category='Page' title='Trip' />
-            <div>
-                <EuiPanel color='primary'>
-                    <EuiTitle size="xs">
-                        <h1>2024-02-09</h1>
-                    </EuiTitle>
-                    <div className='grid grid-cols-3 gap-1 pt-2'>
-                        <EuiPanel>
-                            <EuiText size="s">
-                                Flight
-                            </EuiText>
-                            <EuiPanel>
-                                <EuiText size="s">
-                                    <ul>
-                                        <li>List item one</li>
-                                        <li>List item two</li>
-                                        <li>Dolphins</li>
-                                    </ul>
-                                </EuiText>
-                            </EuiPanel>
-                        </EuiPanel>
-                        <EuiPanel>
-                            <EuiText size="s">
-                                Breakfast
-                            </EuiText>
-                            <EuiPanel>
-                                <EuiText size="s">
-                                    <ul>
-                                        <li>List item one</li>
-                                        <li>List item two</li>
-                                        <li>Dolphins</li>
-                                    </ul>
-                                </EuiText>
-                            </EuiPanel>
-                        </EuiPanel>
-                        <EuiPanel>
-                            <EuiText size="s">
-                                Breakfast
-                            </EuiText>
-                            <EuiPanel>
-                                <EuiText size="s">
-                                    <ul>
-                                        <li>List item one</li>
-                                        <li>List item two</li>
-                                        <li>Dolphins</li>
-                                    </ul>
-                                </EuiText>
-                            </EuiPanel>
-                        </EuiPanel>
-                        <EuiPanel>
-                            <EuiText size="s">
-                                Breakfast
-                            </EuiText>
-                            <EuiPanel>
-                                <EuiText size="s">
-                                    <ul>
-                                        <li>List item one</li>
-                                        <li>List item two</li>
-                                        <li>Dolphins</li>
-                                    </ul>
-                                </EuiText>
-                            </EuiPanel>
-                        </EuiPanel>
-                    </div>
-                </EuiPanel>
-            </div>
-            <div className='pt-2'>
-                <EuiPanel color='primary'>
-                    <EuiTitle size="xs">
-                        <h1>2024-02-09</h1>
-                    </EuiTitle>
-                    <div className='grid grid-cols-3 gap-1 pt-2'>
-                        <EuiPanel>
-                            <EuiText size="s">
-                                Flight
-                            </EuiText>
-                            <EuiPanel>
-                                <EuiText size="s">
-                                    <ul>
-                                        <li>List item one</li>
-                                        <li>List item two</li>
-                                        <li>Dolphins</li>
-                                    </ul>
-                                </EuiText>
-                            </EuiPanel>
-                        </EuiPanel>
-                        <EuiPanel>
-                            <EuiText size="s">
-                                Breakfast
-                            </EuiText>
-                            <EuiPanel>
-                                <EuiText size="s">
-                                    <ul>
-                                        <li>List item one</li>
-                                        <li>List item two</li>
-                                        <li>Dolphins</li>
-                                    </ul>
-                                </EuiText>
-                            </EuiPanel>
-                        </EuiPanel>
-                        <EuiPanel>
-                            <EuiText size="s">
-                                Breakfast
-                            </EuiText>
-                            <EuiPanel>
-                                <EuiText size="s">
-                                    <ul>
-                                        <li>List item one</li>
-                                        <li>List item two</li>
-                                        <li>Dolphins</li>
-                                    </ul>
-                                </EuiText>
-                            </EuiPanel>
-                        </EuiPanel>
-                        <EuiPanel>
-                            <EuiText size="s">
-                                Breakfast
-                            </EuiText>
-                            <EuiPanel>
-                                <EuiText size="s">
-                                    <ul>
-                                        <li>List item one</li>
-                                        <li>List item two</li>
-                                        <li>Dolphins</li>
-                                    </ul>
-                                </EuiText>
-                            </EuiPanel>
-                        </EuiPanel>
-                    </div>
-                </EuiPanel>
-            </div>
-        </div>
-
+        ),
+        [cbTrips, selectedTrip, actionDone]
     )
 
     return (
         <div>
-            {viewNew2()}
+            {ViewNew3()}
         </div>
     );
 };
