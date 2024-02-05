@@ -62,6 +62,7 @@ export const ContextProvider = ({ children }) => {
     const urlupdatetrip = `${urltrip}/updatetrip`;
     const urldeletetrip = `${urltrip}/deletetrip`;
     const urladdtripdetailtype = `${urltrip}/addtripdetailtype`;
+    const urlupdatetripdetailtype = `${urltrip}/updatetripdetailtype`;
     const urladdtripdetail = `${urltrip}/addtripdetail`;
 
     //kanban
@@ -150,7 +151,7 @@ export const ContextProvider = ({ children }) => {
             urlDS, urlgetDSTransactionV2, urlgetDSTransactionWithDate, //dsTrans
             urlgetDSMonthlyExpenses, urlgetDSYearCreditDebitDiff, urlgetDSYearExpenses,//statistic
             urlgetTrips, urlupdatetrip, urladdtrip, urldeletetrip, //trip
-            urladdtripdetailtype, //tripdetailtype
+            urladdtripdetailtype, urlupdatetripdetailtype,//tripdetailtype
             urladdtripdetail, //tripdetail
             urlKanban, //kanban
 

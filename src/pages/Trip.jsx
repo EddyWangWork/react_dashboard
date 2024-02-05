@@ -8,7 +8,8 @@ import {
     EuiButtonEmpty,
     EuiPopoverFooter,
     EuiButton,
-    EuiButtonIcon
+    EuiButtonIcon,
+    EuiInlineEditText
 } from '@elastic/eui';
 import axios from 'axios';
 import moment from 'moment';
@@ -20,7 +21,7 @@ import { DialogTrip } from '../pages';
 
 const Trip = ({ }) => {
 
-    const { handleClearToken, isLogin, token, handleLogin, urlgetTrips } = useStateContext();
+    const { handleClearToken, isLogin, token, handleLogin, urlgetTrips, urlupdatetripdetailtype } = useStateContext();
     const navigate = useNavigate();
 
     const textColors = ['text-[#166534]', 'text-[#3f6212]', 'text-[#854d0e]', 'text-[#92400e]', 'text-[#9a3412]']
@@ -33,10 +34,23 @@ const Trip = ({ }) => {
     const [actionDone, setactionDone] = useState(false);
     const [actionDoneRes, setactionDoneRes] = useState({});
     const [isLoading, setisLoading] = useState(true);
+    const [isInit, setisInit] = useState(true);
+
+    const [isTypeNameReadonly, setisTypeNameReadonly] = useState(true);
 
     const dataSelectedTrip = data?.find(x => x.id == selectedTrip[0]?.id);
     const dataSelectedTripDateFrom = moment(dataSelectedTrip?.tripDtos[0]?.date).format('YYYY/MM/DD');
     const dataSelectedTripDateTo = moment(dataSelectedTrip?.tripDtos[dataSelectedTrip?.tripDtos?.length - 1]?.date).format('YYYY/MM/DD');
+
+    const CBTripsOnChange = useMemo(
+        () => {
+            if (cbTrips.length != 0 || actionDoneRes?.id > 0) {
+                setselectedTrip([actionDoneRes.id > 0 ? cbTrips.find(x => x.id == actionDoneRes.id) : cbTrips[0]])
+                setactionDoneRes({ id: 0 })
+            }
+        },
+        [cbTrips]
+    )
 
     const getTrips = () => {
         axios
@@ -65,22 +79,21 @@ const Trip = ({ }) => {
             });
     }
 
-    const CBTripsOnChange = useMemo(
-        () => {
-            if (cbTrips.length != 0 || actionDoneRes?.id > 0) {
-                setselectedTrip([actionDoneRes.id > 0 ? cbTrips.find(x => x.id == actionDoneRes.id) : cbTrips[0]])
-                setactionDoneRes({ id: 0 })
-            }
-        },
-        [cbTrips]
-    )
-
-    React.useEffect(() => {
-        if (data.length == 0 || actionDone) {
-            getTrips();
-            setactionDone(false);
-        }
-    }, [actionDone, actionDoneRes])
+    const updatetripdetailtype = (id, req) => {
+        axios
+            .put(`${urlupdatetripdetailtype}/${id}`, req, {
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then((response) => {
+                console.log(response.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
 
     const getTypeInfoRowData = (tripID, tripDetailTypeID, tripDate) => ({
         tripID, tripDetailTypeID, tripDate
@@ -93,10 +106,22 @@ const Trip = ({ }) => {
         toDate: dataSelectedTripDateTo
     }
 
-    const getRowDataTripDetail = (v) => ({
-        typeID: v.typeID,
-        typeName: v.typeName
-    })
+    const onSaveTripTypeName = (v, id) => {
+        var req = { name: v }
+        updatetripdetailtype(id, req);
+        setactionDoneRes({ id: selectedTrip[0]?.id })
+        setisTypeNameReadonly(true);
+        setactionDone(true);
+    }
+
+    React.useEffect(() => {
+        if (isInit || actionDone) {
+            setData([]);
+            getTrips();
+            setisInit(false);
+            setactionDone(false);
+        }
+    }, [actionDone, actionDoneRes])
 
     const viewSelectTrip = () => (
         <div className='gap-1'>
@@ -146,7 +171,13 @@ const Trip = ({ }) => {
                         <DialogTrip
                             buttonProp={{ mode: 11, iconType: 'plus', label: 'plus', color: 'accent', bColor: 'border-fuchsia-900/75' }}
                             setactionDone={setactionDone}
-                            setisLoading={setisLoading}
+                        />
+                        <EuiButtonIcon
+                            display="empty"
+                            iconType={'wrench'}
+                            aria-label={'wrench'}
+                            color={'primary'}
+                            onClick={() => { setisTypeNameReadonly(!isTypeNameReadonly) }}
                         />
                     </div>
 
@@ -156,7 +187,13 @@ const Trip = ({ }) => {
                                 <EuiPanel key={ii}>
                                     <EuiText size="s">
                                         <div className='flex flex-row gap-2'>
-                                            {vv.typeName}
+                                            <EuiInlineEditText
+                                                size='xs'
+                                                inputAriaLabel="Edit text inline"
+                                                defaultValue={vv.typeName}
+                                                onSave={(x) => onSaveTripTypeName(x, vv.typeID)}
+                                                isReadOnly={isTypeNameReadonly}
+                                            />
                                             <DialogTrip
                                                 rowData={getTypeInfoRowData(selectedTrip[0]?.id, vv.typeID, moment(v.date).format('YYYY-MM-DD'))}
                                                 buttonProp={{ mode: 111, iconType: 'plus', label: 'plus', color: 'accent', bColor: 'border-fuchsia-900/75' }}
@@ -210,7 +247,7 @@ const Trip = ({ }) => {
                 </div>
             </div>
         ),
-        [cbTrips, selectedTrip, actionDone]
+        [cbTrips, selectedTrip, actionDone, isTypeNameReadonly]
     )
 
     return (
