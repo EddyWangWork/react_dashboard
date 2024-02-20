@@ -19,14 +19,17 @@ export const ContextProvider = ({ children }) => {
     const [themeSettings, setThemeSettings] = useState(false)
     const [isLogin, setIsLogin] = useState(false);
     const [token, setToken] = useState(localStorage.getItem("token"));
+    const [userInfo, setuserInfo] = useState({});
     // const [localhostUrl, setlocalhostUrl] = useState('https://allinoneapi.alwaysdata.net');
     const [localhostUrl, setlocalhostUrl] = useState('https://localhost:7069');
 
-    const [urllogin, seturllogin] = useState(`${localhostUrl}/Member/login`);
+    const urlmember = `${localhostUrl}/Member`;
+    const urllogin = `${urlmember}/loginV2`;
 
     //common
-    const [urlgetTodolistTypes, setgetTodolistTypes] = useState(`${localhostUrl}/Common/getTodolistTypes`);
-    const [urlgetDSTransTypes, seturlgetDSTransTypes] = useState(`${localhostUrl}/Common/getDSTransTypes`);
+    const urlcommon = `${localhostUrl}/Common`;
+    const urlgetTodolistTypes = `${urlcommon}/getTodolistTypes`;
+    const urlgetDSTransTypes = `${urlcommon}/getDSTransTypes`;
 
     //todolist
     const [urlTodolist, seturlTodolist] = useState(`${localhostUrl}/Todolist`);
@@ -89,7 +92,7 @@ export const ContextProvider = ({ children }) => {
     const handleLogin = () => { setIsLogin(true); }
 
     const handleSetToken = (token) => {
-        localStorage.setItem('token', `Bearer ${token}`);
+        localStorage.setItem('token', token);
         setToken(localStorage.getItem("token"));
     };
 
@@ -126,6 +129,7 @@ export const ContextProvider = ({ children }) => {
 
     return (
         <StateContext.Provider value={{
+            userInfo, setuserInfo,
             activeMenu,
             setActiveMenu,
             isClicked,
@@ -141,7 +145,7 @@ export const ContextProvider = ({ children }) => {
             handleClearToken,
             localhostUrl,
 
-            urllogin,
+            urlmember, urllogin,
             urlgetTodolistTypes, urlgetDSTransTypes, //common
             urlTodolist,
             urlTodolistDone, //todolist            

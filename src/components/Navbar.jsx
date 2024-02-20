@@ -1,14 +1,16 @@
-import React, { useEffect } from 'react';
-import { AiOutlineMenu } from 'react-icons/ai';
-import { FiShoppingCart } from 'react-icons/fi';
-import { BsChatLeft } from 'react-icons/bs';
-import { RiNotification3Line } from 'react-icons/ri';
-import { MdKeyboardArrowDown } from 'react-icons/md';
+import {
+    EuiCollapsibleNav
+} from '@elastic/eui';
 import { TooltipComponent } from '@syncfusion/ej2-react-popups';
-
-import avatar from '../data/avatar.jpg';
+import React, { useEffect, useState } from 'react';
+import { AiOutlineMenu } from 'react-icons/ai';
+import { BsChatLeft } from 'react-icons/bs';
+import { FiShoppingCart } from 'react-icons/fi';
+import { MdKeyboardArrowDown } from 'react-icons/md';
+import { RiNotification3Line } from 'react-icons/ri';
 import { Cart, Chat, Notification, UserProfile } from '.';
 import { useStateContext } from '../contexts/ContextProvider';
+import avatar from '../data/avatar.jpg';
 
 const NavButton = ({ title, customFunc, icon, color, dotColor }) => (
     <TooltipComponent content={title} position='BottomCenter'>
@@ -30,6 +32,8 @@ const NavButton = ({ title, customFunc, icon, color, dotColor }) => (
 const Navbar = () => {
     const { activeMenu, setActiveMenu, isClicked, setIsClicked, handleClicked, screenSize, setScreenSize, currentColor } = useStateContext();
 
+    const [navIsOpen, setNavIsOpen] = useState(false);
+
     useEffect(() => {
         const handleResize = () => setScreenSize(window.innerWidth);
         window.addEventListener('resize', handleResize);
@@ -44,6 +48,19 @@ const Navbar = () => {
             setActiveMenu(true);
         }
     }, [screenSize]);
+
+    const viewEuiCollapsibleNav = () => (
+        <EuiCollapsibleNav
+            isOpen={navIsOpen}
+            size={240}
+            side='right'
+            onClose={() => setNavIsOpen(false)}
+        >
+            <div style={{ padding: 16 }}>
+                <UserProfile />
+            </div>
+        </EuiCollapsibleNav>
+    )
 
     return (
         <div className='flex justify-between p-2 md:mx-6 relative'>
@@ -78,7 +95,8 @@ const Navbar = () => {
                 >
                     <div
                         className="flex items-center gap-2 cursor-pointer p-1 hover:bg-light-gray rounded-lg"
-                        onClick={() => handleClicked('userProfile')}
+                        // onClick={() => handleClicked('userProfile')}
+                        onClick={() => setNavIsOpen((isOpen) => !isOpen)}
                     >
                         <img
                             className='rounded-full w-8 h-8'
@@ -96,6 +114,7 @@ const Navbar = () => {
                 {isClicked.notification && <Notification />}
                 {isClicked.userProfile && <UserProfile />}
             </div>
+            {viewEuiCollapsibleNav()}
         </div>
     )
 }

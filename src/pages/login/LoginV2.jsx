@@ -13,7 +13,7 @@ window.$ = $;
 
 function LoginV2() {
     const { handleLogin, handleSetToken, token, localhostUrl,
-        urllogin, urlgetDSTransactionV2, setdsTrans } = useStateContext();
+        urllogin, urlgetDSTransactionV2, setdsTrans, setuserInfo } = useStateContext();
 
     const [formData, setFormData] = useState({ name: '', email: '' });
     const [isLogining, setisLogining] = useState(false);
@@ -23,7 +23,7 @@ function LoginV2() {
         axios
             .get(`${urlgetDSTransactionV2}`, {
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    'Authorization': token,
                     'Content-Type': 'application/json'
                 }
             })
@@ -65,10 +65,10 @@ function LoginV2() {
 
         axios.post(`${urllogin}`, formData)
             .then(response => {
-                console.log(response);
-                console.log(response.data['token']);
-                handleSubmit(response.data['token']);
-                getdstransactions(response.data['token']);
+                setisLogining(false);
+                handleSubmit(response.data.token);
+                getdstransactions(response.data.token);
+                setuserInfo(response.data);
             })
             .catch(error => {
                 setisLogining(false);
