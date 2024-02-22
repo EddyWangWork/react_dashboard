@@ -70,6 +70,7 @@ export const ContextProvider = ({ children }) => {
     const urdeletetripdetailtype = `${urltrip}/deletetripdetailtype`;
     const urladdtripdetail = `${urltrip}/addtripdetail`;
     const urlupdatetripdetail = `${urltrip}/updatetripdetail`;
+    const urldeletetripdetail = `${urltrip}/deletetripdetail`;
 
     //kanban
     const urlKanban = `${localhostUrl}/Kanban`;
@@ -142,13 +143,13 @@ export const ContextProvider = ({ children }) => {
     };
 
     //1:success, 2:warning, 3:error
-    const getToastReq = (type, title, message) => (
+    const getToastReq = (type, title, message, iconValue) => (
         {
             id: `toast${Math.random() * 16}`,
             title: title,
             color: type == 1 ? 'success' : type == 2 ? 'warning' : 'danger',
-            iconType: type == 1 ? 'check' : type == 2 ? 'warning' : 'error',
-            text: <p>{message}</p>,
+            iconType: iconValue ?? (type == 1 ? 'check' : type == 2 ? 'warning' : 'error'),
+            text: message.map((v, i) => (<p key={i}>{v}</p>)),
         }
     )
 
@@ -182,7 +183,7 @@ export const ContextProvider = ({ children }) => {
             urlgetDSMonthlyExpenses, urlgetDSYearCreditDebitDiff, urlgetDSYearExpenses,//statistic
             urlgetTrips, urlupdatetrip, urladdtrip, urldeletetrip, //trip
             urladdtripdetailtype, urlupdatetripdetailtype, urdeletetripdetailtype, //tripdetailtype
-            urladdtripdetail, urlupdatetripdetail, //tripdetail
+            urladdtripdetail, urlupdatetripdetail, urldeletetripdetail, //tripdetail
             urlKanban, //kanban
 
             dsTransactions,

@@ -25,7 +25,8 @@ const DialogTrip = ({ rowData, buttonProp, setactionDone, setisLoading, setactio
     const { token,
         urladdtrip, urlupdatetrip, urldeletetrip,
         urladdtripdetailtype, urdeletetripdetailtype,
-        urladdtripdetail, urlupdatetripdetail
+        urladdtripdetail, urlupdatetripdetail, urldeletetripdetail,
+        addToastHandler, getToastReq
     } = useStateContext();
 
     let modal;
@@ -69,6 +70,8 @@ const DialogTrip = ({ rowData, buttonProp, setactionDone, setisLoading, setactio
             })
             .then((response) => {
                 console.log(response.data);
+                var data = response.data;
+                addToastHandler(getToastReq(1, 'New Trip', [data.name, new moment(data.fromDate).format('YYYY-MM-DD'), new moment(data.toDate).format('YYYY-MM-DD')]));
             })
             .catch((err) => {
                 console.log(err);
@@ -85,6 +88,8 @@ const DialogTrip = ({ rowData, buttonProp, setactionDone, setisLoading, setactio
             })
             .then((response) => {
                 console.log(response.data);
+                var data = response.data;
+                addToastHandler(getToastReq(1, 'Update Trip', [data.name, new moment(data.fromDate).format('YYYY-MM-DD'), new moment(data.toDate).format('YYYY-MM-DD')], 'wrench'));
                 setactionDoneRes({ id: response.data.id })
             })
             .catch((err) => {
@@ -102,6 +107,8 @@ const DialogTrip = ({ rowData, buttonProp, setactionDone, setisLoading, setactio
             })
             .then((response) => {
                 console.log(response.data);
+                var data = response.data;
+                addToastHandler(getToastReq(1, 'Delete Trip', [data.name, new moment(data.fromDate).format('YYYY-MM-DD'), new moment(data.toDate).format('YYYY-MM-DD')], 'trash'));
             })
             .catch((err) => {
                 console.log(err);
@@ -118,6 +125,7 @@ const DialogTrip = ({ rowData, buttonProp, setactionDone, setisLoading, setactio
             })
             .then((response) => {
                 console.log(response.data);
+                addToastHandler(getToastReq(1, 'New DetailType', [response.data.name]));
             })
             .catch((err) => {
                 console.log(err);
@@ -134,6 +142,7 @@ const DialogTrip = ({ rowData, buttonProp, setactionDone, setisLoading, setactio
             })
             .then((response) => {
                 console.log(response.data);
+                addToastHandler(getToastReq(1, 'Delete DetailType', [response.data.name], 'trash'));
             })
             .catch((err) => {
                 console.log(err);
@@ -150,6 +159,7 @@ const DialogTrip = ({ rowData, buttonProp, setactionDone, setisLoading, setactio
             })
             .then((response) => {
                 console.log(response.data);
+                addToastHandler(getToastReq(1, 'New DetailTypeInfo', [response.data.name]));
             })
             .catch((err) => {
                 console.log(err);
@@ -166,7 +176,25 @@ const DialogTrip = ({ rowData, buttonProp, setactionDone, setisLoading, setactio
             })
             .then((response) => {
                 console.log(response);
+                addToastHandler(getToastReq(1, 'Update DetailTypeInfo', [response.data.name], 'wrench'));
                 setactionDoneRes({ id: rowData.tripID })
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
+
+    const deletetripdetail = (id) => {
+        axios
+            .delete(`${urldeletetripdetail}/${id}`, {
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then((response) => {
+                console.log(response.data);
+                addToastHandler(getToastReq(1, 'Delete DetailTypeInfo', [response.data.name], 'trash'));
             })
             .catch((err) => {
                 console.log(err);
@@ -191,6 +219,8 @@ const DialogTrip = ({ rowData, buttonProp, setactionDone, setisLoading, setactio
                 return 'Delete Trip'
             case 33:
                 return 'Delete Trip Detail Type'
+            case 333:
+                return 'Delete Trip Detail Type Info'
             default:
                 return ''
         }
@@ -285,7 +315,7 @@ const DialogTrip = ({ rowData, buttonProp, setactionDone, setisLoading, setactio
                         "tripDetailTypeID": rowData.tripDetailTypeID,
                         "date": rowData.tripDate,
                         "name": typeInfoName,
-                        "linkname": typeInfoLink
+                        "linkname": typeInfoLink ?? ''
                     }
                     addtripdetail(req);
                 }; break;
@@ -305,7 +335,7 @@ const DialogTrip = ({ rowData, buttonProp, setactionDone, setisLoading, setactio
                         "tripDetailTypeID": rowData.tripDetailTypeID,
                         "date": rowData.tripDate,
                         "name": typeInfoName,
-                        "linkname": typeInfoLink
+                        "linkname": typeInfoLink ?? ''
                     }
                     updatetripdetail(rowData.typeValueID, req);
                 }; break;
@@ -316,6 +346,10 @@ const DialogTrip = ({ rowData, buttonProp, setactionDone, setisLoading, setactio
             case 33:
                 {
                     deletetripdetailtype(rowData.typeID);
+                }; break;
+            case 333:
+                {
+                    deletetripdetail(rowData.typeValueID);
                 }; break;
             default:
                 { };

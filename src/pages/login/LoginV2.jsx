@@ -68,7 +68,7 @@ function LoginV2() {
 
         axios.post(`${urllogin}`, formData)
             .then(response => {
-                addToastHandler(getToastReq(1, `Welcome ${response.data.name}!`, 'Thanks for your patience!'));
+                addToastHandler(getToastReq(1, `Welcome ${response.data.name}!`, ['Thanks for your patience!']));
                 setisLogining(false);
                 handleSubmit(response.data.token);
                 getdstransactions(response.data.token);

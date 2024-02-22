@@ -88,6 +88,7 @@ const Trip = ({ }) => {
             })
             .then((response) => {
                 console.log(response.data);
+                addToastHandler(getToastReq(1, 'Update DetailType', [response.data.name], 'wrench'));
             })
             .catch((err) => {
                 console.log(err);
@@ -226,11 +227,19 @@ const Trip = ({ }) => {
 
                                                                 }
                                                             </div>
-                                                            <div>
+                                                            <div className='flex flex-row gap-1'>
                                                                 {
                                                                     !isTypeNameReadonly && vvv.typeValue != '-' && <DialogTrip
                                                                         rowData={getTypeInfoRowData(selectedTrip[0]?.id, vv.typeID, moment(v.date).format('YYYY-MM-DD'), vvv.typeValueID, vvv.typeValue, vvv.typeVTypeLink)}
                                                                         buttonProp={{ mode: 222, iconType: 'pencil', label: 'wrench', color: 'primary', bColor: 'border-indigo-500/75' }}
+                                                                        setactionDone={setactionDone}
+                                                                        setactionDoneRes={setactionDoneRes}
+                                                                    />
+                                                                }
+                                                                {
+                                                                    !isTypeNameReadonly && vvv.typeValue != '-' && <DialogTrip
+                                                                        rowData={getTypeInfoRowData(selectedTrip[0]?.id, vv.typeID, moment(v.date).format('YYYY-MM-DD'), vvv.typeValueID, vvv.typeValue, vvv.typeVTypeLink)}
+                                                                        buttonProp={{ mode: 333, iconType: 'cross', label: 'cross', color: 'danger', bColor: 'border-rose-400/75' }}
                                                                         setactionDone={setactionDone}
                                                                         setactionDoneRes={setactionDoneRes}
                                                                     />
