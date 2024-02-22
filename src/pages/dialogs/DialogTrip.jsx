@@ -24,8 +24,8 @@ const DialogTrip = ({ rowData, buttonProp, setactionDone, setisLoading, setactio
 
     const { token,
         urladdtrip, urlupdatetrip, urldeletetrip,
-        urladdtripdetailtype,
-        urladdtripdetail
+        urladdtripdetailtype, urdeletetripdetailtype,
+        urladdtripdetail, urlupdatetripdetail
     } = useStateContext();
 
     let modal;
@@ -35,6 +35,7 @@ const DialogTrip = ({ rowData, buttonProp, setactionDone, setisLoading, setactio
 
     const isModeTrip = [1, 2, 3].some(x => x == buttonProp.mode);
     const isModeTripDetailType = [11, 22, 33].some(x => x == buttonProp.mode);
+    const isModeTripDetailTypeInfo = [111, 222, 333].some(x => x == buttonProp.mode);
     const isModeDelete = [3, 33, 333].some(x => x == buttonProp.mode);
 
     const borderColor = buttonProp.bColor ?? 'border-blue-900/75';
@@ -123,6 +124,22 @@ const DialogTrip = ({ rowData, buttonProp, setactionDone, setisLoading, setactio
             });
     }
 
+    const deletetripdetailtype = (id) => {
+        axios
+            .delete(`${urdeletetripdetailtype}/${id}`, {
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then((response) => {
+                console.log(response.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
+
     const addtripdetail = (req) => {
         axios
             .post(`${urladdtripdetail}`, req, {
@@ -139,6 +156,23 @@ const DialogTrip = ({ rowData, buttonProp, setactionDone, setisLoading, setactio
             });
     }
 
+    const updatetripdetail = (id, req) => {
+        axios
+            .put(`${urlupdatetripdetail}/${id}`, req, {
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then((response) => {
+                console.log(response);
+                setactionDoneRes({ id: rowData.tripID })
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
+
     const modalName = () => {
         switch (buttonProp.mode) {
             case 1:
@@ -146,13 +180,17 @@ const DialogTrip = ({ rowData, buttonProp, setactionDone, setisLoading, setactio
             case 11:
                 return 'Add Trip Detail Type'
             case 111:
-                return 'Add Trip Detail Info'
+                return 'Add Trip Detail Type Info'
             case 2:
                 return 'Edit Trip'
             case 22:
                 return 'Edit Trip Detail Type'
+            case 22:
+                return 'Edit Trip Detail Type Info'
             case 3:
                 return 'Delete Trip'
+            case 33:
+                return 'Delete Trip Detail Type'
             default:
                 return ''
         }
@@ -209,6 +247,11 @@ const DialogTrip = ({ rowData, buttonProp, setactionDone, setisLoading, setactio
         if (isModeTripDetailType) {
             settypeName(rowData.typeName);
         }
+
+        if (isModeTripDetailTypeInfo) {
+            settypeInfoName(rowData.typeInfoName);
+            settypeInfoLink(rowData.typeInfoLink);
+        }
     }
 
     const clearValue = () => {
@@ -255,9 +298,24 @@ const DialogTrip = ({ rowData, buttonProp, setactionDone, setisLoading, setactio
                     }
                     updatetrip(rowData.tripID, req);
                 }; break;
+            case 222:
+                {
+                    var req = {
+                        "tripID": rowData.tripID,
+                        "tripDetailTypeID": rowData.tripDetailTypeID,
+                        "date": rowData.tripDate,
+                        "name": typeInfoName,
+                        "linkname": typeInfoLink
+                    }
+                    updatetripdetail(rowData.typeValueID, req);
+                }; break;
             case 3:
                 {
                     deletetrip(rowData.tripID);
+                }; break;
+            case 33:
+                {
+                    deletetripdetailtype(rowData.typeID);
                 }; break;
             default:
                 { };
@@ -340,8 +398,8 @@ const DialogTrip = ({ rowData, buttonProp, setactionDone, setisLoading, setactio
         <EuiPanel>
             <EuiForm component="form">
                 {isModeTrip && formTrip()}
-                {buttonProp.mode == 11 && formTripType()}
-                {buttonProp.mode == 111 && formTripTypeInfo()}
+                {isModeTripDetailType && formTripType()}
+                {isModeTripDetailTypeInfo && formTripTypeInfo()}
             </EuiForm>
         </EuiPanel>
     );

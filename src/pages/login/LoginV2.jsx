@@ -12,8 +12,11 @@ window.$ = $;
 
 
 function LoginV2() {
-    const { handleLogin, handleSetToken, token, localhostUrl,
-        urllogin, urlgetDSTransactionV2, setdsTrans, setuserInfo } = useStateContext();
+    const {
+        handleLogin, handleSetToken, token, localhostUrl,
+        urllogin, urlgetDSTransactionV2, setdsTrans, setuserInfo,
+        addToastHandler, getToastReq
+    } = useStateContext();
 
     const [formData, setFormData] = useState({ name: '', email: '' });
     const [isLogining, setisLogining] = useState(false);
@@ -65,6 +68,7 @@ function LoginV2() {
 
         axios.post(`${urllogin}`, formData)
             .then(response => {
+                addToastHandler(getToastReq(1, `Welcome ${response.data.name}!`, 'Thanks for your patience!'));
                 setisLogining(false);
                 handleSubmit(response.data.token);
                 getdstransactions(response.data.token);
@@ -74,8 +78,6 @@ function LoginV2() {
                 setisLogining(false);
                 console.log(error);
                 console.log(error.message);
-                // console.log(error.response.data);
-                // seterrorMsg(error.response != null ? error.response.data : error.message);
                 seterrorMsg(error.response?.data ?? error.message);
             });
     }
@@ -88,8 +90,6 @@ function LoginV2() {
         <div className="bodyClass">
             <meta charSet="UTF-8" />
             <title>CodePen - Neumorphism Login Form</title>
-            {/* <link rel="stylesheet" href="./style.css" /> */}
-            {/* partial:index.partial.html */}
             <Helmet>
                 <script type="application/javascript" src="./LoginV2.js" />
             </Helmet>

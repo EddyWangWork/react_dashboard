@@ -1,24 +1,56 @@
-import React, { useEffect } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { FiSettings } from 'react-icons/fi';
-import { TooltipComponent } from '@syncfusion/ej2-react-popups';
-
-import { Navbar, Footer, Sidebar, ThemeSettings } from '../components';
 import {
-    Ecommerce, Ecommerce2, Orders, Calendar, Employees, Stacked, Pyramid, Customers,
-    Trip, Kanban, Kanban2, Line,
-    Area, Bar, Pie, Financial, ColorPicker, ColorMapping, Editor, Login,
-    LoginV2, Todolists, Transaction,
-    Transaction2, TripManage, TransactionCompare
+    EuiGlobalToastList
+} from '@elastic/eui';
+import { TooltipComponent } from '@syncfusion/ej2-react-popups';
+import React, { useEffect, useMemo } from 'react';
+import { FiSettings } from 'react-icons/fi';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+
+import { Navbar, Sidebar, ThemeSettings } from '../components';
+import {
+    Area, Bar,
+    Calendar,
+    ColorMapping,
+    ColorPicker,
+    Customers,
+    Ecommerce, Ecommerce2,
+    Editor,
+    Employees,
+    Financial,
+    Kanban, Kanban2, Line,
+    LoginV2,
+    Orders,
+    Pie,
+    Pyramid,
+    Stacked,
+    Todolists, Transaction,
+    Transaction2,
+    TransactionCompare,
+    Trip,
+    TripManage
 } from '../pages';
 
 import { useStateContext } from '../contexts/ContextProvider';
 
-import '../App.css'
+import '../App.css';
 
 const Dashboard = () => {
 
-    const { activeMenu, themeSettings, setThemeSettings, currentColor, currentMode, isLogin, token, handleLogin } = useStateContext();
+    const {
+        activeMenu, themeSettings, setThemeSettings, currentColor, currentMode, isLogin, token, handleLogin,
+        toasts, removeToast
+    } = useStateContext();
+
+    const ViewToast = useMemo(
+        () => {
+            return <EuiGlobalToastList
+                toasts={toasts}
+                dismissToast={removeToast}
+                toastLifeTimeMs={3500}
+            />
+        },
+        [toasts]
+    )
 
     useEffect(() => {
         if (token) {
@@ -112,6 +144,7 @@ const Dashboard = () => {
     return (
         <div className={currentMode === 'Dark' ? 'dark' : ''}>
             <div>
+                {ViewToast}
                 <BrowserRouter>
                     {getDashboard()}
                 </BrowserRouter>

@@ -20,6 +20,7 @@ export const ContextProvider = ({ children }) => {
     const [isLogin, setIsLogin] = useState(false);
     const [token, setToken] = useState(localStorage.getItem("token"));
     const [userInfo, setuserInfo] = useState({});
+    const [toasts, setToasts] = useState([]);
     // const [localhostUrl, setlocalhostUrl] = useState('https://allinoneapi.alwaysdata.net');
     const [localhostUrl, setlocalhostUrl] = useState('https://localhost:7069');
 
@@ -66,7 +67,9 @@ export const ContextProvider = ({ children }) => {
     const urldeletetrip = `${urltrip}/deletetrip`;
     const urladdtripdetailtype = `${urltrip}/addtripdetailtype`;
     const urlupdatetripdetailtype = `${urltrip}/updatetripdetailtype`;
+    const urdeletetripdetailtype = `${urltrip}/deletetripdetailtype`;
     const urladdtripdetail = `${urltrip}/addtripdetail`;
+    const urlupdatetripdetail = `${urltrip}/updatetripdetail`;
 
     //kanban
     const urlKanban = `${localhostUrl}/Kanban`;
@@ -127,6 +130,28 @@ export const ContextProvider = ({ children }) => {
             });
     }
 
+    const addToastHandler = (req) => {
+        const toast = req;
+        setToasts(toasts.concat(toast));
+    };
+
+    const removeToast = (removedToast) => {
+        setToasts((toasts) =>
+            toasts.filter((toast) => toast.id !== removedToast.id)
+        );
+    };
+
+    //1:success, 2:warning, 3:error
+    const getToastReq = (type, title, message) => (
+        {
+            id: `toast${Math.random() * 16}`,
+            title: title,
+            color: type == 1 ? 'success' : type == 2 ? 'warning' : 'danger',
+            iconType: type == 1 ? 'check' : type == 2 ? 'warning' : 'error',
+            text: <p>{message}</p>,
+        }
+    )
+
     return (
         <StateContext.Provider value={{
             userInfo, setuserInfo,
@@ -143,6 +168,7 @@ export const ContextProvider = ({ children }) => {
             handleLogin, isLogin,
             handleSetToken, token,
             handleClearToken,
+            toasts, setToasts, removeToast, addToastHandler, getToastReq, //toast
             localhostUrl,
 
             urlmember, urllogin,
@@ -155,8 +181,8 @@ export const ContextProvider = ({ children }) => {
             urlDS, urlgetDSTransactionV2, urlgetDSTransactionWithDate, //dsTrans
             urlgetDSMonthlyExpenses, urlgetDSYearCreditDebitDiff, urlgetDSYearExpenses,//statistic
             urlgetTrips, urlupdatetrip, urladdtrip, urldeletetrip, //trip
-            urladdtripdetailtype, urlupdatetripdetailtype,//tripdetailtype
-            urladdtripdetail, //tripdetail
+            urladdtripdetailtype, urlupdatetripdetailtype, urdeletetripdetailtype, //tripdetailtype
+            urladdtripdetail, urlupdatetripdetail, //tripdetail
             urlKanban, //kanban
 
             dsTransactions,

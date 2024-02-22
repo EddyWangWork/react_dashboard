@@ -1,15 +1,10 @@
 import {
+    EuiButtonIcon,
     EuiComboBox,
+    EuiInlineEditText,
     EuiLink,
     EuiPanel,
-    EuiText,
-    EuiPopover,
-    EuiPopoverTitle,
-    EuiButtonEmpty,
-    EuiPopoverFooter,
-    EuiButton,
-    EuiButtonIcon,
-    EuiInlineEditText
+    EuiText
 } from '@elastic/eui';
 import axios from 'axios';
 import moment from 'moment';
@@ -21,7 +16,11 @@ import { DialogTrip } from '../pages';
 
 const Trip = ({ }) => {
 
-    const { handleClearToken, isLogin, token, handleLogin, urlgetTrips, urlupdatetripdetailtype } = useStateContext();
+    const {
+        handleClearToken, token,
+        urlgetTrips, urlupdatetripdetailtype,
+        addToastHandler, getToastReq
+    } = useStateContext();
     const navigate = useNavigate();
 
     const textColors = ['text-[#166534]', 'text-[#3f6212]', 'text-[#854d0e]', 'text-[#92400e]', 'text-[#9a3412]']
@@ -71,8 +70,8 @@ const Trip = ({ }) => {
             })
             .catch((err) => {
                 console.log(err);
-                console.log(err.response.status);
-                if (err.response.status == 401) {
+                if (err.code = 'ERR_NETWORK' || err?.response?.status == 401) {
+                    addToastHandler(getToastReq(3, err.code, (err?.response?.data?.Message ?? err.code)));
                     handleClearToken();
                     navigate('/login', { replace: true });
                 }
@@ -95,8 +94,8 @@ const Trip = ({ }) => {
             });
     }
 
-    const getTypeInfoRowData = (tripID, tripDetailTypeID, tripDate) => ({
-        tripID, tripDetailTypeID, tripDate
+    const getTypeInfoRowData = (tripID, tripDetailTypeID, tripDate, typeValueID, typeInfoName, typeInfoLink) => ({
+        tripID, tripDetailTypeID, tripDate, typeValueID, typeInfoName, typeInfoLink
     })
 
     const getRowDataTrip = {
@@ -105,6 +104,10 @@ const Trip = ({ }) => {
         fromDate: dataSelectedTripDateFrom,
         toDate: dataSelectedTripDateTo
     }
+
+    const getRowDataTripDetailType = (typeID, typeName) => ({
+        typeID, typeName
+    })
 
     const onSaveTripTypeName = (v, id) => {
         var req = { name: v }
@@ -162,9 +165,8 @@ const Trip = ({ }) => {
 
     const getPanels = () => (
         data.find(x => x.id == selectedTrip[0]?.id)?.tripDtos.map((v, i) => (
-            <div>
-                <EuiPanel key={i} color='primary'>
-
+            <div key={i}>
+                <EuiPanel color='primary'>
                     <h1 className={textColors[i]}>{moment(v.date).format('YYYY/MM/DD dddd')}</h1>
                     <div className='flex flex-row gap-2'>
                         <h1 className='text-[#292524]'><span className='italic'>{selectedTrip[0]?.label} (Day {i + 1})</span></h1>
@@ -194,11 +196,17 @@ const Trip = ({ }) => {
                                                 onSave={(x) => onSaveTripTypeName(x, vv.typeID)}
                                                 isReadOnly={isTypeNameReadonly}
                                             />
-                                            <DialogTrip
+                                            {!isTypeNameReadonly && <DialogTrip
                                                 rowData={getTypeInfoRowData(selectedTrip[0]?.id, vv.typeID, moment(v.date).format('YYYY-MM-DD'))}
                                                 buttonProp={{ mode: 111, iconType: 'plus', label: 'plus', color: 'accent', bColor: 'border-fuchsia-900/75' }}
                                                 setactionDone={setactionDone}
-                                            />
+                                            />}
+                                            {!isTypeNameReadonly && <DialogTrip
+                                                rowData={getRowDataTripDetailType(vv.typeID, vv.typeName)}
+                                                buttonProp={{ mode: 33, iconType: 'cross', label: 'cross', color: 'danger', bColor: 'border-rose-400/75' }}
+                                                setactionDone={setactionDone}
+                                                setactionDoneRes={setactionDoneRes}
+                                            />}
                                         </div>
 
                                     </EuiText>
@@ -207,14 +215,28 @@ const Trip = ({ }) => {
                                             <ul>
                                                 {vv.typeValues.map((vvv, iii) => (
                                                     <li key={iii}>
-                                                        {
-                                                            vvv.typeVTypeLink && <EuiLink href={vvv.typeVTypeLink} target="_blank">
-                                                                {vvv.typeValue}
-                                                            </EuiLink>
-                                                        }
-                                                        {
-                                                            !vvv.typeVTypeLink && vvv.typeValue
-                                                        }
+                                                        <div className='grid grid-cols-3 gap-1'>
+                                                            <div className='col-span-2'>
+                                                                {
+                                                                    vvv.typeVTypeLink ?
+                                                                        <EuiLink href={vvv.typeVTypeLink} target="_blank">
+                                                                            {vvv.typeValue}
+                                                                        </EuiLink> :
+                                                                        vvv.typeValue
+
+                                                                }
+                                                            </div>
+                                                            <div>
+                                                                {
+                                                                    !isTypeNameReadonly && vvv.typeValue != '-' && <DialogTrip
+                                                                        rowData={getTypeInfoRowData(selectedTrip[0]?.id, vv.typeID, moment(v.date).format('YYYY-MM-DD'), vvv.typeValueID, vvv.typeValue, vvv.typeVTypeLink)}
+                                                                        buttonProp={{ mode: 222, iconType: 'pencil', label: 'wrench', color: 'primary', bColor: 'border-indigo-500/75' }}
+                                                                        setactionDone={setactionDone}
+                                                                        setactionDoneRes={setactionDoneRes}
+                                                                    />
+                                                                }
+                                                            </div>
+                                                        </div>
                                                     </li>
                                                 ))}
                                             </ul>
