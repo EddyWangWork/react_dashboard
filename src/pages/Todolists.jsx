@@ -35,7 +35,7 @@ const Todolists = () => {
             <Header category='Page' title='Todolists' />
             <EuiTabbedContent
                 tabs={tabsValue}
-                initialSelectedTab={tabsValue[1]}
+                initialSelectedTab={tabsValue[0]}
                 autoFocus="selected"
                 onTabClick={(tab) => {
                     settabCurrent(tab);

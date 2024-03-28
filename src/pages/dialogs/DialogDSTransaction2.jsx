@@ -47,6 +47,8 @@ const DialogDSTransaction2 = ({ rowData, presetData, buttonProp, setactionDone, 
     const [desc, setdesc] = useState('');
     const [amount, setamount] = useState(0);
 
+    const [isSubmitted, setisSubmitted] = useState(false);
+
     const [isAmountError, setisAmountError] = useState(false);
 
     const isSubmitError = () => amount <= 0;
@@ -61,6 +63,8 @@ const DialogDSTransaction2 = ({ rowData, presetData, buttonProp, setactionDone, 
             })
             .then(response => {
                 console.log(response);
+                closeModal();
+                setactionDone(true);
             })
             .catch(error => {
                 console.log(error);
@@ -77,6 +81,8 @@ const DialogDSTransaction2 = ({ rowData, presetData, buttonProp, setactionDone, 
             })
             .then(response => {
                 console.log(response);
+                closeModal();
+                setactionDone(true);
             })
             .catch(error => {
                 console.log(error);
@@ -93,6 +99,8 @@ const DialogDSTransaction2 = ({ rowData, presetData, buttonProp, setactionDone, 
             })
             .then(response => {
                 console.log(response);
+                closeModal();
+                setactionDone(true);
             })
             .catch(error => {
                 console.log(error);
@@ -153,6 +161,7 @@ const DialogDSTransaction2 = ({ rowData, presetData, buttonProp, setactionDone, 
     }
 
     const completeAction = () => {
+        setisSubmitted(true);
         switch (buttonProp.mode) {
             case 1:
                 {
@@ -224,8 +233,8 @@ const DialogDSTransaction2 = ({ rowData, presetData, buttonProp, setactionDone, 
                 { };
         }
 
-        setactionDone(true);
-        closeModal();
+        // setactionDone(true);
+        //closeModal();
     }
 
     const setFieldsIsError = (v) => {
@@ -383,7 +392,7 @@ const DialogDSTransaction2 = ({ rowData, presetData, buttonProp, setactionDone, 
 
                 <EuiModalFooter>
                     <EuiButtonEmpty onClick={closeModal}>Cancel</EuiButtonEmpty>
-                    <EuiButton autoFocus={isModeDelete} disabled={isSubmitError()} onClick={completeAction}>
+                    <EuiButton isLoading={isSubmitted} autoFocus={isModeDelete} disabled={isSubmitError()} onClick={completeAction}>
                         Save
                     </EuiButton>
                 </EuiModalFooter>

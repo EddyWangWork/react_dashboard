@@ -75,6 +75,11 @@ export const ContextProvider = ({ children }) => {
     //kanban
     const urlKanban = `${localhostUrl}/Kanban`;
 
+    //dashbaord
+    const urlgetDSMonthlyPeriodCreditDebit = `${urlDS}/getDSMonthlyPeriodCreditDebit`;
+    const urlgetDSMonthlyItemExpenses = `${urlDS}/getDSMonthlyItemExpenses`;
+    const urlgetDSMonthlyCommitmentAndOther = `${urlDS}/getDSMonthlyCommitmentAndOther`;
+
     //global
     const [dsTransactions, setdsTransactions] = useState(JSON.parse(localStorage.getItem("transactions")));
     const [dsTrans, setdsTrans] = useState([]);
@@ -185,7 +190,7 @@ export const ContextProvider = ({ children }) => {
             urladdtripdetailtype, urlupdatetripdetailtype, urdeletetripdetailtype, //tripdetailtype
             urladdtripdetail, urlupdatetripdetail, urldeletetripdetail, //tripdetail
             urlKanban, //kanban
-
+            urlgetDSMonthlyPeriodCreditDebit, urlgetDSMonthlyItemExpenses, urlgetDSMonthlyCommitmentAndOther,//dashboard
             dsTransactions,
             dsTrans, setdsTrans, getdstransactions,
             dsTransError

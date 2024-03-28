@@ -1,6 +1,7 @@
 import {
     EuiComboBox,
-    EuiDatePicker
+    EuiDatePicker,
+    EuiSwitch
 } from '@elastic/eui';
 import axios from 'axios';
 import {
@@ -35,6 +36,7 @@ const DSTransactionTable = () => {
     const [selectedPresetName, setselectedPresetName] = useState([cbNames[0]]);
 
     const [isFirstLoad, setisFirstLoad] = useState(true);
+    const [isEditMode, setisEditMode] = useState(false);
     const [isLoadingData, setisLoadingData] = useState(true);
     const [actionDone, setactionDone] = useState(false);
 
@@ -166,7 +168,7 @@ const DSTransactionTable = () => {
 
                 setclDSTransMonth([...new Set(response.data.map(q => q.createdDateTimeMonth))]);
 
-                setDSTrans(response.data);
+                setDSTrans(isEditMode ? response.data.slice(0, 100) : response.data);
                 setisLoadingData(false);
 
                 // debugger;
@@ -238,6 +240,18 @@ const DSTransactionTable = () => {
             }
         },
         [hasValue, cbNames, cbTypes, cbAcc, cbAccTo, getPresetData],
+    );
+
+    const viewIsEditMode = () => (
+        <div>
+            <EuiSwitch
+                label="Is Edit Mode"
+                checked={isEditMode}
+                onChange={(e) => {
+                    setisEditMode(!isEditMode)
+                }}
+            />
+        </div>
     );
 
     const BtnEdit = (data) => useMemo(
@@ -375,7 +389,7 @@ const DSTransactionTable = () => {
         setactionDone(false);
         getdstransactions();
         setisFirstLoad(false);
-    }, [actionDone]);
+    }, [actionDone, isEditMode]);
 
     const table = useMaterialReactTable({
         columns,
@@ -400,7 +414,11 @@ const DSTransactionTable = () => {
             BtnEdit(row)
         ),
         renderTopToolbarCustomActions: ({ table }) => (
-            BtnAdd()
+            <div className='flex flex-row gap-2'>
+                {BtnAdd()}
+                {viewIsEditMode()}
+            </div>
+
         ),
     });
 

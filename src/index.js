@@ -7,7 +7,6 @@ import '@elastic/eui/dist/eui_theme_dark.css';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { ContextProvider } from './contexts/ContextProvider';
-import '@elastic/eui/dist/eui_theme_dark.css';
 
 import { EuiProvider, EuiText } from '@elastic/eui';
 

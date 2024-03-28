@@ -13,7 +13,7 @@ import {
     ColorMapping,
     ColorPicker,
     Customers,
-    Ecommerce, Ecommerce2,
+    Ecommerce, Ecommerce2, Ecommerce3,
     Editor,
     Employees,
     Financial,
@@ -102,6 +102,7 @@ const Dashboard = () => {
                                 <Route path="/" element={<Todolists />} />
                                 <Route path="/ecommerce" element={(<Ecommerce />)} />
                                 <Route path="/ecommerce2" element={(<Ecommerce2 />)} />
+                                <Route path="/ecommerce3" element={(<Ecommerce3 />)} />
 
                                 {/* pages  */}
                                 <Route path="/orders" element={<Orders />} />
