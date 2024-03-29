@@ -3,7 +3,7 @@ import {
 } from '@elastic/eui';
 import { TooltipComponent } from '@syncfusion/ej2-react-popups';
 import React, { useEffect, useMemo } from 'react';
-import { FiSettings } from 'react-icons/fi';
+import { FiSettings, FiArrowUpCircle, FiArrowDownCircle } from 'react-icons/fi';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import { Navbar, Sidebar, ThemeSettings } from '../components';
@@ -65,6 +65,26 @@ const Dashboard = () => {
             }
             {
                 token && <div className="flex relative dark:bg-main-dark-bg">
+                    <div className='fixed right-2 bottom-24' style={{ zIndex: '1000' }}>
+                        <TooltipComponent content="Top" position='Top'>
+                            <button
+                                type='button'
+                                className='text-3xl p-3 hower:drop-shadow-x1 hover:opacity-100 hover:bg-light-gray text-black opacity-25'
+                                onClick={() => document.documentElement.scrollTop = 0}>
+                                <FiArrowUpCircle />
+                            </button>
+                        </TooltipComponent>
+                    </div>
+                    <div className='fixed right-2 bottom-14' style={{ zIndex: '1000' }}>
+                        <TooltipComponent content="Bottom" position='Top'>
+                            <button
+                                type='button'
+                                className='text-3xl p-3 hower:drop-shadow-x1 hover:opacity-100 hover:bg-light-gray text-black opacity-25'
+                                onClick={() => window.scrollTo(0, document.body.scrollHeight)}>
+                                <FiArrowDownCircle />
+                            </button>
+                        </TooltipComponent>
+                    </div>
                     <div className='fixed right-4 bottom-4' style={{ zIndex: '1000' }}>
                         <TooltipComponent content="Settings" position='Top'>
                             <button

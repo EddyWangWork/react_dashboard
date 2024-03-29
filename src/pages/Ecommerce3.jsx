@@ -8,7 +8,9 @@ import {
     EuiPanel,
     EuiProgress,
     EuiStat,
-    EuiTextColor
+    EuiTextColor,
+    EuiButtonEmpty,
+    EuiCollapsibleNavGroup
 } from '@elastic/eui';
 import axios from 'axios';
 import moment from 'moment';
@@ -137,10 +139,244 @@ const Ecommerce3 = () => {
             });
     }
 
+    const selectionSection = () => (
+        <EuiPanel hasBorder={true}>
+
+            <div className='grid grid-cols-2 gap-2'>
+                <EuiDatePicker preventOpenOnFocus={true} dateFormat="YYYY/MM" name="date" selected={date} onChange={(v) => { setdate(v); }} />
+
+                <EuiFieldNumber
+                    name="period"
+                    placeholder="period"
+                    value={period}
+                    onChange={(e) => { setperiod(+e.target.value); }}
+                    aria-label="Use aria labels when no actual label is in use"
+                />
+
+                <div className='flex flex-row gap-1'>
+                    <EuiButtonEmpty onClick={() => { setdate(new moment(date).add(-1, 'months')) }}>Prev</EuiButtonEmpty>
+                    <EuiButtonEmpty onClick={() => { setdate(new moment(date).add(1, 'months')) }}>Next</EuiButtonEmpty>
+                    <EuiButtonEmpty onClick={() => { setdate(new moment()) }}>Today</EuiButtonEmpty>
+                </div>
+
+            </div>
+        </EuiPanel >
+    )
+
+    const ViewSummarySection = () => useMemo(
+        () => {
+            return dataMonthlyPeriod.length > 0 && <EuiPanel hasBorder={true}>
+                <div className='flex flex-row gap-2'>
+                    {summaryCards()}
+                </div>
+            </EuiPanel>
+        },
+        [dataMonthlyPeriod],
+    );
+
+    const summaryCards = () => (
+        dataMonthlyPeriod.map((v, i) => (
+            <EuiCard
+                icon={< EuiIcon size="xl" type="logoLogging" />}
+                title={v.yearMonth}
+                display="plain"
+                hasBorder
+                description={
+                    <>
+                        <p>
+                            <div className='flex flex-col gap-1 whitespace-break-spaces'>
+                                <span className='text-[#22c55e]'>{<EuiIcon type="importAction" />} {v.credit.toLocaleString()}</span>
+                                <span className='text-[#ef4444]'>{<EuiIcon type="exportAction" />} {v.debit.toLocaleString()}</span>
+                                <span className='text-[#eab308]'>{<EuiIcon type="grab" />} {v.remain.toLocaleString()}</span>
+
+                                <span className={`text-[${getUsageCompareColor(v.usageCompare)}] pt-2`}>
+                                    {<EuiIcon type={getUsageCompareIcon(v.usageCompare)} />} {removeMinus(v.usageCompare)}%
+                                </span>
+                            </div>
+                        </p>
+                        <EuiProgress
+                            valueText={true}
+                            color={getUsageColor(v.usage)}
+                            value={v.usage}
+                            max={100}
+                            size="m"
+                        />
+                    </>
+                }
+            />
+        ))
+    )
+
+    const ViewMainStatSection = () => useMemo(
+        () => {
+            return dataMonthlyCurrent && dataMonthlyExpenses != {} && <div>
+                <EuiPanel hasBorder={true}>
+                    <div className='flex flex-row gap-20'>
+                        {statCredit()}
+                        {statDebit()}
+                        {statCommitment()}
+                    </div>
+                </EuiPanel>
+            </div>
+        },
+        [dataMonthlyCurrent, dataMonthlyExpenses],
+    );
+
+    const statCredit = () => (
+        <EuiStat
+            title={dataMonthlyCurrent.credit?.toLocaleString()}
+            description=
+            {
+                <span className='text-[#22c55e]'>Credit</span>
+            }
+            textAlign="left"
+        >
+            <EuiTextColor color={getStatColor(dataMonthlyCurrent.creditCompare, true)}>
+                <span>
+                    <EuiIcon type={getStatIcon(dataMonthlyCurrent.creditCompare)} /> {removeMinus(dataMonthlyCurrent.creditCompare)}%
+                </span>
+            </EuiTextColor>
+        </EuiStat>
+    )
+
+    const statDebit = () => (
+        <EuiStat
+            title={dataMonthlyCurrent.debit?.toLocaleString()}
+            description=
+            {
+                <span className='text-[#ef4444]'>Debit</span>
+            }
+            textAlign="left"
+        >
+            <EuiTextColor color={getStatColor(dataMonthlyCurrent.debitCompare, false)}>
+                <span>
+                    <EuiIcon type={getStatIcon(dataMonthlyCurrent.debitCompare)} /> {removeMinus(dataMonthlyCurrent.debitCompare)}%
+                </span>
+            </EuiTextColor>
+        </EuiStat>
+    )
+
+    const statCommitment = () => {
+        var dataMonthlyExpensesCommitment = dataMonthlyExpenses?.dsMonthlyItems?.find(x => x.itemName == 'Commitment');
+
+        return dataMonthlyExpensesCommitment && <EuiStat
+            title={dataMonthlyExpensesCommitment.amount?.toLocaleString()}
+            description=
+            {
+                <span className='text-[#ef4444]'>Commitment</span>
+            }
+            textAlign="left"
+        >
+            <EuiTextColor color={getStatColor(dataMonthlyExpensesCommitment.amountComparePercentage, false)}>
+                <span>
+                    <EuiIcon type={getStatIcon(dataMonthlyExpensesCommitment.amountComparePercentage)} /> {removeMinus(dataMonthlyExpensesCommitment.amountComparePercentage)}%
+                </span>
+            </EuiTextColor>
+        </EuiStat>
+    }
+
+    const ViewStatSectionItemExpensesAmount = () => useMemo(
+        () => {
+            return dataMonthlyExpenses?.dsMonthlyItems?.length > 0 && <div className='grid grid-cols-3 gap-2'>
+                {statItemExpensesAmount()}
+            </div>
+        },
+        [dataMonthlyExpenses],
+    );
+
+    const statItemExpensesAmount = () => {
+        return dataMonthlyExpenses.dsMonthlyItems.filter(x => x.amount != 0).map((v, i) => (
+            <EuiPanel hasBorder={true}>
+                <EuiStat
+                    title={navItemsDetail(v.amount.toLocaleString(), v.itemsDetail)}
+                    description={v.itemName}
+                    textAlign="left"
+                >
+                </EuiStat>
+            </EuiPanel>
+        ))
+    }
+
+    const navItemsDetail = (amount, itemsDetail) => {
+        return <EuiCollapsibleNavGroup
+            title={amount}
+            titleSize="s"
+            isCollapsible={true}
+            initialIsOpen={false}
+        >
+            <>
+                {cardItemsDetail(itemsDetail)}
+            </>
+        </EuiCollapsibleNavGroup>
+    }
+
+    const cardItemsDetail = (dataItemsDetail) => {
+        return <EuiBasicTable
+            tableCaption="Demo of EuiBasicTable"
+            items={dataItemsDetail}
+            rowHeader="firstName"
+            columns={columnsItemsDetail}
+            compressed={true}
+        />
+    }
+
+    const ViewStatSectionItemExpenses = () => useMemo(
+        () => {
+            return dataMonthlyExpenses?.dsMonthlyItems?.length > 0 && <div className='grid grid-cols-3 gap-2'>
+                {statItemExpenses()}
+            </div>
+        },
+        [dataMonthlyExpenses],
+    );
+
+    const statItemExpenses = () => {
+        return dataMonthlyExpenses.dsMonthlyItems.filter(x => x.amountComparePercentage != '0.00').map((v, i) => (
+            <EuiPanel hasBorder={true}>
+                <EuiStat
+                    title={removeMinus(v.diff.toLocaleString())}
+                    description={v.itemName}
+                    textAlign="left"
+                >
+                    <EuiTextColor color={getStatColor(v.amountComparePercentage, false)}>
+                        <span>
+                            <EuiIcon type={getStatIcon(v.diff)} /> {removeMinus(v.amountComparePercentage)}%
+                        </span>
+                    </EuiTextColor>
+                </EuiStat>
+            </EuiPanel>
+        ))
+    }
+
+    const ViewStatSectionSubItemExpenses = () => useMemo(
+        () => {
+            return dataMonthlyExpenses?.dsMonthlySubItems?.length > 0 && <div className='grid grid-cols-3 gap-2'>
+                {statSubItemExpenses()}
+            </div>
+        },
+        [dataMonthlyExpenses],
+    );
+
+    const statSubItemExpenses = () => {
+        return dataMonthlyExpenses.dsMonthlySubItems.filter(x => x.amountComparePercentage != '0.00').map((v, i) => (
+            <EuiPanel hasBorder={true}>
+                <EuiStat
+                    title={removeMinus(v.diff.toLocaleString())}
+                    description={v.itemName}
+                    textAlign="left"
+                >
+                    <EuiTextColor color={getStatColor(v.amountComparePercentage, false)}>
+                        <span>
+                            <EuiIcon type={getStatIcon(v.diff)} /> {removeMinus(v.amountComparePercentage)}%
+                        </span>
+                    </EuiTextColor>
+                </EuiStat>
+            </EuiPanel>
+        ))
+    }
+
     const ViewCardTableSection = () => useMemo(
         () => {
-            console.log(dataCommitmentAndOther)
-            return dataCommitmentAndOther?.items?.length > 0 && <div className='flex flex-row gap-2'>
+            return dataCommitmentAndOther?.items?.length > 0 && <div className='grid grid-cols-2 gap-2'>
                 {cardCommitment()}
                 {cardCommitmentOther()}
                 {cardTodo()}
@@ -222,191 +458,6 @@ const Ecommerce3 = () => {
         />
 
     }
-
-    const statItemExpensesAmount = () => {
-        return dataMonthlyExpenses.dsMonthlyItems.filter(x => x.amount != 0).map((v, i) => (
-            <EuiPanel hasBorder={true}>
-                <EuiStat
-                    title={removeMinus(v.amount.toLocaleString())}
-                    description={v.itemName}
-                    textAlign="left"
-                >
-                </EuiStat>
-            </EuiPanel>
-        ))
-    }
-
-    const statItemExpenses = () => {
-        return dataMonthlyExpenses.dsMonthlyItems.filter(x => x.amountComparePercentage != '0.00').map((v, i) => (
-            <EuiPanel hasBorder={true}>
-                <EuiStat
-                    title={removeMinus(v.diff.toLocaleString())}
-                    description={v.itemName}
-                    textAlign="left"
-                >
-                    <EuiTextColor color={getStatColor(v.amountComparePercentage, false)}>
-                        <span>
-                            <EuiIcon type={getStatIcon(v.diff)} /> {removeMinus(v.amountComparePercentage)}%
-                        </span>
-                    </EuiTextColor>
-                </EuiStat>
-            </EuiPanel>
-        ))
-    }
-
-    const statSubItemExpenses = () => {
-        return dataMonthlyExpenses.dsMonthlySubItems.filter(x => x.amountComparePercentage != '0.00').map((v, i) => (
-            <EuiPanel hasBorder={true}>
-                <EuiStat
-                    title={removeMinus(v.diff.toLocaleString())}
-                    description={v.itemName}
-                    textAlign="left"
-                >
-                    <EuiTextColor color={getStatColor(v.amountComparePercentage, false)}>
-                        <span>
-                            <EuiIcon type={getStatIcon(v.diff)} /> {removeMinus(v.amountComparePercentage)}%
-                        </span>
-                    </EuiTextColor>
-                </EuiStat>
-            </EuiPanel>
-        ))
-    }
-
-    const ViewStatSectionItemExpensesAmount = () => useMemo(
-        () => {
-            return dataMonthlyExpenses?.dsMonthlyItems?.length > 0 && <div className='grid grid-cols-3 gap-2'>
-                {statItemExpensesAmount()}
-            </div>
-        },
-        [dataMonthlyExpenses],
-    );
-
-    const ViewStatSectionItemExpenses = () => useMemo(
-        () => {
-            return dataMonthlyExpenses?.dsMonthlyItems?.length > 0 && <div className='grid grid-cols-3 gap-2'>
-                {statItemExpenses()}
-            </div>
-        },
-        [dataMonthlyExpenses],
-    );
-
-    const ViewStatSectionSubItemExpenses = () => useMemo(
-        () => {
-            return dataMonthlyExpenses?.dsMonthlySubItems?.length > 0 && <div className='grid grid-cols-3 gap-2'>
-                {statSubItemExpenses()}
-            </div>
-        },
-        [dataMonthlyExpenses],
-    );
-
-    const statCredit = () => (
-        <EuiStat
-            title={dataMonthlyCurrent.credit?.toLocaleString()}
-            description=
-            {
-                <span className='text-[#22c55e]'>Credit</span>
-            }
-            textAlign="left"
-        >
-            <EuiTextColor color={getStatColor(dataMonthlyCurrent.creditCompare, true)}>
-                <span>
-                    <EuiIcon type={getStatIcon(dataMonthlyCurrent.creditCompare)} /> {removeMinus(dataMonthlyCurrent.creditCompare)}%
-                </span>
-            </EuiTextColor>
-        </EuiStat>
-    )
-
-    const statDebit = () => (
-        <EuiStat
-            title={dataMonthlyCurrent.debit?.toLocaleString()}
-            description=
-            {
-                <span className='text-[#ef4444]'>Debit</span>
-            }
-            textAlign="left"
-        >
-            <EuiTextColor color={getStatColor(dataMonthlyCurrent.debitCompare, false)}>
-                <span>
-                    <EuiIcon type={getStatIcon(dataMonthlyCurrent.debitCompare)} /> {removeMinus(dataMonthlyCurrent.debitCompare)}%
-                </span>
-            </EuiTextColor>
-        </EuiStat>
-    )
-
-    const ViewMainStatSection = () => useMemo(
-        () => {
-            return dataMonthlyCurrent && <div>
-                <EuiPanel hasBorder={true}>
-                    <div className='flex flex-row gap-20'>
-                        {statCredit()}
-                        {statDebit()}
-                    </div>
-                </EuiPanel>
-            </div>
-        },
-        [dataMonthlyCurrent],
-    );
-
-    const selectionSection = () => (
-        <EuiPanel hasBorder={true}>
-
-            <div className='flex flex-row gap-2'>
-                <EuiDatePicker preventOpenOnFocus={true} dateFormat="YYYY/MM" name="date" selected={date} onChange={(v) => { setdate(v); }} />
-
-                <EuiFieldNumber
-                    name="period"
-                    placeholder="period"
-                    value={period}
-                    onChange={(e) => { setperiod(+e.target.value); }}
-                    aria-label="Use aria labels when no actual label is in use"
-                />
-            </div>
-        </EuiPanel >
-    )
-
-    const ViewSummarySection = () => useMemo(
-        () => {
-            return dataMonthlyPeriod.length > 0 && <EuiPanel hasBorder={true}>
-                <div className='flex flex-row gap-2'>
-                    {summaryCards()}
-                </div>
-            </EuiPanel>
-        },
-        [dataMonthlyPeriod],
-    );
-
-    const summaryCards = () => (
-        dataMonthlyPeriod.map((v, i) => (
-            <EuiCard
-                icon={< EuiIcon size="xl" type="logoLogging" />}
-                title={v.yearMonth}
-                display="plain"
-                hasBorder
-                description={
-                    <>
-                        <p>
-                            <div className='flex flex-col gap-1 whitespace-break-spaces'>
-                                <span className='text-[#22c55e]'>{<EuiIcon type="importAction" />} {v.credit.toLocaleString()}</span>
-                                <span className='text-[#ef4444]'>{<EuiIcon type="exportAction" />} {v.debit.toLocaleString()}</span>
-                                <span className='text-[#eab308]'>{<EuiIcon type="grab" />} {v.remain.toLocaleString()}</span>
-
-                                <span className={`text-[${getUsageCompareColor(v.usageCompare)}] pt-2`}>
-                                    {<EuiIcon type={getUsageCompareIcon(v.usageCompare)} />} {removeMinus(v.usageCompare)}%
-                                </span>
-                            </div>
-                        </p>
-                        <EuiProgress
-                            valueText={true}
-                            color={getUsageColor(v.usage)}
-                            value={v.usage}
-                            max={100}
-                            size="m"
-                        />
-                    </>
-                }
-            />
-        ))
-    )
 
     const getStatColor = (value, isCredit) => {
         if (isCredit)
@@ -513,6 +564,42 @@ const Ecommerce3 = () => {
         },
     ]
 
+    const columnsItemsDetail = [
+        {
+            field: 'itemName',
+            name: 'Name',
+            truncateText: true,
+            mobileOptions: {
+                show: false,
+            },
+        },
+        {
+            field: 'desc',
+            name: 'Desc',
+            truncateText: true,
+            mobileOptions: {
+                show: false,
+            },
+        },
+        {
+            field: 'amount',
+            name: 'Amount',
+            align: 'center',
+            truncateText: true,
+            render: (amount) =>
+                amount.toFixed(2),
+            footer: (asd) => {
+                return (
+                    <span>{asd.items.reduce((a, b) => a + b.amount, 0).toLocaleString()}</span>
+                );
+            },
+            mobileOptions: {
+                show: false,
+                align: 'right'
+            },
+        }
+    ]
+
     const columnsTodo = [
         {
             field: 'name',
@@ -544,6 +631,11 @@ const Ecommerce3 = () => {
     ]
 
     useEffect(() => {
+        setdataMonthlyPeriod([]);
+        setdataMonthlyCurrent({});
+        setdataMonthlyExpenses({});
+        setdataCommitmentAndOther({});
+        setdataTodolist([]);
         getDSMonthlyPeriodCreditDebit();
         getDSMonthlyItemExpenses();
         getDSMonthlyCommitmentAndOther();
