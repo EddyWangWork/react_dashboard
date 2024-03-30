@@ -63,6 +63,7 @@ const DialogDSTransaction2 = ({ rowData, presetData, buttonProp, setactionDone, 
             })
             .then(response => {
                 console.log(response);
+                setisSubmitted(false)
                 closeModal();
                 setactionDone(true);
             })

@@ -41,10 +41,19 @@ const Ecommerce3 = () => {
 
     const query = `year=${date.year()}&month=${date.month() + 1}&monthDuration=${period}`
     const queryByItem = `name=commitment&year=${date.year()}&month=${date.month() + 1}`
+    const getDSMonthlyPeriodCreditDebitReq = {
+        year: date.year(),
+        Month: date.month() + 1,
+        MonthDuration: period,
+        IsIncludeCredit: true,
+        CreditIds: [19],
+        IsIncludeDebit: true,
+        DebitIds: []
+    }
 
     const getDSMonthlyPeriodCreditDebit = () => {
         axios
-            .get(`${urlgetDSMonthlyPeriodCreditDebit}?${query}`, {
+            .post(urlgetDSMonthlyPeriodCreditDebit, getDSMonthlyPeriodCreditDebitReq, {
                 headers: {
                     'Authorization': token,
                     'Content-Type': 'application/json'
