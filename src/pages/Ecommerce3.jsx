@@ -50,6 +50,11 @@ const Ecommerce3 = () => {
         IsIncludeDebit: true,
         DebitIds: []
     }
+    const getDSMonthlyCommitmentAndOtherReq = {
+        year: date.year(),
+        Month: date.month() + 1,
+        DebitIds: []
+    }
 
     const getDSMonthlyPeriodCreditDebit = () => {
         axios
@@ -104,7 +109,7 @@ const Ecommerce3 = () => {
 
     const getDSMonthlyCommitmentAndOther = () => {
         axios
-            .get(`${urlgetDSMonthlyCommitmentAndOther}?${queryByItem}`, {
+            .post(urlgetDSMonthlyCommitmentAndOther, getDSMonthlyCommitmentAndOtherReq, {
                 headers: {
                     'Authorization': token,
                     'Content-Type': 'application/json'
