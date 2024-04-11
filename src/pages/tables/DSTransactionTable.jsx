@@ -48,6 +48,9 @@ const DSTransactionTable = () => {
         pAcc: selectedPresetAcc[0]?.id,
         pName: selectedPresetName[0]?.uid
     }
+    const getDSTransactionV2Req = {
+        dataLimit: isEditMode ? 100 : 0
+    }
 
     const getDSACItems = () => {
         axios
@@ -149,7 +152,7 @@ const DSTransactionTable = () => {
 
     const getdstransactions = () => {
         axios
-            .get(`${urlgetDSTransactionV2}`, {
+            .post(`${urlgetDSTransactionV2}`, getDSTransactionV2Req, {
                 headers: {
                     'Authorization': token,
                     'Content-Type': 'application/json'
