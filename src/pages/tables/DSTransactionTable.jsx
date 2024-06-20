@@ -17,7 +17,7 @@ import { DialogDSTransaction2 } from '../../pages';
 const DSTransactionTable = () => {
 
     const {
-        handleClearToken, token, urlgetDSTransTypes, urldsAccont, urlgetDSTransactionV2, urlgetDSItemWithSubV3
+        handleClearToken, token, urlgetDSTransTypes, urldsAccont, urlgetDSTransactionV2, urlgetDSItemWithSubV3, urlgetDSTransactionByDSAccount
     } = useStateContext();
     const navigate = useNavigate();
 
@@ -35,6 +35,8 @@ const DSTransactionTable = () => {
     const [selectedPresetAcc, setselectedPresetAcc] = useState([cbAcc[0]]);
     const [selectedPresetName, setselectedPresetName] = useState([cbNames[0]]);
 
+    const [selectedPresetAccForTrans, setselectedPresetAccForTrans] = useState([cbAcc[0]]);
+
     const [isFirstLoad, setisFirstLoad] = useState(true);
     const [isEditMode, setisEditMode] = useState(false);
     const [isLoadingData, setisLoadingData] = useState(true);
@@ -48,8 +50,14 @@ const DSTransactionTable = () => {
         pAcc: selectedPresetAcc[0]?.id,
         pName: selectedPresetName[0]?.uid
     }
+
     const getDSTransactionV2Req = {
         dataLimit: isEditMode ? 100 : 0
+    }
+
+    const getDSTransactionByDSAccountReq = {
+        dataLimit: isEditMode ? 100 : 0,
+        dsAccountID: selectedPresetAccForTrans[0]?.id
     }
 
     const getDSACItems = () => {
@@ -135,8 +143,11 @@ const DSTransactionTable = () => {
                     cbData.push({ 'id': v.id, 'label': v.name })
                 })
 
-                if (isFirstLoad)
+                if (isFirstLoad) {
                     setselectedPresetAcc([cbData[0]])
+                    setselectedPresetAccForTrans([cbData[0]])
+                }
+
                 setcbAcc(cbData);
                 setcbAccTo(cbData.slice(1));
             })
@@ -176,6 +187,40 @@ const DSTransactionTable = () => {
 
                 // debugger;
                 console.info(table); //table.getExpandedRowModel().rows
+            })
+            .catch((err) => {
+                console.log(err);
+                console.log(err.response.status);
+                if (err.response.status == 401) {
+                    handleClearToken();
+                    navigate('/login', { replace: true });
+                }
+            });
+    }
+
+    const getdstransactionsByAcc = () => {
+        axios
+            .post(`${urlgetDSTransactionByDSAccount}`, getDSTransactionByDSAccountReq, {
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then((response) => {
+                console.log(response.data)
+                response.data.map((data, index) => {
+                    data.createdDateTimeMonth = moment(data.createdDateTime).format("YYYY/MM");
+                    data.createdDateTimeDay = new Date(data.createdDateTime);
+                });
+
+                getDSACItems();
+                GetDSTransactionTypes();
+                getdsaccounts();
+
+                setclDSTransMonth([...new Set(response.data.map(q => q.createdDateTimeMonth))]);
+
+                setDSTrans(isEditMode ? response.data.slice(0, 100) : response.data);
+                setisLoadingData(false);
             })
             .catch((err) => {
                 console.log(err);
@@ -255,6 +300,27 @@ const DSTransactionTable = () => {
                 }}
             />
         </div>
+    );
+
+    const ViewPresetAccForTrans = () => useMemo(
+        () => {
+            {
+                return cbAcc.length > 0 &&
+                    <div>
+                        <EuiComboBox
+                            aria-label="Accessible screen reader label"
+                            placeholder="Select a single option"
+                            compressed="true"
+                            singleSelection={{ asPlainText: true }}
+                            options={cbAcc}
+                            selectedOptions={selectedPresetAccForTrans}
+                            onChange={(v) => { setselectedPresetAccForTrans(v) }}
+                            isClearable={false}
+                        />
+                    </div>
+            }
+        },
+        [cbAcc, selectedPresetAccForTrans],
     );
 
     const BtnEdit = (data) => useMemo(
@@ -390,9 +456,12 @@ const DSTransactionTable = () => {
     useEffect(() => {
         setisLoadingData(true);
         setactionDone(false);
-        getdstransactions();
+        if (isEditMode)
+            getdstransactionsByAcc();
+        else
+            getdstransactions();
         setisFirstLoad(false);
-    }, [actionDone, isEditMode]);
+    }, [actionDone, isEditMode, selectedPresetAccForTrans]);
 
     const table = useMaterialReactTable({
         columns,
@@ -417,11 +486,9 @@ const DSTransactionTable = () => {
             BtnEdit(row)
         ),
         renderTopToolbarCustomActions: ({ table }) => (
-            <div className='flex flex-row gap-2'>
+            <div>
                 {BtnAdd()}
-                {viewIsEditMode()}
             </div>
-
         ),
     });
 
@@ -429,7 +496,7 @@ const DSTransactionTable = () => {
         () => {
             {
                 return hasValue > 0 &&
-                    <div href="#" className="block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700" >
+                    <div href="#" className="block p-4 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700" >
                         <div className='grid gap-2 grid-cols-5'>
                             <div>
                                 <EuiComboBox
@@ -474,11 +541,22 @@ const DSTransactionTable = () => {
         [presetDate, selectedPresetType, selectedPresetAcc, selectedPresetName],
     );
 
+    const viewPreset2 = () =>
+    (
+        <div href="#" className="p-4 block bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700" >
+            <div className='flex flex-row gap-4'>
+                {ViewPresetAccForTrans()}
+                {viewIsEditMode()}
+            </div>
+        </div >
+    );
+
     return (
         <div>
             <div>
                 <div className='pt-2'>
                     {ViewPreset()}
+                    {viewPreset2()}
                 </div>
                 <MaterialReactTable table={table} />
             </div>

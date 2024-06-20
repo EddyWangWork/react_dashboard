@@ -15,3 +15,20 @@ netlify - reroute issue
 ------------------------------------------------------------------------
 1. add file Public/_redirects
     /*  /index.html  200
+
+------------------------------------------------------------------------
+BE - Compress
+------------------------------------------------------------------------
+https://stackoverflow.com/questions/50918729/compress-filter-at-the-action-level-for-asp-net-core-mvc
+
+
+------------------------------------------------------------------------
+BE - EF
+------------------------------------------------------------------------    
+Remove-Migration
+Update-Database <previous-migration-name>
+
+Add-Migration [MigrationName]
+Update-Database
+
+    
