@@ -554,6 +554,10 @@ export const links = [
         icon: <RiContactsLine />,
       },
       {
+        name: 'shops',
+        icon: <RiContactsLine />,
+      },
+      {
         name: 'trips',
         icon: <RiContactsLine />,
       },

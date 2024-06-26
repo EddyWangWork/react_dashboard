@@ -213,7 +213,7 @@ const DialogTrip = ({ rowData, buttonProp, setactionDone, setisLoading, setactio
                 return 'Edit Trip'
             case 22:
                 return 'Edit Trip Detail Type'
-            case 22:
+            case 222:
                 return 'Edit Trip Detail Type Info'
             case 3:
                 return 'Delete Trip'

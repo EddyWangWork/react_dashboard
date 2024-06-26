@@ -278,7 +278,7 @@ const Trip = ({ }) => {
                 </div>
             </div>
         ),
-        [cbTrips, selectedTrip, actionDone, isTypeNameReadonly]
+        [cbTrips, selectedTrip, actionDone, actionDoneRes, isTypeNameReadonly]
     )
 
     return (

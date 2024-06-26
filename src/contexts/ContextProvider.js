@@ -81,6 +81,24 @@ export const ContextProvider = ({ children }) => {
     const urlgetDSMonthlyItemExpenses = `${urlDS}/getDSMonthlyItemExpenses`;
     const urlgetDSMonthlyCommitmentAndOther = `${urlDS}/getDSMonthlyCommitmentAndOther`;
 
+    //shop
+    const urlShop = `${localhostUrl}/Shop`;
+    const urlgetShops = `${urlShop}/getShops`;
+    const urladdShop = `${urlShop}/addShop`;
+    const urlupdateShop = `${urlShop}/updateShop`;
+    const urldeleteShop = `${urlShop}/deleteShop`;
+
+    const urlgetShopDiaries = `${urlShop}/getShopDiaries`;
+    const urlgetShopDiariesByShop = `${urlShop}/getShopDiariesByShop`;
+    const urladdShopDiary = `${urlShop}/addShopDiary`;
+    const urlupdateShopDiary = `${urlShop}/updateShopDiary`;
+    const urldeleteShopDiary = `${urlShop}/deleteShopDiary`;
+
+    const urlgetShopTypes = `${urlShop}/getShopTypes`;
+    const urladdShopType = `${urlShop}/addShopType`;
+    const urlupdateShopType = `${urlShop}/updateShopType`;
+    const urldeleteShopType = `${urlShop}/deleteShopType`;
+
     //global
     const [dsTransactions, setdsTransactions] = useState(JSON.parse(localStorage.getItem("transactions")));
     const [dsTrans, setdsTrans] = useState([]);
@@ -192,6 +210,9 @@ export const ContextProvider = ({ children }) => {
             urladdtripdetail, urlupdatetripdetail, urldeletetripdetail, //tripdetail
             urlKanban, //kanban
             urlgetDSMonthlyPeriodCreditDebit, urlgetDSMonthlyItemExpenses, urlgetDSMonthlyCommitmentAndOther,//dashboard
+            urlgetShops, urladdShop, urlupdateShop, urldeleteShop, urlgetShopDiariesByShop, //shop
+            urlgetShopDiaries, urladdShopDiary, urlupdateShopDiary, urldeleteShopDiary, //shop diary
+            urlgetShopTypes, urladdShopType, urlupdateShopType, urldeleteShopType, //shop type,
             dsTransactions,
             dsTrans, setdsTrans, getdstransactions,
             dsTransError

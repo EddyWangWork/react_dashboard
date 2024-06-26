@@ -3,35 +3,36 @@ import {
 } from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
 import { Header } from '../components';
-import { TodolistDoneTable, TodolistTable, TodolistsCard } from '../pages';
+import { ShopDiaryTable, ShopTable, ShopTypeTable } from '../pages';
 
-const Todolists = () => {
+const Shop = () => {
     const [tabCurrent, settabCurrent] = useState([]);
 
     useEffect(() => {
+
     }, [tabCurrent]);
 
     const tabsValue = [
         {
-            id: 'todolistCard',
-            name: 'TodolistCard',
-            content: <TodolistsCard />,
+            id: 'shop',
+            name: 'Shop',
+            content: <ShopTable />,
         },
         {
-            id: 'dextrose',
-            name: 'Todolist',
-            content: <TodolistTable />,
+            id: 'shopDiary',
+            name: 'Shop Diary',
+            content: <ShopDiaryTable />,
         },
         {
-            id: 'hydrogen',
-            name: 'Todolist-Done',
-            content: <TodolistDoneTable />,
-        }
+            id: 'shopType',
+            name: 'Shop Type',
+            content: <ShopTypeTable />,
+        },
     ];
 
     return (
         <div className='m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl'>
-            <Header category='Page' title='Todolists' />
+            <Header category='Page' title='Shop' />
             <EuiTabbedContent
                 tabs={tabsValue}
                 initialSelectedTab={tabsValue[0]}
@@ -44,4 +45,4 @@ const Todolists = () => {
     )
 }
 
-export default Todolists
+export default Shop

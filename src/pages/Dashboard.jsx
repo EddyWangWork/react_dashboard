@@ -25,6 +25,7 @@ import {
     Stacked,
     Todolists, Transaction,
     Transaction2,
+    Shop,
     TransactionCompare,
     Trip,
     TripManage
@@ -132,6 +133,7 @@ const Dashboard = () => {
                                 <Route path="/transactions" element={<Transaction />} />
                                 <Route path="/transactions2" element={<Transaction2 />} />
                                 <Route path="/trips" element={<Trip />} />
+                                <Route path="/shops" element={<Shop />} />
                                 <Route path="/tripsbo" element={<TripManage />} />
                                 <Route path="/transcompare" element={<TransactionCompare />} />
 
