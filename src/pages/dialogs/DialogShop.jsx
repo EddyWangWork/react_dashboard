@@ -12,7 +12,8 @@ import {
     EuiModalFooter,
     EuiModalHeader,
     EuiModalHeaderTitle,
-    EuiSwitch
+    EuiSwitch,
+    EuiTextArea
 } from '@elastic/eui';
 import axios from 'axios';
 import { Fragment, useEffect, useState } from 'react';
@@ -26,6 +27,7 @@ const DialogShop = ({ rowData, buttonProp, setactionDone, cbTypeData }) => {
 
     let modal;
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const [isLoadingSave, setisLoadingSave] = useState(false);
     const showModal = () => setIsModalVisible(true)
     const closeModal = () => setIsModalVisible(false)
 
@@ -54,6 +56,7 @@ const DialogShop = ({ rowData, buttonProp, setactionDone, cbTypeData }) => {
             .then(response => {
                 console.log(response);
                 setactionDone(true);
+                closeModal();
             })
             .catch(error => {
                 console.log(error);
@@ -70,6 +73,7 @@ const DialogShop = ({ rowData, buttonProp, setactionDone, cbTypeData }) => {
             .then(response => {
                 console.log(response);
                 setactionDone(true);
+                closeModal();
             })
             .catch(error => {
                 console.log(error);
@@ -86,6 +90,7 @@ const DialogShop = ({ rowData, buttonProp, setactionDone, cbTypeData }) => {
             .then(response => {
                 console.log(response);
                 setactionDone(true);
+                closeModal();
             })
             .catch(error => {
                 console.log(error);
@@ -131,6 +136,7 @@ const DialogShop = ({ rowData, buttonProp, setactionDone, cbTypeData }) => {
     }
 
     const completeAction = () => {
+        setisLoadingSave(true);
         switch (buttonProp.mode) {
             case 1:
                 {
@@ -179,11 +185,10 @@ const DialogShop = ({ rowData, buttonProp, setactionDone, cbTypeData }) => {
             default:
                 { };
         }
-
-        closeModal();
     }
 
     useEffect(() => {
+        setisLoadingSave(false);
         if (rowData?.original) {
             setModalValue();
         }
@@ -213,10 +218,10 @@ const DialogShop = ({ rowData, buttonProp, setactionDone, cbTypeData }) => {
                     />
                 </EuiFormRow>
                 <EuiFormRow label="Remark">
-                    <EuiFieldText name="remark" readOnly={isModeDelete} value={remark} onChange={(e) => { setremark(e.target.value) }} />
+                    <EuiTextArea compressed={true} name="remark" readOnly={isModeDelete} value={remark} onChange={(e) => { setremark(e.target.value) }} />
                 </EuiFormRow>
                 <EuiFormRow label="Comment">
-                    <EuiFieldText name="comment" readOnly={isModeDelete} value={comment} onChange={(e) => { setcomment(e.target.value) }} />
+                    <EuiTextArea compressed={true} name="comment" readOnly={isModeDelete} value={comment} onChange={(e) => { setcomment(e.target.value) }} />
                 </EuiFormRow>
                 <EuiFormRow label="Rate" >
                     <EuiFieldNumber
@@ -256,7 +261,7 @@ const DialogShop = ({ rowData, buttonProp, setactionDone, cbTypeData }) => {
 
                 <EuiModalFooter>
                     <EuiButtonEmpty onClick={closeModal}>Cancel</EuiButtonEmpty>
-                    <EuiButton disabled={isSubmitError()} onClick={completeAction}>
+                    <EuiButton isLoading={isLoadingSave} disabled={isSubmitError()} onClick={completeAction}>
                         Save
                     </EuiButton>
                 </EuiModalFooter>

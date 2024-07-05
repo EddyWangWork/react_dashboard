@@ -19,19 +19,13 @@ const ShopTable = () => {
     const [cbTypeData, setcbTypeData] = useState([]);
     const [cbShopData, setcbShopData] = useState([]);
 
+    const [typeColor, settypeColor] = useState({});
+
     const [tdlData, setTdlData] = useState([]);
     const [isLoadingData, setisLoadingData] = useState(true);
 
     const [actionDone, setactionDone] = useState(false);
     const [actionDone2, setactionDone2] = useState(false);
-
-    const customBadges = [
-        'primary',
-        'success',
-        'accent',
-        'warning',
-        'danger',
-    ];
 
     const visColorsBehindText = euiPaletteColorBlindBehindText();
 
@@ -48,12 +42,26 @@ const ShopTable = () => {
             .then((response) => {
                 console.log(response.data)
 
+                //unique                
+                var uniqueTypeList = {};
+                var typeCount = 0;
+                response.data.map((v, i) => {
+                    v.typeList.map((vv, ii) => {
+                        if (!uniqueTypeList[vv]) {
+                            uniqueTypeList[vv] = visColorsBehindText[typeCount]
+                            typeCount++;
+                        }
+                    })
+                })
+                settypeColor(uniqueTypeList);
+
                 var cbData = [];
                 response.data.map((v, i) => {
                     cbData.push({ 'id': v.id, 'label': v.name, 'color': visColorsBehindText[i] })
+                    v.typeList.sort();
                 })
 
-                setcbShopData(cbData);
+                setcbShopData(cbData.sort((a, b) => a.label.localeCompare(b.label)));
 
                 setisLoadingData(false);
                 setTdlData(response.data)
@@ -85,7 +93,7 @@ const ShopTable = () => {
                     cbData.push({ 'id': v.id, 'label': v.name, 'color': visColorsBehindText[i] })
                 })
 
-                setcbTypeData(cbData);
+                setcbTypeData(cbData.sort((a, b) => a.label.localeCompare(b.label)));
             })
             .catch((err) => {
                 console.log(err);
@@ -126,7 +134,7 @@ const ShopTable = () => {
                 Cell: ({ cell }) => (
                     <div>
                         {cell.getValue().map((x, i) =>
-                            <EuiBadge color={customBadges[i]}>{x}</EuiBadge>
+                            <EuiBadge color={typeColor[x]}>{x}</EuiBadge>
                         )}
                     </div>
                 ),
@@ -173,7 +181,7 @@ const ShopTable = () => {
                 size: 50,
             }
         ],
-        [],
+        [typeColor],
     );
 
     useEffect(() => {

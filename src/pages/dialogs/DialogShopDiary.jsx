@@ -4,14 +4,14 @@ import {
     EuiButtonIcon,
     EuiComboBox,
     EuiDatePicker,
-    EuiFieldText,
     EuiForm,
     EuiFormRow,
     EuiModal,
     EuiModalBody,
     EuiModalFooter,
     EuiModalHeader,
-    EuiModalHeaderTitle
+    EuiModalHeaderTitle,
+    EuiTextArea
 } from '@elastic/eui';
 import axios from 'axios';
 import moment from 'moment';
@@ -26,6 +26,7 @@ const DialogShopDiary = ({ rowData, buttonProp, setactionDone, cbShopData }) => 
 
     let modal;
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const [isLoadingSave, setisLoadingSave] = useState(false);
     const showModal = () => setIsModalVisible(true)
     const closeModal = () => setIsModalVisible(false)
 
@@ -50,6 +51,7 @@ const DialogShopDiary = ({ rowData, buttonProp, setactionDone, cbShopData }) => 
             .then(response => {
                 console.log(response);
                 setactionDone(true);
+                closeModal();
             })
             .catch(error => {
                 console.log(error);
@@ -66,6 +68,7 @@ const DialogShopDiary = ({ rowData, buttonProp, setactionDone, cbShopData }) => 
             .then(response => {
                 console.log(response);
                 setactionDone(true);
+                closeModal();
             })
             .catch(error => {
                 console.log(error);
@@ -82,6 +85,7 @@ const DialogShopDiary = ({ rowData, buttonProp, setactionDone, cbShopData }) => 
             .then(response => {
                 console.log(response);
                 setactionDone(true);
+                closeModal();
             })
             .catch(error => {
                 console.log(error);
@@ -117,6 +121,7 @@ const DialogShopDiary = ({ rowData, buttonProp, setactionDone, cbShopData }) => 
     }
 
     const completeAction = () => {
+        setisLoadingSave(true);
         switch (buttonProp.mode) {
             case 1:
             case 11:
@@ -150,14 +155,14 @@ const DialogShopDiary = ({ rowData, buttonProp, setactionDone, cbShopData }) => 
             default:
                 { };
         }
-
-        closeModal();
     }
 
     useEffect(() => {
+        setisLoadingSave(false);
         if (buttonProp.mode == 11) {
-            console.log(rowData?.original);
             setselectedShop([cbShopData.find(x => x.id == rowData?.original.id)]);
+            setremark('');
+            setcomment('');
         }
         else if (rowData?.original) {
             setModalValue();
@@ -187,10 +192,10 @@ const DialogShopDiary = ({ rowData, buttonProp, setactionDone, cbShopData }) => 
                     <EuiDatePicker readOnly={isModeDelete} selected={date} onChange={(e) => { setdate(e) }} />
                 </EuiFormRow>
                 <EuiFormRow label="Remark">
-                    <EuiFieldText name="remark" readOnly={isModeDelete} value={remark} onChange={(e) => { setremark(e.target.value) }} />
+                    <EuiTextArea compressed={true} name="remark" readOnly={isModeDelete} value={remark} onChange={(e) => { setremark(e.target.value) }} />
                 </EuiFormRow>
                 <EuiFormRow label="Comment">
-                    <EuiFieldText name="comment" readOnly={isModeDelete} value={comment} onChange={(e) => { setcomment(e.target.value) }} />
+                    <EuiTextArea compressed={true} name="comment" readOnly={isModeDelete} value={comment} onChange={(e) => { setcomment(e.target.value) }} />
                 </EuiFormRow>
             </EuiForm>
         </Fragment>
@@ -211,7 +216,7 @@ const DialogShopDiary = ({ rowData, buttonProp, setactionDone, cbShopData }) => 
 
                 <EuiModalFooter>
                     <EuiButtonEmpty onClick={closeModal}>Cancel</EuiButtonEmpty>
-                    <EuiButton disabled={isSubmitError()} onClick={completeAction}>
+                    <EuiButton isLoading={isLoadingSave} disabled={isSubmitError()} onClick={completeAction}>
                         Save
                     </EuiButton>
                 </EuiModalFooter>

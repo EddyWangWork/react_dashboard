@@ -7,7 +7,8 @@ import {
     EuiModalBody,
     EuiModalFooter,
     EuiModalHeader,
-    EuiModalHeaderTitle
+    EuiModalHeaderTitle,
+    EuiSkeletonRectangle
 } from '@elastic/eui';
 import axios from 'axios';
 import moment from 'moment';
@@ -32,6 +33,8 @@ const DialogShopDiaryDetail = ({ rowData, buttonProp, setactionDone2, cbShopData
 
     const [borderColor, setborderColor] = useState(buttonProp.bColor ?? 'border-blue-900/75');
 
+    const [isLoading, setisLoading] = useState(true);
+
     const [shopName, setshopName] = useState('');
     const [dataShopDiaries, setdataShopDiaries] = useState([]);
 
@@ -40,6 +43,7 @@ const DialogShopDiaryDetail = ({ rowData, buttonProp, setactionDone2, cbShopData
             field: 'date',
             name: 'Date',
             align: 'center',
+            width: '110px',
             mobileOptions: {
                 show: false,
                 align: 'center'
@@ -50,17 +54,19 @@ const DialogShopDiaryDetail = ({ rowData, buttonProp, setactionDone2, cbShopData
             field: 'remark',
             name: 'Remark',
             align: 'center',
-            truncateText: true,
-            mobileOptions: {
-                show: false,
-                align: 'center'
-            },
+            render: (remark) => {
+                var remarks = remark.split("\n");
+                return <ul>
+                    {remarks.map((x, i) => (
+                        <li style={{ listStyleType: 'none' }} key={i}>{x}</li>
+                    ))}
+                </ul>
+            }
         },
         {
             field: 'comment',
             name: 'Comment',
             align: 'center',
-            truncateText: true,
             mobileOptions: {
                 show: false,
                 align: 'center'
@@ -70,6 +76,7 @@ const DialogShopDiaryDetail = ({ rowData, buttonProp, setactionDone2, cbShopData
             field: 'id',
             name: 'Action',
             align: 'center',
+            width: '100px',
             mobileOptions: {
                 show: false,
                 align: 'center'
@@ -85,7 +92,7 @@ const DialogShopDiaryDetail = ({ rowData, buttonProp, setactionDone2, cbShopData
                 rowData.original.comment = shopdiary.comment;
                 rowData.original.shopID = shopdiary.shopID;
 
-                return <div className='grid gap-2 grid-cols-4'>
+                return <div className='flex justify-center gap-2'>
                     <DialogShopDiary
                         rowData={rowData}
                         buttonProp={{ mode: 2, iconType: 'wrench', label: 'wrench', color: 'primary', bColor: 'border-indigo-500/75' }}
@@ -113,6 +120,7 @@ const DialogShopDiaryDetail = ({ rowData, buttonProp, setactionDone2, cbShopData
             .then(response => {
                 console.log(response.data.sort((a, b) => moment(b.date) - moment(a.date)))
                 setdataShopDiaries(response.data.sort((a, b) => b.date - a.date));
+                setisLoading(false);
             })
             .catch(error => {
                 console.log(error);
@@ -125,6 +133,7 @@ const DialogShopDiaryDetail = ({ rowData, buttonProp, setactionDone2, cbShopData
 
     useEffect(() => {
         setdataShopDiaries([]);
+        setisLoading(true);
         setactionDone(false);
         setshopName(rowData.original.name)
         getShopDiariesByShop(rowData.original.id);
@@ -134,15 +143,32 @@ const DialogShopDiaryDetail = ({ rowData, buttonProp, setactionDone2, cbShopData
         <EuiCard
             className='select-text'
             hasBorder
-            title='-'
+            // title='-'
+            title={
+                <DialogShopDiary
+                    rowData={rowData}
+                    buttonProp={{ mode: 11, iconType: 'plus', label: 'plus', color: 'success', bColor: 'border-fuchsia-900/75' }}
+                    setactionDone={setactionDone}
+                    cbShopData={cbShopData}
+                />
+            }
             description={
                 <>
-                    <EuiBasicTable
-                        tableCaption="Demo of EuiBasicTable"
-                        items={dataShopDiaries}
-                        rowHeader="firstName"
-                        columns={columns}
-                    />
+                    <EuiSkeletonRectangle
+                        isLoading={isLoading}
+                        contentAriaLabel="Demo skeleton card"
+                        width={400}
+                        height={148}
+                        borderRadius="m"
+                    >
+                        <EuiBasicTable
+                            compressed={true}
+                            tableCaption="Demo of EuiBasicTable"
+                            items={dataShopDiaries}
+                            rowHeader="firstName"
+                            columns={columns}
+                        />
+                    </EuiSkeletonRectangle>
                 </>
             }
             betaBadgeProps={{
@@ -174,7 +200,7 @@ const DialogShopDiaryDetail = ({ rowData, buttonProp, setactionDone2, cbShopData
     }
 
     return (
-        <div>
+        <div className='w-96'>
             <EuiButtonIcon
                 display="base"
                 iconType={buttonProp.iconType}

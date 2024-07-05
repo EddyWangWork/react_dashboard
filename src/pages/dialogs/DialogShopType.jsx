@@ -23,6 +23,7 @@ const DialogShopType = ({ rowData, buttonProp, setactionDone }) => {
 
     let modal;
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const [isLoadingSave, setisLoadingSave] = useState(false);
     const showModal = () => setIsModalVisible(true)
     const closeModal = () => setIsModalVisible(false)
 
@@ -43,6 +44,7 @@ const DialogShopType = ({ rowData, buttonProp, setactionDone }) => {
             .then(response => {
                 console.log(response);
                 setactionDone(true);
+                closeModal();
             })
             .catch(error => {
                 console.log(error);
@@ -59,6 +61,7 @@ const DialogShopType = ({ rowData, buttonProp, setactionDone }) => {
             .then(response => {
                 console.log(response);
                 setactionDone(true);
+                closeModal();
             })
             .catch(error => {
                 console.log(error);
@@ -75,6 +78,7 @@ const DialogShopType = ({ rowData, buttonProp, setactionDone }) => {
             .then(response => {
                 console.log(response);
                 setactionDone(true);
+                closeModal();
             })
             .catch(error => {
                 console.log(error);
@@ -103,6 +107,7 @@ const DialogShopType = ({ rowData, buttonProp, setactionDone }) => {
     }
 
     const completeAction = () => {
+        setisLoadingSave(true);
         switch (buttonProp.mode) {
             case 1:
                 {
@@ -123,11 +128,10 @@ const DialogShopType = ({ rowData, buttonProp, setactionDone }) => {
             default:
                 { };
         }
-
-        closeModal();
     }
 
     useEffect(() => {
+        setisLoadingSave(false);
         if (rowData?.original) {
             setModalValue();
         }
@@ -161,7 +165,7 @@ const DialogShopType = ({ rowData, buttonProp, setactionDone }) => {
 
                 <EuiModalFooter>
                     <EuiButtonEmpty onClick={closeModal}>Cancel</EuiButtonEmpty>
-                    <EuiButton disabled={isSubmitError()} onClick={completeAction}>
+                    <EuiButton isLoading={isLoadingSave} disabled={isSubmitError()} onClick={completeAction}>
                         Save
                     </EuiButton>
                 </EuiModalFooter>
