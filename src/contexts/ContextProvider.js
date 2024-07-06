@@ -21,8 +21,8 @@ export const ContextProvider = ({ children }) => {
     const [token, setToken] = useState(localStorage.getItem("token"));
     const [userInfo, setuserInfo] = useState({});
     const [toasts, setToasts] = useState([]);
-    // const [localhostUrl, setlocalhostUrl] = useState('https://allinoneapi.alwaysdata.net');
-    const [localhostUrl, setlocalhostUrl] = useState('https://localhost:7069');
+    const [localhostUrl, setlocalhostUrl] = useState('https://allinoneapi.alwaysdata.net');
+    // const [localhostUrl, setlocalhostUrl] = useState('https://localhost:7069');
 
     const urlmember = `${localhostUrl}/Member`;
     const urllogin = `${urlmember}/loginV2`;
@@ -38,6 +38,8 @@ export const ContextProvider = ({ children }) => {
 
     //ds account
     const [urldsAccont, seturldsAccont] = useState(`${localhostUrl}/DSAccount`);
+    const urlgetDSAccounts = `${urldsAccont}/getDSAccounts`;
+    const urlgetDSAccountsByStatus = `${urldsAccont}/getDSAccountsByStatus`;
 
     //dsItem
     const [urlDSItem, seturlDSItem] = useState(`${localhostUrl}/DSItem`);

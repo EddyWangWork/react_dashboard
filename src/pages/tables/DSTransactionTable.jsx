@@ -139,7 +139,7 @@ const DSTransactionTable = () => {
                 setclDSAccountName([...new Set(activeAcc.map(q => q.name))]);
 
                 var cbData = [];
-                activeAcc.map((v) => {
+                activeAcc.filter(x => x.isActive == true).map((v) => {
                     cbData.push({ 'id': v.id, 'label': v.name })
                 })
 
@@ -353,45 +353,60 @@ const DSTransactionTable = () => {
                 header: 'Month',
                 filterVariant: 'select',
                 // filterSelectOptions: clDSTransMonth,
+                muiTableHeadCellProps: {
+                    align: 'center',
+                },
                 muiTableBodyCellProps: {
                     align: 'center',
                 },
-                size: 80
+                maxSize: 30
             },
             {
                 accessorFn: (row) => new Date(row.createdDateTimeDay), //convert to Date for sorting and filtering
                 accessorKey: 'createdDateTimeDay',
                 header: 'Date',
+                muiTableHeadCellProps: {
+                    align: 'center',
+                },
                 muiTableBodyCellProps: {
                     align: 'center',
                 },
                 filterVariant: 'date-range',
                 Cell: ({ cell }) => moment(cell.getValue()).format("YYYY/MM/DD"), //render Date as a string
-                size: 100,
+                maxSize: 30
             },
             {
                 accessorKey: 'dsItemName', //access nested data with dot notation
                 header: 'Name',
                 filterVariant: 'multi-select',
+                muiTableHeadCellProps: {
+                    align: 'center',
+                },
                 muiTableBodyCellProps: {
                     align: 'center',
                 },
-                size: 200
+                size: 100
             },
             {
                 accessorKey: 'description',
                 header: 'Description',
+                muiTableHeadCellProps: {
+                    align: 'center',
+                },
                 muiTableBodyCellProps: {
                     align: 'center',
                 },
-                size: 150,
+                size: 100,
             },
             {
                 accessorKey: 'amount',
                 header: 'Amount',
                 filterVariant: 'range',
                 filterFn: 'between',
-                size: 100,
+                size: 50,
+                muiTableHeadCellProps: {
+                    align: 'right',
+                },
                 muiTableBodyCellProps: {
                     align: 'right',
                 },
@@ -419,7 +434,12 @@ const DSTransactionTable = () => {
             {
                 accessorKey: 'balance',
                 header: 'Balance',
-                size: 80,
+                filterVariant: 'range',
+                filterFn: 'between',
+                size: 50,
+                muiTableHeadCellProps: {
+                    align: 'right',
+                },
                 muiTableBodyCellProps: {
                     align: 'right',
                 },
@@ -434,20 +454,26 @@ const DSTransactionTable = () => {
                 header: 'Type',
                 filterVariant: 'select',
                 filterFn: 'equals',
+                muiTableHeadCellProps: {
+                    align: 'center',
+                },
                 muiTableBodyCellProps: {
                     align: 'center',
                 },
-                size: 150,
+                size: 50,
             },
             {
                 accessorKey: 'dsAccountName', //dsAccountName
                 header: 'Account',
                 filterVariant: 'select',
                 filterSelectOptions: clDSAccountName,
+                muiTableHeadCellProps: {
+                    align: 'center',
+                },
                 muiTableBodyCellProps: {
                     align: 'center',
                 },
-                size: 150,
+                size: 50,
             },
         ],
         [clDSAccountName],
@@ -466,12 +492,12 @@ const DSTransactionTable = () => {
     const table = useMaterialReactTable({
         columns,
         data: dsTrans,
-        enableGrouping: true,
-        enableColumnResizing: true,
+        enableGrouping: false,
+        enableColumnResizing: false,
         enableFacetedValues: true,
         state: {
             isLoading: isLoadingData,
-            showColumnFilters: true
+            // showColumnFilters: true
         },
         initialState: {
             density: 'compact',
@@ -497,7 +523,8 @@ const DSTransactionTable = () => {
             {
                 return hasValue > 0 &&
                     <div href="#" className="block p-4 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700" >
-                        <div className='grid gap-2 grid-cols-5'>
+                        <div className='flex flex-row gap-4'>
+                            {/* <div className='grid gap-2 grid-cols-5'> */}
                             <div>
                                 <EuiComboBox
                                     aria-label="Accessible screen reader label"
@@ -534,6 +561,14 @@ const DSTransactionTable = () => {
                                     isClearable={false}
                                 />
                             </div>
+                            <div className='pt-1.5'>
+                                <DialogDSTransaction2
+                                    presetData={getPresetData}
+                                    buttonProp={{ mode: 1, iconType: 'plus', label: 'plus', color: 'accent', bColor: 'border-fuchsia-900/75' }}
+                                    setactionDone={setactionDone}
+                                    cbList={{ cbNames, cbTypes, cbAcc, cbAccTo }}
+                                />
+                            </div>
                         </div>
                     </div >
             }
@@ -554,7 +589,7 @@ const DSTransactionTable = () => {
     return (
         <div>
             <div>
-                <div className='pt-2'>
+                <div className='flex flex-col gap-2 pt-2'>
                     {ViewPreset()}
                     {viewPreset2()}
                 </div>

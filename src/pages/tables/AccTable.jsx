@@ -1,15 +1,12 @@
-import axios from 'axios';
 import {
-    Stack,
-    Box
-} from '@mui/material';
+    EuiButtonIcon,
+    EuiIcon
+} from '@elastic/eui';
+import axios from 'axios';
 import {
     MaterialReactTable,
     useMaterialReactTable,
 } from 'material-react-table';
-import {
-    EuiIcon
-} from '@elastic/eui';
 import moment from 'moment';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -24,6 +21,7 @@ const AccTable = () => {
 
     const [bankAccData, setBankAccData] = useState([]);
     const [isLoadingData, setisLoadingData] = useState(true);
+    const [isRefresh, setisRefresh] = useState(false);
 
     const [actionDone, setactionDone] = useState(false);
 
@@ -40,18 +38,10 @@ const AccTable = () => {
             .then((response) => {
                 console.log(response.data)
 
-                // response.data.map((data, index) => {
-                //     data.createdDateTime = new Date(data.createdDateTime);
-                // });
-
-                // var activeAcc = response.data.filter(x => x.isActive == true)
-                var activeAcc = response.data
-
-                const sortActiveAcc = activeAcc.sort((a, b) => b.balance - a.balance)
-                console.log(sortActiveAcc)
-
-                setBankAccData(sortActiveAcc)
+                setBankAccData(response.data)
                 setisLoadingData(false);
+
+                console.log(table);
             })
             .catch((err) => {
                 console.log(err);
@@ -65,7 +55,7 @@ const AccTable = () => {
     }
 
     const sumBalance = useMemo(
-        () => bankAccData.reduce((a, v) => a = a + v.balance, 0),
+        () => bankAccData.filter(x => x.isActive == true).reduce((a, v) => a = a + v.balance, 0),
         [bankAccData],
     );
 
@@ -74,6 +64,10 @@ const AccTable = () => {
             {
                 accessorKey: 'name', //access nested data with dot notation
                 header: 'Name',
+                // filterVariant: 'select',
+                muiTableHeadCellProps: {
+                    align: 'center',
+                },
                 muiTableBodyCellProps: {
                     align: 'center',
                 },
@@ -83,6 +77,9 @@ const AccTable = () => {
                 accessorKey: 'balance',
                 header: 'Balance',
                 size: 150,
+                muiTableHeadCellProps: {
+                    align: 'right',
+                },
                 muiTableBodyCellProps: {
                     align: 'right',
                 },
@@ -92,7 +89,8 @@ const AccTable = () => {
                     </div>
                 ),
                 Footer: () => (
-                    <div className='grid grid-cols-2 gap-4'>
+                    // <div className='grid grid-cols-2 gap-4'>
+                    <div className='flex justify-end gap-4'>
                         <div>
                             Sum
                         </div>
@@ -106,6 +104,9 @@ const AccTable = () => {
                 accessorFn: (row) => new Date(row.createdDateTime), //convert to Date for sorting and filtering
                 accessorKey: 'createdDateTime',
                 header: 'Last Update Date',
+                muiTableHeadCellProps: {
+                    align: 'center',
+                },
                 muiTableBodyCellProps: {
                     align: 'center',
                 },
@@ -115,10 +116,14 @@ const AccTable = () => {
             },
             {
                 accessorKey: 'isActive',
-                header: 'IsActive',
+                header: 'Status',
+                muiTableHeadCellProps: {
+                    align: 'center',
+                },
                 muiTableBodyCellProps: {
                     align: 'center',
                 },
+                filterVariant: 'checkbox',
                 Cell: ({ cell }) => (
                     <div className={`${cell.getValue() == true ? 'text-green-500' : 'text-red-500'}`}>
                         <EuiIcon type="dot" />
@@ -131,47 +136,68 @@ const AccTable = () => {
     );
 
     useEffect(() => {
+        setisRefresh(false);
         setactionDone(false);
+        setisLoadingData(true);
         getdsaccounts();
-    }, [actionDone]);
+    }, [actionDone, isRefresh]);
 
     const table = useMaterialReactTable({
         columns,
         data: bankAccData,
-        enableGrouping: true,
-        enableColumnResizing: true,
+        enableGrouping: false,
+        enableColumnResizing: false,
         state: {
             isLoading: isLoadingData, //cell skeletons and loading overlay
         },
         initialState: {
             density: 'compact',
+            columnFilters: [
+                {
+                    id: 'isActive',
+                    value: true,
+                },
+            ],
         },
-        // enableRowActions: true,
-        // displayColumnDefOptions: {
-        //     'mrt-row-actions': {
-        //         size: 80, //make actions column wider
-        //     },
-        // },
-        // renderRowActions: ({ row, table }) => (
-        //     <div className='grid gap-2 grid-cols-2'>
-        //         <DialogDSAccount2
-        //             rowData={row}
-        //             buttonProp={{ mode: 2, iconType: 'wrench', label: 'wrench', color: 'primary', bColor: 'border-indigo-500/75' }}
-        //             setactionDone={setactionDone}
-        //         />
-        //         <DialogDSAccount2
-        //             rowData={row}
-        //             buttonProp={{ mode: 3, iconType: 'error', label: 'error', color: 'danger', bColor: 'border-rose-400/75' }}
-        //             setactionDone={setactionDone}
-        //         />
-        //     </div>
-        // ),
-        // renderTopToolbarCustomActions: ({ table }) => (
-        //     <DialogDSAccount2
-        //         buttonProp={{ mode: 1, iconType: 'plus', label: 'plus', color: 'accent', bColor: 'border-fuchsia-900/75' }}
-        //         setactionDone={setactionDone}
-        //     />
-        // ),
+        enableRowActions: true,
+        displayColumnDefOptions: {
+            'mrt-row-actions': {
+                size: 80, //make actions column wider
+            },
+        },
+        renderRowActions: ({ row, table }) => (
+            <div className='flex flex-row gap-2'>
+                <DialogDSAccount2
+                    rowData={row}
+                    buttonProp={{ mode: 2, iconType: 'wrench', label: 'wrench', color: 'primary', bColor: 'border-indigo-500/75' }}
+                    setactionDone={setactionDone}
+                />
+                <DialogDSAccount2
+                    rowData={row}
+                    buttonProp={{ mode: 3, iconType: 'error', label: 'error', color: 'danger', bColor: 'border-rose-400/75' }}
+                    setactionDone={setactionDone}
+                />
+            </div>
+        ),
+        renderTopToolbarCustomActions: ({ table }) => (
+            <div className='flex flex-row gap-2'>
+                <div>
+                    <DialogDSAccount2
+                        buttonProp={{ mode: 1, iconType: 'plus', label: 'plus', color: 'accent', bColor: 'border-fuchsia-900/75' }}
+                        setactionDone={setactionDone}
+                    />
+                </div>
+                <div>
+                    <EuiButtonIcon
+                        display="base"
+                        iconType='refresh'
+                        aria-label='refresh'
+                        color='success'
+                        onClick={() => { setisRefresh(true) }}
+                    />
+                </div>
+            </div>
+        ),
     });
 
     return (
