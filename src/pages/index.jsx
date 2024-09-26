@@ -1,3 +1,4 @@
+export { default as Home } from './Home';
 export { default as Ecommerce } from './Ecommerce';
 export { default as Ecommerce2 } from './Ecommerce2';
 export { default as Ecommerce3 } from './Ecommerce3';
@@ -22,6 +23,7 @@ export { default as ModalTodolist } from './ModalTodolist';
 export { default as DialogTodolistsDone } from './DialogTodolistsDone';
 export { default as Login } from './Login';
 export { default as LoginV2 } from './login/LoginV2';
+export { default as LoginV3 } from './login/LoginV3';
 export { default as Dashboard } from './Dashboard';
 export { default as Transaction } from './Transaction';
 export { default as DSItems } from './DSItems';

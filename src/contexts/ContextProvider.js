@@ -22,6 +22,9 @@ export const ContextProvider = ({ children }) => {
     const [userInfo, setuserInfo] = useState({});
     const [toasts, setToasts] = useState([]);
     const [localhostUrl, setlocalhostUrl] = useState('https://allinoneapi.alwaysdata.net');
+    const screenSizeBody = activeMenu ? screenSize - 275 : screenSize;
+    const isSmallScreen = screenSize <= 500;
+    const isScreenLess900 = screenSize <= 900;
     // const [localhostUrl, setlocalhostUrl] = useState('https://localhost:7069');
 
     const urlmember = `${localhostUrl}/Member`;
@@ -105,6 +108,9 @@ export const ContextProvider = ({ children }) => {
     const [dsTransactions, setdsTransactions] = useState(JSON.parse(localStorage.getItem("transactions")));
     const [dsTrans, setdsTrans] = useState([]);
     const [dsTransError, setdsTransError] = useState(null);
+    const getDSTransactionV2Req = {
+        dataLimit: 0
+    }
 
     const setMode = (e) => {
         setCurrentMode(e.target.value);
@@ -133,7 +139,7 @@ export const ContextProvider = ({ children }) => {
 
     const getdstransactions = () => {
         axios
-            .get(`${urlgetDSTransactionV2}`, {
+            .post(`${urlgetDSTransactionV2}`, getDSTransactionV2Req, {
                 headers: {
                     'Authorization': token,
                     'Content-Type': 'application/json'
@@ -150,10 +156,12 @@ export const ContextProvider = ({ children }) => {
                 setdsTransError(null);
             })
             .catch((err) => {
-                console.log(token);
                 console.log(err);
                 console.log(err.response.status);
-                setdsTransError(err.response.status);
+                if (err.response.status == 401) {
+                    handleClearToken();
+                    addToastHandler(getToastReq(3, `Token Expired!`, ['Please re-login']));
+                }
             });
     }
 
@@ -187,7 +195,7 @@ export const ContextProvider = ({ children }) => {
             isClicked,
             setIsClicked,
             handleClicked,
-            screenSize, setScreenSize,
+            screenSize, setScreenSize, screenSizeBody, isSmallScreen, isScreenLess900,
             currentColor, currentMode,
             themeSettings, setThemeSettings,
             setMode,

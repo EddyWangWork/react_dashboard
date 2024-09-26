@@ -13,12 +13,14 @@ import {
     ColorMapping,
     ColorPicker,
     Customers,
+    Home,
     Ecommerce, Ecommerce2, Ecommerce3,
     Editor,
     Employees,
     Financial,
     Kanban, Kanban2, Line,
     LoginV2,
+    LoginV3,
     Orders,
     Pie,
     Pyramid,
@@ -39,8 +41,10 @@ const Dashboard = () => {
 
     const {
         activeMenu, themeSettings, setThemeSettings, currentColor, currentMode, isLogin, token, handleLogin,
-        toasts, removeToast
+        toasts, removeToast, screenSize, setScreenSize
     } = useStateContext();
+
+    const ssLess800 = screenSize <= 800;
 
     const ViewToast = useMemo(
         () => {
@@ -57,10 +61,39 @@ const Dashboard = () => {
         if (token) {
             handleLogin();
         }
+
+        // const handleResize = () => setScreenSize(window.innerWidth);
+        // window.addEventListener('resize', handleResize);
+        // handleResize();
+        // return () => window.removeEventListener('resize', handleResize);
+
     }, [token]);
+
+    const getScale = () => {
+        switch (true) {
+            case screenSize <= 940:
+                return 'scale-75'
+            case (screenSize > 940 && screenSize <= 1100):
+                return 'scale-90'
+            case (screenSize > 1100 && screenSize <= 1200):
+                return 'scale-85'
+            default:
+                return 'display'
+        }
+    }
 
     const getDashboard = () => (
         <div>
+            {/* {
+                !token && <div>
+                    <div className={ssLess800 ? 'hidden' : `${getScale()} w-0`}>
+                        <LoginV2 />
+                    </div>
+                    <div className={!ssLess800 ? 'hidden' : 'display'}>
+                        <LoginV3 />
+                    </div>
+                </div>
+            } */}
             {
                 !token && <LoginV2 />
             }
@@ -121,6 +154,7 @@ const Dashboard = () => {
                             <Routes>
                                 {/* dashboard  */}
                                 <Route path="/" element={<Todolists />} />
+                                <Route path="/home" element={(<Home />)} />
                                 <Route path="/ecommerce" element={(<Ecommerce />)} />
                                 <Route path="/ecommerce2" element={(<Ecommerce2 />)} />
                                 <Route path="/ecommerce3" element={(<Ecommerce3 />)} />

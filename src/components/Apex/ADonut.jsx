@@ -13,7 +13,7 @@ import { useStateContext } from '../../contexts/ContextProvider';
 
 function ADonut() {
 
-    const { handleClearToken, token, dsTrans, urlgetDSMonthlyExpenses } = useStateContext();
+    const { handleClearToken, token, dsTrans, urlgetDSMonthlyExpenses, screenSize, activeMenu } = useStateContext();
 
     const [dsMonthlyExpenses, setdsMonthlyExpenses] = useState([]);
     const [options, setoptions] = useState([]);
@@ -148,7 +148,7 @@ function ADonut() {
                             options={chartOptions.options}
                             series={chartOptions.options.series}
                             type="donut"
-                            width="500"
+                            width={!activeMenu ? (screenSize - 120) : (screenSize - 600)}
                         />
                     </div>
                 </EuiText>

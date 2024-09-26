@@ -23,6 +23,7 @@ import { useStateContext } from '../contexts/ContextProvider';
 const Ecommerce3 = () => {
 
     const {
+        screenSize, screenSizeBody,
         handleClearToken, token,
         urlTodolist, //todolist
         urlgetDSMonthlyPeriodCreditDebit, urlgetDSMonthlyItemExpenses, urlgetDSMonthlyCommitmentAndOther
@@ -38,6 +39,8 @@ const Ecommerce3 = () => {
     const [dataMonthlyExpenses, setdataMonthlyExpenses] = useState({});
     const [dataCommitmentAndOther, setdataCommitmentAndOther] = useState({});
     const [dataTodolist, setdataTodolist] = useState([]);
+
+    const isSmallScreen = screenSize <= 470;
 
     const query = `year=${date.year()}&month=${date.month() + 1}&monthDuration=${period}`
     const queryByItem = `name=commitment&year=${date.year()}&month=${date.month() + 1}`
@@ -180,7 +183,7 @@ const Ecommerce3 = () => {
     const ViewSummarySection = () => useMemo(
         () => {
             return dataMonthlyPeriod.length > 0 && <EuiPanel hasBorder={true}>
-                <div className='flex flex-row gap-2'>
+                <div className={`${isSmallScreen ? 'flex flex-col' : 'flex flex-row'} gap-2`}>
                     {summaryCards()}
                 </div>
             </EuiPanel>
@@ -225,7 +228,7 @@ const Ecommerce3 = () => {
         () => {
             return dataMonthlyCurrent && dataMonthlyExpenses != {} && <div>
                 <EuiPanel hasBorder={true}>
-                    <div className='flex flex-row gap-20'>
+                    <div className={`${isSmallScreen ? 'flex flex-col gap-7' : 'flex flex-row gap-10'}`}>
                         {statCredit()}
                         {statDebit()}
                         {statCommitment()}
@@ -239,6 +242,7 @@ const Ecommerce3 = () => {
     const statCredit = () => (
         <EuiStat
             title={dataMonthlyCurrent.credit?.toLocaleString()}
+            titleSize='s'
             description=
             {
                 <span className='text-[#22c55e]'>Credit</span>
@@ -256,6 +260,7 @@ const Ecommerce3 = () => {
     const statDebit = () => (
         <EuiStat
             title={dataMonthlyCurrent.debit?.toLocaleString()}
+            titleSize='s'
             description=
             {
                 <span className='text-[#ef4444]'>Debit</span>
@@ -275,6 +280,7 @@ const Ecommerce3 = () => {
 
         return dataMonthlyExpensesCommitment && <EuiStat
             title={dataMonthlyExpensesCommitment.amount?.toLocaleString()}
+            titleSize='s'
             description=
             {
                 <span className='text-[#ef4444]'>Commitment</span>
@@ -291,9 +297,10 @@ const Ecommerce3 = () => {
 
     const ViewStatSectionItemExpensesAmount = () => useMemo(
         () => {
-            return dataMonthlyExpenses?.dsMonthlyItems?.length > 0 && <div className='grid grid-cols-3 gap-2'>
-                {statItemExpensesAmount()}
-            </div>
+            return dataMonthlyExpenses?.dsMonthlyItems?.length > 0 &&
+                <div className={`${getClassGrid2()} gap-2`}>
+                    {statItemExpensesAmount()}
+                </div>
         },
         [dataMonthlyExpenses],
     );
@@ -336,7 +343,7 @@ const Ecommerce3 = () => {
 
     const ViewStatSectionItemExpenses = () => useMemo(
         () => {
-            return dataMonthlyExpenses?.dsMonthlyItems?.length > 0 && <div className='grid grid-cols-3 gap-2'>
+            return dataMonthlyExpenses?.dsMonthlyItems?.length > 0 && <div className={`${getClassGrid2()} gap-2`}>
                 {statItemExpenses()}
             </div>
         },
@@ -348,6 +355,7 @@ const Ecommerce3 = () => {
             <EuiPanel hasBorder={true}>
                 <EuiStat
                     title={removeMinus(v.diff.toLocaleString())}
+                    titleSize='s'
                     description={v.itemName}
                     textAlign="left"
                 >
@@ -363,7 +371,7 @@ const Ecommerce3 = () => {
 
     const ViewStatSectionSubItemExpenses = () => useMemo(
         () => {
-            return dataMonthlyExpenses?.dsMonthlySubItems?.length > 0 && <div className='grid grid-cols-3 gap-2'>
+            return dataMonthlyExpenses?.dsMonthlySubItems?.length > 0 && <div className={`${getClassGrid2()} gap-2`}>
                 {statSubItemExpenses()}
             </div>
         },
@@ -375,6 +383,7 @@ const Ecommerce3 = () => {
             <EuiPanel hasBorder={true}>
                 <EuiStat
                     title={removeMinus(v.diff.toLocaleString())}
+                    titleSize='s'
                     description={v.itemName}
                     textAlign="left"
                 >
@@ -390,7 +399,7 @@ const Ecommerce3 = () => {
 
     const ViewCardTableSection = () => useMemo(
         () => {
-            return dataCommitmentAndOther?.items?.length > 0 && <div className='grid grid-cols-2 gap-2'>
+            return dataCommitmentAndOther?.items?.length > 0 && <div className={`${screenSizeBody >= 900 ? 'grid grid-cols-2' : 'grid grid-cols'} gap-2`}>
                 {cardCommitment()}
                 {cardCommitmentOther()}
                 {cardTodo()}
@@ -508,15 +517,43 @@ const Ecommerce3 = () => {
             return '#ef4444'
     }
 
+    const getClassGrid = () => {
+        console.log(screenSizeBody)
+        switch (true) {
+            case screenSizeBody >= 1475:
+                return 'grid grid-cols-3'
+            case screenSizeBody >= 975:
+                return 'grid grid-cols-2'
+            default:
+                return 'grid grid-cols'
+        }
+    }
+
+    const getClassGrid2 = () => {
+        console.log(screenSizeBody)
+        switch (true) {
+            case screenSizeBody >= 1000:
+                return 'grid grid-cols-3'
+            case screenSizeBody >= 500:
+                return 'grid grid-cols-2'
+            default:
+                return 'grid grid-cols'
+        }
+    }
+
     const columnsCommitment = [
         {
             field: 'itemName',
             name: 'Name',
             align: 'center',
             truncateText: true,
+            width: '100%',
             mobileOptions: {
-                show: false,
-                align: 'center'
+                header: false,
+                enlarge: true,
+                render: (dataList) => {
+                    return <span>{`${dataList.itemName}  ${dataList.desc != '' ? `(${dataList.desc})` : ``}`}</span>
+                }
             },
         },
         {
@@ -524,9 +561,9 @@ const Ecommerce3 = () => {
             name: 'Desc',
             align: 'center',
             truncateText: true,
+            width: '100%',
             mobileOptions: {
-                show: false,
-                align: 'center'
+                show: false
             },
         },
         {
@@ -534,17 +571,14 @@ const Ecommerce3 = () => {
             name: 'Amount',
             align: 'center',
             truncateText: true,
+            width: '100%',
             render: (amount) =>
                 amount.toFixed(2),
             footer: (data) => {
                 return (
                     <span>{data.items.reduce((a, b) => a + b.amount, 0).toLocaleString()}</span>
                 );
-            },
-            mobileOptions: {
-                show: false,
-                align: 'right'
-            },
+            }
         },
     ]
 
@@ -554,26 +588,27 @@ const Ecommerce3 = () => {
             name: 'Name',
             align: 'center',
             truncateText: true,
+            width: '100%',
             mobileOptions: {
-                show: false,
-                align: 'center'
-            },
+                header: false,
+                enlarge: true,
+            }
         },
         {
             field: 'amount',
             name: 'Amount',
             align: 'center',
             truncateText: true,
+            width: '100%',
+            mobileOptions: {
+                // header: false,
+            },
             render: (amount) =>
                 amount.toFixed(2),
             footer: (asd) => {
                 return (
                     <span>{asd.items.reduce((a, b) => a + b.amount, 0).toLocaleString()}</span>
                 );
-            },
-            mobileOptions: {
-                show: false,
-                align: 'right'
             },
         },
     ]
@@ -583,16 +618,22 @@ const Ecommerce3 = () => {
             field: 'itemName',
             name: 'Name',
             truncateText: true,
+            width: '100%',
             mobileOptions: {
-                show: false,
+                header: false,
+                enlarge: true,
+                render: (dataList) => {
+                    return <span>{`${dataList.itemName}  ${dataList.desc != '' ? `(${dataList.desc})` : ``}`}</span>
+                }
             },
         },
         {
             field: 'desc',
             name: 'Desc',
             truncateText: true,
+            width: '100%',
             mobileOptions: {
-                show: false,
+                show: false
             },
         },
         {
@@ -600,17 +641,14 @@ const Ecommerce3 = () => {
             name: 'Amount',
             align: 'center',
             truncateText: true,
+            width: '100%',
             render: (amount) =>
                 amount.toFixed(2),
             footer: (asd) => {
                 return (
                     <span>{asd.items.reduce((a, b) => a + b.amount, 0).toLocaleString()}</span>
                 );
-            },
-            mobileOptions: {
-                show: false,
-                align: 'right'
-            },
+            }
         }
     ]
 
@@ -659,8 +697,7 @@ const Ecommerce3 = () => {
     return (
         <div className='dark:bg-secondary-dark-bg m-2 md:m-10 mt-24 p-2 md:p-10 rounded-3xl'>
             <Header category='Page' title='Dashboard' />
-
-            <div className='flex flex-col'>
+            <div className='flex flex-col justify-center'>
                 <EuiPanel>
                     {selectionSection()}
                 </EuiPanel>

@@ -13,7 +13,7 @@ import { useStateContext } from '../../contexts/ContextProvider';
 function ALine2() {
 
     const {
-        handleClearToken, token, dsTrans, urlgetDSYearExpenses
+        handleClearToken, token, dsTrans, urlgetDSYearExpenses, screenSize, activeMenu
     } = useStateContext();
 
     const [dsYearExpensesItems, setdsYearExpensesItems] = useState([]);
@@ -156,7 +156,7 @@ function ALine2() {
                     options={chartOptions.options}
                     series={chartOptions.options.series}
                     type="line"
-                    width="750"
+                    width={!activeMenu ? (screenSize - 120) : (screenSize - 600)}
                 />
             </div>
         </EuiCard>

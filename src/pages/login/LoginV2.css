@@ -34,7 +34,7 @@
     overflow: hidden;
 }
 
-@media (max-width: 1200px) {
+/* @media (max-width: 1200px) {
     .main {
         transform: scale(0.7);
     }
@@ -56,7 +56,7 @@
     .main {
         transform: scale(0.4);
     }
-}
+} */
 
 .container {
     display: flex;

@@ -12,7 +12,7 @@ import { useStateContext } from '../../contexts/ContextProvider';
 
 function ABar() {
 
-    const { handleClearToken, token, dsTrans, urlgetDSYearCreditDebitDiff } = useStateContext();
+    const { handleClearToken, token, dsTrans, urlgetDSYearCreditDebitDiff, screenSize, activeMenu } = useStateContext();
 
     const [dsYearCreditDebitDiff, setdsYearCreditDebitDiff] = useState([]);
     const [options, setoptions] = useState([]);
@@ -138,7 +138,7 @@ function ABar() {
                         options={chartOptions.options}
                         series={chartOptions.options.series}
                         type="bar"
-                        width="750"
+                        width={!activeMenu ? (screenSize - 120) : (screenSize - 600)}
                     />
                 </div>
             </EuiCard>

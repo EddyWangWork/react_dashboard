@@ -10,11 +10,11 @@ const Ecommerce2 = () => {
     }, []);
 
     return (
-        <div class="grid grid-cols-2 gap-5 py-5">
-            <div class="pl-1 pr-1 col-span-2"><ALine2 /></div>
-            <div class="pl-1 pr-1 col-span-2"><ABar /></div>
-            <div class="pl-1 pr-1 col-span-2"><ADonut /></div>
-            <div class="pl-1 pr-1 col-span-2"><ALine /></div>
+        <div class="flex flex-wrap justify-center gap-5">
+            <div className='pt-14'><ALine2 /></div>
+            <div><ABar /></div>
+            <div><ADonut /></div>
+            <div><ALine /></div>
         </div>
     )
 }
