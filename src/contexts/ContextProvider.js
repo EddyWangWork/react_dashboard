@@ -171,9 +171,11 @@ export const ContextProvider = ({ children }) => {
     };
 
     const removeToast = (removedToast) => {
-        setToasts((toasts) =>
-            toasts.filter((toast) => toast.id !== removedToast.id)
-        );
+        // setToasts((toasts) =>
+        //     toasts.filter((toast) => toast.id != removedToast.id)
+        // );
+        toasts.shift();
+        setToasts(toasts);
     };
 
     //1:success, 2:warning, 3:error
